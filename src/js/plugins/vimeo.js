@@ -113,7 +113,7 @@ const vimeo = {
       autoplay: player.autoplay,
       muted: player.muted,
       gesture: 'media',
-      playsinline: !this.config.fullscreen.iosNative,
+      playsinline: player.config.playsinline,
       // hash has to be added to iframe-URL
       ...hashParam,
       ...frameParams,

@@ -98,9 +98,6 @@ const ui = {
     // Check for airplay support
     toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
 
-    // Add iOS class
-    toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
-
     // Add touch class
     toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
 

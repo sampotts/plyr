@@ -67,7 +67,7 @@ export function createElement(type, attributes, text) {
   return element;
 }
 
-// Inaert an element after another
+// Insert an element after another
 export function insertAfter(element, target) {
   if (!is.element(element) || !is.element(target)) {
     return;

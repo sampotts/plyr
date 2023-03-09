@@ -246,7 +246,7 @@ class Plyr {
     }
 
     // Check for support again but with type
-    this.supported = support.check(this.type, this.provider, this.config.playsinline);
+    this.supported = support.check(this.type, this.provider);
 
     // If no support for even API, bail
     if (!this.supported.api) {
@@ -1032,7 +1032,7 @@ class Plyr {
   }
 
   /**
-   * Sets the preview thubmnails for the current source
+   * Sets the preview thumbnails for the current source
    */
   setPreviewThumbnails(thumbnailSource) {
     if (this.previewThumbnails && this.previewThumbnails.loaded) {
@@ -1239,10 +1239,9 @@ class Plyr {
    * Check for support
    * @param {String} type - Player type (audio/video)
    * @param {String} provider - Provider (html5/youtube/vimeo)
-   * @param {Boolean} inline - Where player has `playsinline` sttribute
    */
-  static supported(type, provider, inline) {
-    return support.check(type, provider, inline);
+  static supported(type, provider) {
+    return support.check(type, provider);
   }
 
   /**

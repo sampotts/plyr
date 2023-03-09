@@ -797,7 +797,7 @@ class Listeners {
     });
 
     // Polyfill for lower fill in <input type="range"> for webkit
-    if (browser.isWebkit) {
+    if (browser.isWebKit) {
       Array.from(getElements.call(player, 'input[type="range"]')).forEach((element) => {
         this.bind(element, 'input', (event) => controls.updateRangeFill.call(player, event.target));
       });

@@ -131,7 +131,7 @@ const youtube = {
       const posterSrc = (s) => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
 
       // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
-      loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
+      loadImage(posterSrc('maxres'), 121) // Highest quality and un-padded
         .catch(() => loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
         .catch(() => loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
         .then((image) => ui.setPoster.call(player, image.src))
@@ -161,7 +161,7 @@ const youtube = {
           // Disable keyboard as we handle it
           disablekb: 1,
           // Allow iOS inline playback
-          playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
+          playsinline: player.config.playsinline && !player.config.fullscreen.iosNative ? 1 : 0,
           // Captions are flaky on YouTube
           cc_load_policy: player.captions.active ? 1 : 0,
           cc_lang_pref: player.config.captions.language,
@@ -183,7 +183,7 @@ const youtube = {
                 100: 'The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.',
                 101: 'The owner of the requested video does not allow it to be played in embedded players.',
                 150: 'The owner of the requested video does not allow it to be played in embedded players.',
-              }[code] || 'An unknown error occured';
+              }[code] || 'An unknown error occurred';
 
             player.media.error = { code, message };
 

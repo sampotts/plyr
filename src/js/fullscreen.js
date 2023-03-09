@@ -57,12 +57,10 @@ class Fullscreen {
 
     // Update the UI
     this.update();
-
-    // this.toggle = this.toggle.bind(this);
   }
 
   // Determine if native supported
-  static get native() {
+  static get nativeSupported() {
     return !!(
       document.fullscreenEnabled ||
       document.webkitFullscreenEnabled ||
@@ -72,16 +70,14 @@ class Fullscreen {
   }
 
   // If we're actually using native
-  get usingNative() {
-    return Fullscreen.native && !this.forceFallback;
+  get useNative() {
+    return Fullscreen.nativeSupported && !this.forceFallback;
   }
 
   // Get the prefix for handlers
   static get prefix() {
     // No prefix
-    if (is.function(document.exitFullscreen)) {
-      return '';
-    }
+    if (is.function(document.exitFullscreen)) return '';
 
     // Check for fullscreen support by vendor prefix
     let value = '';
@@ -103,24 +99,30 @@ class Fullscreen {
     return this.prefix === 'moz' ? 'FullScreen' : 'Fullscreen';
   }
 
-  // Determine if fullscreen is enabled
-  get enabled() {
-    return (
-      (Fullscreen.native || this.player.config.fullscreen.fallback) &&
-      this.player.config.fullscreen.enabled &&
-      this.player.supported.ui &&
-      this.player.isVideo
-    );
+  // Determine if fullscreen is supported
+  get supported() {
+    return [
+      // Fullscreen is enabled in config
+      this.player.config.fullscreen.enabled,
+      // Must be a video
+      this.player.isVideo,
+      // Either native is supported or fallback enabled
+      Fullscreen.nativeSupported || this.player.config.fullscreen.fallback,
+      // YouTube has no way to trigger fullscreen, so on devices with no native support, playsinline
+      // must be enabled and iosNative fullscreen must be disabled to offer the fullscreen fallback
+      !this.player.isYouTube ||
+        Fullscreen.nativeSupported ||
+        !browser.isIos ||
+        (this.player.config.playsinline && !this.player.config.fullscreen.iosNative),
+    ].every(Boolean);
   }
 
   // Get active state
   get active() {
-    if (!this.enabled) {
-      return false;
-    }
+    if (!this.supported) return false;
 
     // Fallback using classname
-    if (!Fullscreen.native || this.forceFallback) {
+    if (!Fullscreen.nativeSupported || this.forceFallback) {
       return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
     }
 
@@ -135,13 +137,11 @@ class Fullscreen {
   get target() {
     return browser.isIos && this.player.config.fullscreen.iosNative
       ? this.player.media
-      : this.player.elements.fullscreen || this.player.elements.container;
+      : this.player.elements.fullscreen ?? this.player.elements.container;
   }
 
   onChange = () => {
-    if (!this.enabled) {
-      return;
-    }
+    if (!this.supported) return;
 
     // Update toggle button
     const button = this.player.elements.buttons.fullscreen;
@@ -159,8 +159,8 @@ class Fullscreen {
     // Store or restore scroll position
     if (toggle) {
       this.scrollPosition = {
-        x: window.scrollX || 0,
-        y: window.scrollY || 0,
+        x: window.scrollX ?? 0,
+        y: window.scrollY ?? 0,
       };
     } else {
       window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
@@ -188,10 +188,7 @@ class Fullscreen {
 
       if (toggle) {
         this.cleanupViewport = !hasProperty;
-
-        if (!hasProperty) {
-          viewport.content += `,${property}`;
-        }
+        if (!hasProperty) viewport.content += `,${property}`;
       } else if (this.cleanupViewport) {
         viewport.content = viewport.content
           .split(',')
@@ -206,10 +203,8 @@ class Fullscreen {
 
   // Trap focus inside container
   trapFocus = (event) => {
-    // Bail if iOS, not active, not the tab key
-    if (browser.isIos || !this.active || event.key !== 'Tab') {
-      return;
-    }
+    // Bail if iOS/iPadOS, not active, not the tab key
+    if (browser.isIos || browser.isIPadOS || !this.active || event.key !== 'Tab') return;
 
     // Get the current focused element
     const focused = document.activeElement;
@@ -230,16 +225,12 @@ class Fullscreen {
 
   // Update UI
   update = () => {
-    if (this.enabled) {
+    if (this.supported) {
       let mode;
 
-      if (this.forceFallback) {
-        mode = 'Fallback (forced)';
-      } else if (Fullscreen.native) {
-        mode = 'Native';
-      } else {
-        mode = 'Fallback';
-      }
+      if (this.forceFallback) mode = 'Fallback (forced)';
+      else if (Fullscreen.nativeSupported) mode = 'Native';
+      else mode = 'Fallback';
 
       this.player.debug.log(`${mode} fullscreen enabled`);
     } else {
@@ -247,14 +238,12 @@ class Fullscreen {
     }
 
     // Add styling hook to show button
-    toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
+    toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.supported);
   };
 
   // Make an element fullscreen
   enter = () => {
-    if (!this.enabled) {
-      return;
-    }
+    if (!this.supported) return;
 
     // iOS native fullscreen doesn't need the request step
     if (browser.isIos && this.player.config.fullscreen.iosNative) {
@@ -263,7 +252,7 @@ class Fullscreen {
       } else {
         this.target.webkitEnterFullscreen();
       }
-    } else if (!Fullscreen.native || this.forceFallback) {
+    } else if (!Fullscreen.nativeSupported || this.forceFallback) {
       this.toggleFallback(true);
     } else if (!this.prefix) {
       this.target.requestFullscreen({ navigationUI: 'hide' });
@@ -274,15 +263,17 @@ class Fullscreen {
 
   // Bail from fullscreen
   exit = () => {
-    if (!this.enabled) {
-      return;
-    }
+    if (!this.supported) return;
 
     // iOS native fullscreen
     if (browser.isIos && this.player.config.fullscreen.iosNative) {
-      this.target.webkitExitFullscreen();
+      if (this.player.isVimeo) {
+        this.player.embed.exitFullscreen();
+      } else {
+        this.target.webkitEnterFullscreen();
+      }
       silencePromise(this.player.play());
-    } else if (!Fullscreen.native || this.forceFallback) {
+    } else if (!Fullscreen.nativeSupported || this.forceFallback) {
       this.toggleFallback(false);
     } else if (!this.prefix) {
       (document.cancelFullScreen || document.exitFullscreen).call(document);
@@ -294,11 +285,8 @@ class Fullscreen {
 
   // Toggle state
   toggle = () => {
-    if (!this.active) {
-      this.enter();
-    } else {
-      this.exit();
-    }
+    if (!this.active) this.enter();
+    else this.exit();
   };
 }
 

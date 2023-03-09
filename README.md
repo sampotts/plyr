@@ -32,7 +32,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 - 🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
 - 💁‍♀️ **Sass** - to include in your build processes
 
-### Demos
+## Demos
 
 You can try Plyr in Codepen using our minimal templates: [HTML5 video](https://codepen.io/pen?template=bKeqpr), [HTML5 audio](https://codepen.io/pen?template=rKLywR), [YouTube](https://codepen.io/pen?template=GGqbbJ), [Vimeo](https://codepen.io/pen?template=bKeXNq). For Streaming we also have example integrations with: [Dash.js](https://codepen.io/pen?template=GRoogML), [Hls.js](https://codepen.io/pen?template=oyLKQb) and [Shaka Player](https://codepen.io/pen?template=ZRpzZO)
 
@@ -117,7 +117,7 @@ Or the `<div>` non progressively enhanced method:
 
 You can use Plyr as an ES6 module as follows:
 
-```javascript
+```js
 import Plyr from 'plyr';
 
 const player = new Plyr('#player');
@@ -132,7 +132,7 @@ Alternatively you can include the `plyr.js` script before the closing `</body>` 
 </script>
 ```
 
-See [initialising](#initialising) for more information on advanced setups.
+See [initialising](#initializing) for more information on advanced setups.
 
 You can use our CDN (provided by [Cloudflare](https://www.cloudflare.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills separately as part of your application but to make life easier you can use the polyfilled build.
 
@@ -310,7 +310,7 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 ## JavaScript
 
-### Initialising
+### Initializing
 
 You can specify a range of arguments for the constructor to use:
 
@@ -324,17 +324,17 @@ _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element
 
 Passing a CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector):
 
-```javascript
+```js
 const player = new Plyr('#player');
 ```
 
 Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement):
 
-```javascript
+```js
 const player = new Plyr(document.getElementById('player'));
 ```
 
-```javascript
+```js
 const player = new Plyr(document.querySelector('.js-player'));
 ```
 
@@ -344,13 +344,13 @@ The HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<
 
 You have two choices here. You can either use a simple array loop to map the constructor:
 
-```javascript
+```js
 const players = Array.from(document.querySelectorAll('.js-player')).map((p) => new Plyr(p));
 ```
 
 ...or use a static method where you can pass a [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
 
-```javascript
+```js
 const players = Plyr.setup('.js-player');
 ```
 
@@ -360,7 +360,7 @@ Both options will also return an array of instances in the order of they were in
 
 The second argument for the constructor is the [options](#options) object:
 
-```javascript
+```js
 const player = new Plyr('#player', {
   title: 'Example Title',
 });
@@ -374,54 +374,60 @@ Options can be passed as an object to the constructor as above or as JSON in `da
 
 Note the single quotes encapsulating the JSON and double quotes on the object keys. Only string values need double quotes.
 
-| Option               | Type                       | Default                                                                                                                        | Description                                                                                                                                                                                                                                                                                                                                                                                             |
-| -------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `enabled`            | Boolean                    | `true`                                                                                                                         | Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.                                                                                                                                                                                                                                           |
-| `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                                                            |
-| `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [CONTROLS.md](CONTROLS.md) for more info on how the html needs to be structured.                                  |
-| `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                                    |
-| `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                         |
-| `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                   |
-| `iconUrl`            | String                     | `null`                                                                                                                         | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                                                     |
-| `iconPrefix`         | String                     | `plyr`                                                                                                                         | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.                                                                                                                                                                  |
-| `blankVideo`         | String                     | `https://cdn.plyr.io/static/blank.mp4`                                                                                         | Specify a URL or path to a blank video file used to properly cancel network requests.                                                                                                                                                                                                                                                                                                                   |
-| `autoplay`&sup2;     | Boolean                    | `false`                                                                                                                        | Autoplay the media on load. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                                                                                                                         |
-| `autopause`&sup1;    | Boolean                    | `true`                                                                                                                         | Only allow one player playing at once.                                                                                                                                                                                                                                                                                                                                                                  |
-| `seekTime`           | Number                     | `10`                                                                                                                           | The time, in seconds, to seek when a user hits fast forward or rewind.                                                                                                                                                                                                                                                                                                                                  |
-| `volume`             | Number                     | `1`                                                                                                                            | A number, between 0 and 1, representing the initial volume of the player.                                                                                                                                                                                                                                                                                                                               |
-| `muted`              | Boolean                    | `false`                                                                                                                        | Whether to start playback muted. If the `muted` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                                                                                                                       |
-| `clickToPlay`        | Boolean                    | `true`                                                                                                                         | Click (or tap) of the video container will toggle play/pause.                                                                                                                                                                                                                                                                                                                                           |
-| `disableContextMenu` | Boolean                    | `true`                                                                                                                         | Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.                                                                                                                                                                                                                                                                                       |
-| `hideControls`       | Boolean                    | `true`                                                                                                                         | Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.                                                                                                                              |
-| `resetOnEnd`         | Boolean                    | false                                                                                                                          | Reset the playback to the start once playback is complete.                                                                                                                                                                                                                                                                                                                                              |
-| `keyboard`           | Object                     | `{ focused: true, global: false }`                                                                                             | Enable [keyboard shortcuts](#shortcuts) for focused players only or globally                                                                                                                                                                                                                                                                                                                            |
-| `tooltips`           | Object                     | `{ controls: false, seek: true }`                                                                                              | `controls`: Display control labels as tooltips on `:hover` & `:focus` (by default, the labels are screen reader only). `seek`: Display a seek tooltip to indicate on click where the media would seek to.                                                                                                                                                                                               |
-| `duration`           | Number                     | `null`                                                                                                                         | Specify a custom duration for media.                                                                                                                                                                                                                                                                                                                                                                    |
-| `displayDuration`    | Boolean                    | `true`                                                                                                                         | Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see `controls` option).                                                                                                                               |
-| `invertTime`         | Boolean                    | `true`                                                                                                                         | Display the current time as a countdown rather than an incremental counter.                                                                                                                                                                                                                                                                                                                             |
-| `toggleInvert`       | Boolean                    | `true`                                                                                                                         | Allow users to click to toggle the above.                                                                                                                                                                                                                                                                                                                                                               |
-| `listeners`          | Object                     | `null`                                                                                                                         | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. If your handler prevents default on the event (`event.preventDefault()`), the default handler will not fire.                                                                                                                                                              |
-| `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in non-selectable language options).                                                                                      |
-| `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false, container: null }`                                                         | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (`true`/`false`/`'force'`). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls). `container`: A selector for an ancestor of the player element, allows contextual content to remain visual in fullscreen mode. Non-ancestors are ignored.     |
-| `ratio`              | String                     | `null`                                                                                                                         | Force an aspect ratio for all videos. The format is `'w:h'` - e.g. `'16:9'` or `'4:3'`. If this is not specified then the default for HTML5 and Vimeo is to use the native resolution of the video. As dimensions are not available from YouTube via SDK, 16:9 is forced as a sensible default.                                                                                                         |
-| `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                                                               |
-| `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4] }`                                                              | `selected`: The default speed for playback. `options`: The speed options to display in the UI. YouTube and Vimeo will ignore any options outside of the 0.5-2 range, so options outside of this range will be hidden automatically.                                                                                                                                                                     |
-| `quality`            | Object                     | `{ default: 576, options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240] }`                                           | `default` is the default quality level (if it exists in your sources). `options` are the options to display. This is used to filter the available sources.                                                                                                                                                                                                                                              |
-| `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                                                          |
-| `ads`                | Object                     | `{ enabled: false, publisherId: '', tagUrl: '' }`                                                                              | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID. `tagUrl` is a URL for a custom VAST tag if you're not using Vi.                                                                                                                                                                                   |
-| `urls`               | Object                     | See source.                                                                                                                    | If you wish to override any API URLs then you can do so here. You can also set a custom download URL for the download button.                                                                                                                                                                                                                                                                           |
-| `vimeo`              | Object                     | `{ byline: false, portrait: false, title: false, speed: true, transparent: false }`                                            | See [Vimeo embed options](https://github.com/vimeo/player.js/#embed-options). Some are set automatically based on other config options, namely: `loop`, `autoplay`, `muted`, `gesture`, `playsinline`                                                                                                                                                                                                   |
-| `youtube`            | Object                     | `{ noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }`                                               | See [YouTube embed options](https://developers.google.com/youtube/player_parameters#Parameters). The only custom option is `noCookie` to use an alternative to YouTube that doesn't use cookies (useful for GDPR, etc). Some are set automatically based on other config options, namely: `autoplay`, `hl`, `controls`, `disablekb`, `playsinline`, `cc_load_policy`, `cc_lang_pref`, `widget_referrer` |
-| `previewThumbnails`  | Object                     | `{ enabled: false, src: '' }`                                                                                                  | `enabled`: Whether to enable the preview thumbnails (they must be generated by you). `src` must be either a string or an array of strings representing URLs for the VTT files containing the image URL(s). Learn more about [preview thumbnails](#preview-thumbnails) below.                                                                                                                            |
-| `mediaMetadata`      | Object                     | `{ title: '', artist: '', album: '', artwork: [] }`                                                                            | The [MediaMetadata](https://developer.mozilla.org/en-US/docs/Web/API/MediaMetadata) interface of the Media Session API allows a web page to provide rich media metadata for display in a platform UI.                                                                                                                                                                                                   |
-| `markers`            | Object                     | `{ enabled: false, points: [] }`                                                                                               | `enabled`: Whether to enable markers. `points` is an array of `{ time: number; label: string; }` objects where `time` represents the marker position in seconds and `label` is the HTML string to be displayed.                                                                                                                                                                                         |
+| Option               | Type                       | Default                                                                                                                        | Description                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| -------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enabled`            | Boolean                    | `true`                                                                                                                         | Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.                                                                                                                                                                                                                                                                           |
+| `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                                                                                            |
+| `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [CONTROLS.md](CONTROLS.md) for more info on how the html needs to be structured.                                                                  |
+| `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                                                                    |
+| `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                                                         |
+| `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                                                   |
+| `iconUrl`            | String                     | `null`                                                                                                                         | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                                                                                     |
+| `iconPrefix`         | String                     | `plyr`                                                                                                                         | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.                                                                                                                                                                                                  |
+| `blankVideo`         | String                     | `https://cdn.plyr.io/static/blank.mp4`                                                                                         | Specify a URL or path to a blank video file used to properly cancel network requests.                                                                                                                                                                                                                                                                                                                                                   |
+| `autoplay`&sup2;     | Boolean                    | `false`                                                                                                                        | Autoplay the media on load. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                                                                                                                                                         |
+| `autopause`&sup1;    | Boolean                    | `true`                                                                                                                         | Only allow one player playing at once.                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `playsinline`&sup3;  | Boolean                    | `true`                                                                                                                         | Allow inline playback on iOS. Note this has no effect on iPadOS.                                                                                                                                                                                                                                                                                                                                                                        |
+| `seekTime`           | Number                     | `10`                                                                                                                           | The time, in seconds, to seek when a user hits fast forward or rewind.                                                                                                                                                                                                                                                                                                                                                                  |
+| `volume`             | Number                     | `1`                                                                                                                            | A number, between 0 and 1, representing the initial volume of the player.                                                                                                                                                                                                                                                                                                                                                               |
+| `muted`              | Boolean                    | `false`                                                                                                                        | Whether to start playback muted. If the `muted` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                                                                                                                                                       |
+| `clickToPlay`        | Boolean                    | `true`                                                                                                                         | Click (or tap) of the video container will toggle play/pause.                                                                                                                                                                                                                                                                                                                                                                           |
+| `disableContextMenu` | Boolean                    | `true`                                                                                                                         | Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.                                                                                                                                                                                                                                                                                                                       |
+| `hideControls`       | Boolean                    | `true`                                                                                                                         | Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.                                                                                                                                                              |
+| `resetOnEnd`         | Boolean                    | false                                                                                                                          | Reset the playback to the start once playback is complete.                                                                                                                                                                                                                                                                                                                                                                              |
+| `keyboard`           | Object                     | `{ focused: true, global: false }`                                                                                             | Enable [keyboard shortcuts](#shortcuts) for focused players only or globally                                                                                                                                                                                                                                                                                                                                                            |
+| `tooltips`           | Object                     | `{ controls: false, seek: true }`                                                                                              | `controls`: Display control labels as tooltips on `:hover` & `:focus` (by default, the labels are screen reader only). `seek`: Display a seek tooltip to indicate on click where the media would seek to.                                                                                                                                                                                                                               |
+| `duration`           | Number                     | `null`                                                                                                                         | Specify a custom duration for media.                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `displayDuration`    | Boolean                    | `true`                                                                                                                         | Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see `controls` option).                                                                                                                                                               |
+| `invertTime`         | Boolean                    | `true`                                                                                                                         | Display the current time as a countdown rather than an incremental counter.                                                                                                                                                                                                                                                                                                                                                             |
+| `toggleInvert`       | Boolean                    | `true`                                                                                                                         | Allow users to click to toggle the above.                                                                                                                                                                                                                                                                                                                                                                                               |
+| `listeners`          | Object                     | `null`                                                                                                                         | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. If your handler prevents default on the event (`event.preventDefault()`), the default handler will not fire.                                                                                                                                                                                              |
+| `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in non-selectable language options).                                                                                                                      |
+| `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false, container: null }`                                                         | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (`true`/`false`/`'force'`). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls) - note this has no effect on iPadOS. `container`: A selector for an ancestor of the player element, allows contextual content to remain visual in fullscreen mode. Non-ancestors are ignored. |
+| `ratio`              | String                     | `null`                                                                                                                         | Force an aspect ratio for all videos. The format is `'w:h'` - e.g. `'16:9'` or `'4:3'`. If this is not specified then the default for HTML5 and Vimeo is to use the native resolution of the video. As dimensions are not available from YouTube via SDK, 16:9 is forced as a sensible default.                                                                                                                                         |
+| `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                                                                                               |
+| `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4] }`                                                              | `selected`: The default speed for playback. `options`: The speed options to display in the UI. YouTube and Vimeo will ignore any options outside of the 0.5-2 range, so options outside of this range will be hidden automatically.                                                                                                                                                                                                     |
+| `quality`            | Object                     | `{ default: 576, options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240] }`                                           | `default` is the default quality level (if it exists in your sources). `options` are the options to display. This is used to filter the available sources.                                                                                                                                                                                                                                                                              |
+| `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                                                                                          |
+| `ads`                | Object                     | `{ enabled: false, publisherId: '', tagUrl: '' }`                                                                              | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID. `tagUrl` is a URL for a custom VAST tag if you're not using Vi.                                                                                                                                                                                                                   |
+| `urls`               | Object                     | See source.                                                                                                                    | If you wish to override any API URLs then you can do so here. You can also set a custom download URL for the download button.                                                                                                                                                                                                                                                                                                           |
+| `vimeo`              | Object                     | `{ byline: false, portrait: false, title: false, speed: true, transparent: false }`                                            | See [Vimeo embed options](https://github.com/vimeo/player.js/#embed-options). Some are set automatically based on other config options, namely: `loop`, `autoplay`, `muted`, `gesture`, `playsinline`                                                                                                                                                                                                                                   |
+| `youtube`            | Object                     | `{ noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }`                                               | See [YouTube embed options](https://developers.google.com/youtube/player_parameters#Parameters). The only custom option is `noCookie` to use an alternative to YouTube that doesn't use cookies (useful for GDPR, etc). Some are set automatically based on other config options, namely: `autoplay`, `hl`, `controls`, `disablekb`, `playsinline`, `cc_load_policy`, `cc_lang_pref`, `widget_referrer`                                 |
+| `previewThumbnails`  | Object                     | `{ enabled: false, src: '' }`                                                                                                  | `enabled`: Whether to enable the preview thumbnails (they must be generated by you). `src` must be either a string or an array of strings representing URLs for the VTT files containing the image URL(s). Learn more about [preview thumbnails](#preview-thumbnails) below.                                                                                                                                                            |
+| `mediaMetadata`      | Object                     | `{ title: '', artist: '', album: '', artwork: [] }`                                                                            | The [MediaMetadata](https://developer.mozilla.org/en-US/docs/Web/API/MediaMetadata) interface of the Media Session API allows a web page to provide rich media metadata for display in a platform UI.                                                                                                                                                                                                                                   |
+| `markers`            | Object                     | `{ enabled: false, points: [] }`                                                                                               | `enabled`: Whether to enable markers. `points` is an array of `{ time: number; label: string; }` objects where `time` represents the marker position in seconds and `label` is the HTML string to be displayed.                                                                                                                                                                                                                         |
 
-1.  Vimeo only
-2.  Autoplay is generally not recommended as it is seen as a negative user experience. It is also disabled in many browsers. Before raising issues, do your homework. More info can be found here:
+1. Vimeo only
+2. Autoplay is generally not recommended as it is seen as a negative user experience. It is also disabled in many browsers. Before raising issues, do your homework. More info can be found here:
 
-- https://webkit.org/blog/6784/new-video-policies-for-ios/
-- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
-- https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/
+- <https://webkit.org/blog/6784/new-video-policies-for-ios/>
+- <https://developers.google.com/web/updates/2017/09/autoplay-policy-changes>
+- <https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/>
+
+3. YouTube does not support programatically toggling the native fullscreen player via it's API. This means on iOS you have two options, neither being perfect:
+
+- Use the fallback/faux fullscreen option which covers the whole viewport (this is the default)
+- Set `playsinline` to `false` and/or `fullscreen.iosNative` to `true` - either option hides the fullscreen toggle in the UI (because of the above API issue) and means iOS will play the video in it's native player.
 
 # API
 
@@ -431,7 +437,7 @@ There are methods, setters and getters on a Plyr object.
 
 The easiest way to access the Plyr object is to set the return value from your call to the constructor to a variable. For example:
 
-```javascript
+```js
 const player = new Plyr('#player', {
   /* options */
 });
@@ -439,7 +445,7 @@ const player = new Plyr('#player', {
 
 You can also access the object through any events:
 
-```javascript
+```js
 element.addEventListener('ready', (event) => {
   const player = event.detail.plyr;
 });
@@ -449,7 +455,7 @@ element.addEventListener('ready', (event) => {
 
 Example method use:
 
-```javascript
+```js
 player.play(); // Start playback
 player.fullscreen.enter(); // Enter fullscreen
 ```
@@ -478,20 +484,20 @@ player.fullscreen.enter(); // Enter fullscreen
 | `supports(type)`                                         | String           | Check support for a mime type.                                                                             |
 | `destroy()`                                              | -                | Destroy the instance and garbage collect any elements.                                                     |
 
-1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for most browsers - e.g. Chrome, Firefox, Opera, Safari and Edge [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
+1. For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for most browsers - e.g. Chrome, Firefox, Opera, Safari and Edge [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
 ## Getters and Setters
 
 Example setters:
 
-```javascript
+```js
 player.volume = 0.5; // Sets volume at 50%
 player.currentTime = 10; // Seeks to 10 seconds
 ```
 
 Example getters:
 
-```javascript
+```js
 player.volume; // 0.5;
 player.currentTime; // 10
 player.fullscreen.active; // false;
@@ -527,7 +533,7 @@ player.fullscreen.active; // false;
 | `ratio`              | ✓      | ✓      | Gets or sets the video aspect ratio. The setter accepts a string in the same format as the `ratio` option.                                                                                                                                                                                                                             |
 | `download`           | ✓      | ✓      | Gets or sets the URL for the download button. The setter accepts a string containing a valid absolute URL.                                                                                                                                                                                                                             |
 
-1.  HTML5 only
+1. HTML5 only
 
 ### The `.source` setter
 
@@ -535,7 +541,7 @@ This allows changing the player source and type on the fly.
 
 Video example:
 
-```javascript
+```js
 player.source = {
   type: 'video',
   title: 'Example title',
@@ -575,7 +581,7 @@ player.source = {
 
 Audio example:
 
-```javascript
+```js
 player.source = {
   type: 'audio',
   title: 'Example title',
@@ -594,7 +600,7 @@ player.source = {
 
 YouTube example:
 
-```javascript
+```js
 player.source = {
   type: 'video',
   sources: [
@@ -608,7 +614,7 @@ player.source = {
 
 Vimeo example
 
-```javascript
+```js
 player.source = {
   type: 'video',
   sources: [
@@ -631,7 +637,7 @@ _Note:_ `src` property for YouTube and Vimeo can either be the video ID or the w
 | `tracks`&sup1;            | String | An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>` and similar for the French version. Booleans are converted to HTML5 value-less attributes. |
 | `previewThumbnails`&sup1; | Object | The same object like in the `previewThumbnails` constructor option. This means you can either change the thumbnails vtt via the `src` key or disable the thumbnails plugin for the next video by passing `{ enabled: false }`.                                                                                                                                                                                 |
 
-1.  HTML5 only
+1. HTML5 only
 
 # Events
 
@@ -639,7 +645,7 @@ You can listen for events on the target element you setup Plyr on (see example u
 reference to the instance, you can use the `on()` API method or `addEventListener()`. Access to the API can be obtained this way through the `event.detail.plyr`
 property. Here's an example:
 
-```javascript
+```js
 player.on('ready', (event) => {
   const instance = event.detail.plyr;
 });
@@ -749,9 +755,9 @@ Plyr supports the last 2 versions of most _modern_ browsers.
 | IE11          | ✓&sup3;         |
 | IE10          | ✓<sup>2,3</sup> |
 
-1.  Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
-2.  Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options)).
-3.  Polyfills required. See below.
+1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
+2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options)).
+3. Polyfills required. See below.
 
 ## Polyfills
 
@@ -761,21 +767,20 @@ Plyr uses ES6 which isn't supported in all browsers quite yet. This means some f
 
 You can use the static method to check for support. For example
 
-```javascript
-const supported = Plyr.supported('video', 'html5', true);
+```js
+const supported = Plyr.supported('video', 'html5');
 ```
 
 The arguments are:
 
-- Media type (`audio` or `video`)
-- Provider (`html5`, `youtube` or `vimeo`)
-- Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
+- Media type (`'audio' | 'video'`)
+- Provider (`'html5' | 'youtube' | 'vimeo'`)
 
 ## Disable support programmatically
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
-```javascript
+```js
 {
   enabled: !/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 }

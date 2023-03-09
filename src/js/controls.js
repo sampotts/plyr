@@ -676,7 +676,7 @@ const controls = {
     }
 
     // WebKit only
-    if (!browser.isWebkit) {
+    if (!browser.isWebKit && !browser.isIPadOS) {
       return;
     }
 
@@ -1385,7 +1385,7 @@ const controls = {
         // Volume range control
         // Ignored on iOS as it's handled globally
         // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-        if (control === 'volume' && !browser.isIos) {
+        if (control === 'volume' && !browser.isIos && !browser.isIPadOS) {
           // Set the attributes
           const attributes = {
             max: 1,
