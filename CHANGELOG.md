@@ -1,3 +1,7 @@
+### v3.7.6
+
+- Fix: Revert postinstall script
+
 ### v3.7.5
 
 - Fix: Replace `pnpm` with `npm` in scripts to fix build issues

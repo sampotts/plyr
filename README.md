@@ -171,7 +171,7 @@ If you don't want to create a build system to include Plyr as an npm module, you
 
 - Download the files from the CDN links above, they're already minified.
 - Download the files from [unpkg](https://unpkg.com/browse/plyr/dist/) or similar services.
-- Build the project yourself using `pnpm i`, which installs the dependencies and spits out a build to `dist`.
+- Build the project yourself using `npm i && npm run build`, which installs the dependencies and spits out a build to `dist`.
 
 # Ads
 
