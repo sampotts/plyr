@@ -383,6 +383,7 @@ const controls = {
       extend(attributes, {
         class: `${attributes.class ? attributes.class : ''} ${this.config.classNames.display.time} `.trim(),
         'aria-label': i18n.get(type, this.config),
+        role: 'timer',
       }),
       '00:00',
     );
