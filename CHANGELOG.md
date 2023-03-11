@@ -1,3 +1,9 @@
+### v3.7.7
+
+- Fix (Accessibility): Don’t set tabindex on parent container
+- Fix (Accessibility): Add `role="timer"` to time elements
+- Fix (Accessibility): Leverage native `:focus-visible` in CSS, instead of a custom solution (🚨 Requires a SCSS/CSS update 🚨)
+
 ### v3.7.6
 
 - Fix: Revert postinstall script
