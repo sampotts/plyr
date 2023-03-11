@@ -267,7 +267,7 @@ class Plyr {
 
     // Wrap media
     if (!is.element(this.elements.container)) {
-      this.elements.container = createElement('div', { tabindex: 0 });
+      this.elements.container = createElement('div');
       wrap(this.media, this.elements.container);
     }
 
