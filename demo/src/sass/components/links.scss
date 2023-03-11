@@ -38,8 +38,8 @@ a {
     }
   }
 
-  &.tab-focus {
-    @include tab-focus;
+  &:focus-visible {
+    @include focus-visible($color-link);
   }
 
   &.no-border::after {

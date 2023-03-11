@@ -17,7 +17,7 @@
 
 // Control elements
 .plyr--audio .plyr__control {
-  &.plyr__tab-focus,
+  &:focus-visible,
   &:hover,
   &[aria-expanded='true'] {
     background: $plyr-audio-control-background-hover;

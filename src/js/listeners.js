@@ -21,7 +21,6 @@ class Listeners {
 
     this.handleKey = this.handleKey.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
-    this.setTabFocus = this.setTabFocus.bind(this);
     this.firstTouch = this.firstTouch.bind(this);
   }
 
@@ -194,57 +193,6 @@ class Listeners {
     toggleClass(elements.container, player.config.classNames.isTouch, true);
   };
 
-  setTabFocus = (event) => {
-    const { player } = this;
-    const { elements } = player;
-    const { key, type, timeStamp } = event;
-
-    clearTimeout(this.focusTimer);
-
-    // Ignore any key other than tab
-    if (type === 'keydown' && key !== 'Tab') {
-      return;
-    }
-
-    // Store reference to event timeStamp
-    if (type === 'keydown') {
-      this.lastKeyDown = timeStamp;
-    }
-
-    // Remove current classes
-    const removeCurrent = () => {
-      const className = player.config.classNames.tabFocus;
-      const current = getElements.call(player, `.${className}`);
-      toggleClass(current, className, false);
-    };
-
-    // Determine if a key was pressed to trigger this event
-    const wasKeyDown = timeStamp - this.lastKeyDown <= 20;
-
-    // Ignore focus events if a key was pressed prior
-    if (type === 'focus' && !wasKeyDown) {
-      return;
-    }
-
-    // Remove all current
-    removeCurrent();
-
-    // Delay the adding of classname until the focus has changed
-    // This event fires before the focusin event
-    if (type !== 'focusout') {
-      this.focusTimer = setTimeout(() => {
-        const focused = document.activeElement;
-
-        // Ignore if current focus element isn't inside the player
-        if (!elements.container.contains(focused)) {
-          return;
-        }
-
-        toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
-      }, 10);
-    }
-  };
-
   // Global window & document listeners
   global = (toggle = true) => {
     const { player } = this;
@@ -259,9 +207,6 @@ class Listeners {
 
     // Detect touch by events
     once.call(player, document.body, 'touchstart', this.firstTouch);
-
-    // Tab focus detection
-    toggleListener.call(player, document.body, 'keydown focus blur focusout', this.setTabFocus, toggle, false, true);
   };
 
   // Container listeners

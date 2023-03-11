@@ -4,8 +4,8 @@
 
 // Nicer focus styles
 // ---------------------------------------
-@mixin plyr-tab-focus($color: $plyr-tab-focus-color) {
-  outline: $color dotted 3px;
+@mixin plyr-focus-visible($color: $plyr-focus-visible-color) {
+  outline: 2px dashed $color;
   outline-offset: 2px;
 }
 

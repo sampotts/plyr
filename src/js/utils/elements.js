@@ -268,16 +268,11 @@ export function getElement(selector) {
 }
 
 // Set focus and tab focus class
-export function setFocus(element = null, tabFocus = false) {
+export function setFocus(element = null, focusVisible = false) {
   if (!is.element(element)) {
     return;
   }
 
   // Set regular focus
-  element.focus({ preventScroll: true });
-
-  // If we want to mimic keyboard focus via tab
-  if (tabFocus) {
-    toggleClass(element, this.config.classNames.tabFocus);
-  }
+  element.focus({ preventScroll: true, focusVisible });
 }

@@ -87,8 +87,7 @@ $embed-padding: (math.div(100, 16) * 9);
 
 // Control elements
 .plyr--video .plyr__control {
-  // Hover and tab focus
-  &.plyr__tab-focus,
+  &:focus-visible,
   &:hover,
   &[aria-expanded='true'] {
     background: $plyr-video-control-background-hover;

@@ -379,7 +379,6 @@ const defaults = {
       supported: 'plyr--airplay-supported',
       active: 'plyr--airplay-active',
     },
-    tabFocus: 'plyr__tab-focus',
     previewThumbnails: {
       // Tooltip thumbs
       thumbContainer: 'plyr__preview-thumb',

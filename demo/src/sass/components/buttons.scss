@@ -44,8 +44,8 @@
     outline: 0;
   }
 
-  &.tab-focus {
-    @include tab-focus;
+  &:focus-visible {
+    @include focus-visible($color-button-background);
   }
 
   &:active {

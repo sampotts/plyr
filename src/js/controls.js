@@ -1106,7 +1106,7 @@ const controls = {
   },
 
   // Focus the first menu item in a given (or visible) menu
-  focusFirstMenuItem(pane, tabFocus = false) {
+  focusFirstMenuItem(pane, focusVisible = false) {
     if (this.elements.settings.popup.hidden) {
       return;
     }
@@ -1119,7 +1119,7 @@ const controls = {
 
     const firstItem = target.querySelector('[role^="menuitem"]');
 
-    setFocus.call(this, firstItem, tabFocus);
+    setFocus.call(this, firstItem, focusVisible);
   },
 
   // Show/hide menu
@@ -1196,7 +1196,7 @@ const controls = {
   },
 
   // Show a panel in the menu
-  showMenuPanel(type = '', tabFocus = false) {
+  showMenuPanel(type = '', focusVisible = false) {
     const target = this.elements.container.querySelector(`#plyr-settings-${this.id}-${type}`);
 
     // Nothing to show, bail
@@ -1247,7 +1247,7 @@ const controls = {
     toggleHidden(target, false);
 
     // Focus the first item
-    controls.focusFirstMenuItem.call(this, target, tabFocus);
+    controls.focusFirstMenuItem.call(this, target, focusVisible);
   },
 
   // Set the download URL

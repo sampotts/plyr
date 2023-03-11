@@ -25,9 +25,9 @@
 
 // Nicer focus styles
 // ---------------------------------------
-@mixin tab-focus($color: $tab-focus-default-color) {
-  box-shadow: 0 0 0 3px rgba($color, 0.35);
-  outline: 0;
+@mixin focus-visible($color: $focus-default-color) {
+  outline: 2px dashed $color;
+  outline-offset: 2px;
 }
 
 // Use rems for font sizing

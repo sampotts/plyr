@@ -58,8 +58,8 @@ aside {
   a {
     color: $color-twitter;
 
-    &.tab-focus {
-      @include tab-focus($color-twitter);
+    &:focus-visible {
+      @include focus-visible($color-twitter);
     }
   }
 }
