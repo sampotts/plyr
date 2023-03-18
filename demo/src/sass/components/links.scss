@@ -2,15 +2,9 @@
 // Links
 // ==========================================================================
 
-// Make a <button> look like an <a>
-button.faux-link {
-  @extend a; // stylelint-disable-line
-  @include cancel-button-styles;
-}
-
-// Links
-a {
-  border-bottom: 1px dotted currentColor;
+.link {
+  align-items: center;
+  border-bottom: 1px dashed currentColor;
   color: $color-link;
   position: relative;
   text-decoration: none;

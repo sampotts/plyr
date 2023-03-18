@@ -6,8 +6,10 @@
 
 // Example players
 .plyr {
-  border-radius: $border-radius-large;
-  box-shadow: 0 2px 15px rgba(#000, 0.1);
+  --shadow-color: 197deg 32% 65%;
+  border-radius: $border-radius-2x-large;
+  box-shadow: 0 0.5px 0.6px hsl(var(--shadow-color) / 0.36), 0 1.7px 1.9px -0.8px hsl(var(--shadow-color) / 0.36),
+    0 4.3px 4.8px -1.7px hsl(var(--shadow-color) / 0.36), -0.1px 10.6px 11.9px -2.5px hsl(var(--shadow-color) / 0.36);
   margin: $spacing-base auto;
 
   &.plyr--audio {
@@ -17,6 +19,7 @@
 
 .plyr__video-wrapper::after {
   border: 1px solid rgba(#000, 0.15);
+  border-bottom-color: rgba(#000, 0.25);
   border-radius: inherit;
   bottom: 0;
   content: '';

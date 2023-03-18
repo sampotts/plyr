@@ -6,8 +6,9 @@
 $arrow-size: 5px;
 
 // Radii
-$border-radius-base: 4px;
-$border-radius-large: 8px;
+$border-radius-small: 4px;
+$border-radius-medium: 6px;
+$border-radius-2x-large: 12px;
 
 // Background
 $page-background: linear-gradient(to left top, $color-background-from, $color-background-to);
