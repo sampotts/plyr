@@ -1,3 +1,10 @@
+# Changelog
+
+### v3.7.8
+
+- Feat: Minor demo style tweaks
+- Fix: Minor style fixes related to backgrounds and border radii (🚨 Requires a SCSS/CSS update 🚨)
+
 ### v3.7.7
 
 - Fix (Accessibility): Don’t set tabindex on parent container
