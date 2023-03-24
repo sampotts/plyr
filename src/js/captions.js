@@ -25,6 +25,15 @@ import { parseUrl } from './utils/urls';
 const captions = {
   // Setup captions
   setup() {
+    window.show = [];
+    const media = this.media;
+    media.ontimeupdate = function () {
+      while (window.show[0] && media.currentTime > window.show[0].time) {
+        const caption = window.show.shift();
+        document.getElementById(caption.id).className = '';
+      }
+    };
+
     // Requires UI support
     if (!this.supported.ui) {
       return;
@@ -386,7 +395,36 @@ const captions = {
       const track = captions.getCurrentTrack.call(this);
 
       cues = Array.from((track || {}).activeCues || [])
-        .map((cue) => cue.getCueAsHTML())
+        .map((cue) => {
+          const cueFragment = cue.getCueAsHTML();
+          const newFragment = document.createDocumentFragment();
+
+          const array = Array.prototype.slice.call(cueFragment.childNodes);
+          let currentSegment = 0;
+          window.show = [];
+          for (let child of array) {
+            if (child.nodeType === 7) {
+              let id = 'captionSegment' + (currentSegment + 1);
+              window.show.push({
+                time: Number(new Date('1970-01-01T' + child.data + 'Z')) / 1000,
+                id: id,
+              });
+              /* setTimeout(() => {
+                console.log(id)
+                document.getElementById(id).className = ''
+              }, Number(new Date('1970-01-01T' + child.data + 'Z')) - (this.media.currentTime * 1000)) */
+              currentSegment += 1;
+              continue;
+            }
+            if (currentSegment !== 0) {
+              child.id = 'captionSegment' + currentSegment;
+              child.className = 'pendingCaption';
+            }
+            newFragment.append(child);
+          }
+
+          return newFragment;
+        })
         .map(getHTML);
     }
 
