@@ -969,6 +969,14 @@ class Plyr {
   }
 
   /**
+   * Set the wanted track node for captions
+   * @param {TextTrack} input - Two character ISO language code (e.g. EN, FR, PT, etc)
+   */
+  set nodeTrack(input) {
+    captions.setNode.call(this, input, false);
+  }
+
+  /**
    * Set the wanted language for captions
    * Since tracks can be added later it won't update the actual caption track until there is a matching track
    * @param {String} input - Two character ISO language code (e.g. EN, FR, PT, etc)
