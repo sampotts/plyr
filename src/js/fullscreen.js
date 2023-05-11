@@ -137,7 +137,7 @@ class Fullscreen {
   get target() {
     return browser.isIos && this.player.config.fullscreen.iosNative
       ? this.player.media
-      : this.player.elements.fullscreen ?? this.player.elements.container;
+      : (this.player.elements.fullscreen !== null && this.player.elements.fullscreen !== void 0 ? this.player.elements.fullscreen : this.player.elements.container);
   }
 
   onChange = () => {
@@ -159,8 +159,8 @@ class Fullscreen {
     // Store or restore scroll position
     if (toggle) {
       this.scrollPosition = {
-        x: window.scrollX ?? 0,
-        y: window.scrollY ?? 0,
+        x: window.scrollX !== null && window.scrollX !== void 0 ? window.scrollX : 0,
+        y: window.scrollY !== null && window.scrollY !== void 0 ? window.scrollX : 0,
       };
     } else {
       window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
