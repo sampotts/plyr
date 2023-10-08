@@ -1,5 +1,5 @@
-| 🎉  | [Plyr is merging into Vidstack](https://github.com/sampotts/plyr/issues/2408) | 🎉  |
-| :-: | :---------------------------------------------------------------------------: | :-- |
+| ⚠️  | [Plyr will be deprecated and archived soon](https://github.com/sampotts/plyr/issues/2737) | ⚠️  |
+| :-: | :---------------------------------------------------------------------------------------: | :-- |
 
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
