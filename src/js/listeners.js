@@ -641,7 +641,8 @@ class Listeners {
     // Set range input alternative "value", which matches the tooltip time (#954)
     this.bind(elements.inputs.seek, 'mousedown mousemove', (event) => {
       const rect = elements.progress.getBoundingClientRect();
-      const percent = (100 / rect.width) * (event.pageX - rect.left);
+      const scrollLeft = event.pageX - event.clientX;
+      const percent = (100 / rect.width) * (event.pageX - rect.left - scrollLeft);
       event.currentTarget.setAttribute('seek-value', percent);
     });
 
