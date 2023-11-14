@@ -712,7 +712,8 @@ const controls = {
     const clientRect = this.elements.progress.getBoundingClientRect();
 
     if (is.event(event)) {
-      percent = (100 / clientRect.width) * (event.pageX - clientRect.left);
+      const scrollLeft = event.pageX - event.clientX;
+      percent = (100 / clientRect.width) * (event.pageX - clientRect.left - scrollLeft);
     } else if (hasClass(tipElement, visible)) {
       percent = parseFloat(tipElement.style.left, 10);
     } else {
