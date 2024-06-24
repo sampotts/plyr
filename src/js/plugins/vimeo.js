@@ -24,8 +24,10 @@ function parseId(url) {
     return url;
   }
 
-  const regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
-  return url.match(regex) ? RegExp.$2 : url;
+  const regex = /^(.*vimeo.com\/|.*video\/)?(\d+).*/;
+  const found = url.match(regex);
+
+  return !found ? url : found[found.length - 1];
 }
 
 // Try to extract a hash for private videos from the URL
@@ -35,12 +37,13 @@ function parseHash(url) {
    *  - [https://player.]vimeo.com/video/{id}?h={hash}[&params]
    *  - [https://player.]vimeo.com/video/{id}?[params]&h={hash}
    *  - video/{id}/{hash}
-   * If matched, the hash is available in capture group 4
+   *  - {id}/{hash}
+   * If matched, the hash is available in the captured group
    */
-  const regex = /^.*(vimeo.com\/|video\/)(\d+)(\?.*&*h=|\/)+([\d,a-f]+)/;
+  const regex = /^(.*vimeo.com\/|.*video\/)?(\d+)(\?.*&*h=|\/)+([\d,a-f]+)/;
   const found = url.match(regex);
 
-  return found && found.length === 5 ? found[4] : null;
+  return !found ? url : found[found.length - 1];
 }
 
 // Set playback state and trigger change (only on actual change)
@@ -94,6 +97,11 @@ const vimeo = {
       source = player.media.getAttribute(player.config.attributes.embed.id);
       // hash can also be set as attribute on the <div>
       hash = player.media.getAttribute(player.config.attributes.embed.hash);
+      // In case hash is not explicitly set as attribute we try to parse it from the id attribute
+      if (!hash) {
+        hash = parseHash(source);
+        alert(hash);
+      }
     } else {
       hash = parseHash(source);
     }
