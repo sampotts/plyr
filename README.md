@@ -431,7 +431,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 - <https://developers.google.com/web/updates/2017/09/autoplay-policy-changes>
 - <https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/>
 
-3. YouTube does not support programatically toggling the native fullscreen player via it's API. This means on iOS you have two options, neither being perfect:
+3. YouTube does not support programmatically toggling the native fullscreen player via it's API. This means on iOS you have two options, neither being perfect:
 
 - Use the fallback/faux fullscreen option which covers the whole viewport (this is the default)
 - Set `playsinline` to `false` and/or `fullscreen.iosNative` to `true` - either option hides the fullscreen toggle in the UI (because of the above API issue) and means iOS will play the video in it's native player.
