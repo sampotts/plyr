@@ -113,6 +113,8 @@ Or the `<div>` non progressively enhanced method:
 <div id="player" data-plyr-provider="vimeo" data-plyr-embed-id="76979871"></div>
 ```
 
+_Note_: The `data-plyr-embed-id` can either be the video ID or URL for the media.
+
 ## JavaScript
 
 You can use Plyr as an ES6 module as follows:
