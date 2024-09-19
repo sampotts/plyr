@@ -86,14 +86,14 @@ const captions = {
 
     const browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
     const languages = dedupe(browserLanguages.map((language) => language.split('-')[0]));
-    let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
+    let language = (this.storage.get('language') || this.captions.language || this.config.captions.language || 'auto').toLowerCase();
 
     // Use first browser language when language is 'auto'
     if (language === 'auto') {
       [language] = languages;
     }
 
-    let active = this.storage.get('captions');
+    let active = this.storage.get('captions') || this.captions.active;
     if (!is.boolean(active)) {
       ({ active } = this.config.captions);
     }
