@@ -1,30 +1,33 @@
+@use "../lib/css-vars";
+@use "colors";
+
 // ==========================================================================
 // Controls
 // ==========================================================================
 
-$plyr-control-icon-size: var(--plyr-control-icon-size, 18px) !default;
-$plyr-control-spacing: var(--plyr-control-spacing, 10px) !default;
+$plyr-control-icon-size: css-vars.var(--plyr-control-icon-size, 18px) !default;
+$plyr-control-spacing: css-vars.var(--plyr-control-spacing, 10px) !default;
 $plyr-control-padding: calc(#{$plyr-control-spacing} * 0.7);
-$plyr-control-padding: var(--plyr-control-padding, $plyr-control-padding) !default;
-$plyr-control-radius: var(--plyr-control-radius, 4px) !default;
-$plyr-control-toggle-checked-background: var(
+$plyr-control-padding: css-vars.var(--plyr-control-padding, $plyr-control-padding) !default;
+$plyr-control-radius: css-vars.var(--plyr-control-radius, 4px) !default;
+$plyr-control-toggle-checked-background: css-vars.var(
   --plyr-control-toggle-checked-background,
-  var(--plyr-color-main, $plyr-color-main)
+  css-vars.var(--plyr-color-main, colors.$plyr-color-main)
 ) !default;
-$plyr-video-controls-background: var(
+$plyr-video-controls-background: css-vars.var(
   --plyr-video-controls-background,
   linear-gradient(rgba(#000, 0), rgba(#000, 0.75))
 ) !default;
-$plyr-video-control-color: var(--plyr-video-control-color, #fff) !default;
-$plyr-video-control-color-hover: var(--plyr-video-control-color-hover, #fff) !default;
-$plyr-video-control-background-hover: var(
+$plyr-video-control-color: css-vars.var(--plyr-video-control-color, #fff) !default;
+$plyr-video-control-color-hover: css-vars.var(--plyr-video-control-color-hover, #fff) !default;
+$plyr-video-control-background-hover: css-vars.var(
   --plyr-video-control-background-hover,
-  var(--plyr-color-main, $plyr-color-main)
+  css-vars.var(--plyr-color-main, colors.$plyr-color-main)
 ) !default;
-$plyr-audio-controls-background: var(--plyr-audio-controls-background, #fff) !default;
-$plyr-audio-control-color: var(--plyr-audio-control-color, $plyr-color-gray-700) !default;
-$plyr-audio-control-color-hover: var(--plyr-audio-control-color-hover, #fff) !default;
-$plyr-audio-control-background-hover: var(
+$plyr-audio-controls-background: css-vars.var(--plyr-audio-controls-background, #fff) !default;
+$plyr-audio-control-color: css-vars.var(--plyr-audio-control-color, colors.$plyr-color-gray-700) !default;
+$plyr-audio-control-color-hover: css-vars.var(--plyr-audio-control-color-hover, #fff) !default;
+$plyr-audio-control-background-hover: css-vars.var(
   --plyr-audio-control-background-hover,
-  var(--plyr-color-main, $plyr-color-main)
+  css-vars.var(--plyr-color-main, colors.$plyr-color-main)
 ) !default;

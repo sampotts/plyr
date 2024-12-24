@@ -1,9 +1,12 @@
+@use "../lib/css-vars";
+@use "../settings/colors";
+
 // --------------------------------------------------------------
 // Faux poster overlay
 // --------------------------------------------------------------
 
 .plyr__poster {
-  background-color: var(--plyr-video-background, $plyr-video-background);
+  background-color: css-vars.var(--plyr-video-background, colors.$plyr-video-background);
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-size: contain;

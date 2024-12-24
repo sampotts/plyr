@@ -1,18 +1,21 @@
+@use "../lib/css-vars";
+@use "colors";
+
 // ==========================================================================
 // Progress
 // ==========================================================================
 
 // Loading
-$plyr-progress-loading-size: var(--plyr-progress-loading-size, 25px) !default;
-$plyr-progress-loading-background: var(--plyr-progress-loading-background, rgba($plyr-color-gray-900, 0.6)) !default;
+$plyr-progress-loading-size: css-vars.var(--plyr-progress-loading-size, 25px) !default;
+$plyr-progress-loading-background: css-vars.var(--plyr-progress-loading-background, rgba(colors.$plyr-color-gray-900, 0.6)) !default;
 
 // Markers
-$plyr-progress-marker-background: var(--plyr-progress-marker-background, #fff) !default;
-$plyr-progress-marker-width: var(--plyr-progress-marker-width, 3px) !default;
+$plyr-progress-marker-background: css-vars.var(--plyr-progress-marker-background, #fff) !default;
+$plyr-progress-marker-width: css-vars.var(--plyr-progress-marker-width, 3px) !default;
 
 // Buffered
-$plyr-video-progress-buffered-background: var(--plyr-video-progress-buffered-background, rgba(#fff, 0.25)) !default;
-$plyr-audio-progress-buffered-background: var(
+$plyr-video-progress-buffered-background: css-vars.var(--plyr-video-progress-buffered-background, rgba(#fff, 0.25)) !default;
+$plyr-audio-progress-buffered-background: css-vars.var(
   --plyr-audio-progress-buffered-background,
-  rgba($plyr-color-gray-200, 0.6)
+  rgba(colors.$plyr-color-gray-200, 0.6)
 ) !default;

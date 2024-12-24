@@ -1,3 +1,5 @@
+@use "sass:meta";
+@use "sass:string";
 // Downloaded from https://github.com/malyw/css-vars (and modified)
 
 @use 'sass:list';
@@ -14,7 +16,7 @@ $css-vars-use-native: false !default;
 // Assigns a variable to the global map
 ///
 @function css-var-assign($varName: null, $varValue: null) {
-  @return map-merge(
+  @return map.merge(
     $css-vars,
     (
       $varName: $varValue,
@@ -32,11 +34,11 @@ $css-vars-use-native: false !default;
 ///
 @function var($args...) {
   // CHECK PARAMS
-  @if length($args) == 0 {
+  @if list.length($args) == 0 {
     @error 'Variable name is expected to be passed to the var() function';
   }
 
-  @if str-length(nth($args, 1)) < 2 or str-slice(nth($args, 1), 0, 2) != '--' {
+  @if string.length(list.nth($args, 1)) < 2 or string.slice(list.nth($args, 1), 0, 2) != '--' {
     @error "Variable name is expected to start from '--'";
   }
 
@@ -47,11 +49,11 @@ $css-vars-use-native: false !default;
   @if $css-vars-use-native {
     // CSS variables
     // Native CSS: don't process function in case of native
-    @return unquote('var(' + $args + ')');
+    @return string.unquote('var(' + $args + ')');
   } @else {
     @if not $var-value {
       // variable is not provided so far
-      @if length($args) == 2 {
+      @if list.length($args) == 2 {
         $var-value: list.nth($args, 2);
       }
     }
@@ -76,8 +78,8 @@ $css-vars-use-native: false !default;
     @error 'Map of variables is expected, instead got: null';
   }
 
-  @if type_of($var-map) != map {
-    @error 'Map of variables is expected, instead got another type passed: #{type_of($var, ap)}';
+  @if meta.type_of($var-map) != map {
+    @error 'Map of variables is expected, instead got another type passed: #{meta.type_of($var, ap)}';
   }
 
   // PROCESS
@@ -86,7 +88,7 @@ $css-vars-use-native: false !default;
     // Native CSS: assign CSS custom properties to the global scope
     @at-root :root {
       @each $var-name, $var-value in $var-map {
-        @if type_of($var-value) == string {
+        @if meta.type_of($var-value) == string {
           #{$var-name}: $var-value; // to prevent quotes interpolation
         } @else {
           #{$var-name}: #{$var-value};

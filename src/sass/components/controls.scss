@@ -1,3 +1,5 @@
+@use "../settings/controls";
+
 // --------------------------------------------------------------
 // Controls
 // --------------------------------------------------------------
@@ -21,7 +23,7 @@
 
   // Spacing
   .plyr__controls__item {
-    margin-left: calc(#{$plyr-control-spacing} / 4);
+    margin-left: calc(#{controls.$plyr-control-spacing} / 4);
 
     &:first-child {
       margin-left: 0;
@@ -29,11 +31,11 @@
     }
 
     &.plyr__progress__container {
-      padding-left: calc(#{$plyr-control-spacing} / 4);
+      padding-left: calc(#{controls.$plyr-control-spacing} / 4);
     }
 
     &.plyr__time {
-      padding: 0 calc(#{$plyr-control-spacing} / 2);
+      padding: 0 calc(#{controls.$plyr-control-spacing} / 2);
     }
 
     &.plyr__progress__container:first-child,
