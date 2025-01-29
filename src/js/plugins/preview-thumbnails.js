@@ -334,7 +334,7 @@ class PreviewThumbnails {
     this.elements.thumb.imageContainer.appendChild(timeContainer);
 
     // Inject the whole thumb
-    if (is.element(this.player.elements.progress)) {
+    if (this.player && this.player.elements && is.element(this.player.elements.progress)) {
       this.player.elements.progress.appendChild(this.elements.thumb.container);
     }
 
@@ -342,8 +342,10 @@ class PreviewThumbnails {
     this.elements.scrubbing.container = createElement('div', {
       class: this.player.config.classNames.previewThumbnails.scrubbingContainer,
     });
-
-    this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
+    
+    if (this.player && this.player.elements) {
+      this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
+    }
   };
 
   destroy = () => {
