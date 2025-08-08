@@ -17,6 +17,16 @@ header {
     margin-top: ($spacing-base * 1.5);
   }
 
+  .cta-mux {
+    margin-top: $spacing-base;
+
+    a {
+      border-bottom: 1px solid $color-link;
+      color: $color-link;
+      text-decoration: none;
+    }
+  }
+
   @media only screen and (min-width: $screen-md) {
     margin-right: ($spacing-base * 3);
     max-width: 360px;

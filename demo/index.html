@@ -84,6 +84,19 @@
             </svg>
             Audio</button
           >,
+          <button type="button" class="link" data-source="mux">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_5607_90730)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16 0H0V16H16V0ZM11.4398 2.43862C11.8687 2.00974 12.5138 1.88158 13.0742 2.11366C13.6346 2.34574 14.0001 2.8927 14.0001 3.49918V12.4997C14.0001 13.3279 13.3286 13.9995 12.5004 13.9995C11.6722 13.9995 11.0007 13.3279 11.0007 12.4997V7.11959L9.06054 9.05976C8.47495 9.64536 7.52529 9.64536 6.9397 9.05976L4.99958 7.11959V12.4997C4.99958 13.3279 4.32807 13.9995 3.49985 13.9995C2.67162 13.9995 2.00012 13.3279 2.00012 12.4997V3.49918C2.00012 2.89246 2.36539 2.34574 2.92578 2.11366C3.48617 1.88158 4.13127 2.00974 4.56015 2.43862L8 5.87855L11.4398 2.43862ZM11.7564 12.4999C11.7564 12.9108 12.0895 13.2439 12.5004 13.2439C12.9113 13.2439 13.2444 12.9108 13.2444 12.4999C13.2444 12.089 12.9113 11.7559 12.5004 11.7559C12.0895 11.7559 11.7564 12.089 11.7564 12.4999Z" fill="#00b2ff"/>
+              </g>
+              <defs>
+              <clipPath id="clip0_5607_90730">
+              <rect width="16" height="16" fill="white"/>
+              </clipPath>
+              </defs>
+            </svg>
+            Mux
+          </button>,
           <button type="button" class="link" data-source="youtube">
             <svg class="icon" role="presentation">
               <title>YouTube</title>
@@ -124,6 +137,9 @@
             </svg>
             Download on GitHub
           </a>
+          <div class="cta-mux">
+            Looking for video hosting? Check out <a href="https://mux.com?ref=plyr">Mux</a>.
+          </div>
         </div>
       </header>
       <main>
@@ -170,6 +186,15 @@
             <!-- Fallback for browsers that don't support the <video> element -->
             <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download>Download</a>
           </video>
+          <video
+            controls
+            crossorigin
+            playsinline
+            data-poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg"
+            id="player-hls"
+            hidden
+          >
+          </video>
         </div>
 
         <ul>
@@ -187,7 +212,7 @@
                 class="link"
                 >View From A Blue Moon</a
               >
-              &copy; Brainfarm
+              <span>&copy; Brainfarm</span>
             </small>
           </li>
           <li class="plyr__cite plyr__cite--audio" hidden>
@@ -201,7 +226,24 @@
               <a href="http://www.kishibashi.com/" target="_blank" class="link"
                 >Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;</a
               >
-              &copy; Kishi Bashi
+              <span>&copy; Kilshi Bashi</span>
+            </small>
+          </li>
+          <li class="plyr__cite plyr__cite--mux" hidden>
+            <small>
+              <a
+                href="https://itunes.apple.com/au/movie/view-from-a-blue-moon/id1041586323"
+                target="_blank"
+                class="link"
+                >View From A Blue Moon</a
+              >
+              <span>&copy; Brainfarm</span>
+              <span>on</span>
+              <svg class="icon">
+                <title>Mux</title>
+                <svg width="100%" height="100%" viewBox="0 0 1600 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="Layer-1" serif:id="Layer 1"><path d="M994.287,93.486c-17.121,-0 -31,-13.879 -31,-31c0,-17.121 13.879,-31 31,-31c17.121,-0 31,13.879 31,31c0,17.121 -13.879,31 -31,31m0,-93.486c-34.509,-0 -62.484,27.976 -62.484,62.486l0,187.511c0,68.943 -56.09,125.033 -125.032,125.033c-68.942,-0 -125.03,-56.09 -125.03,-125.033l0,-187.511c0,-34.51 -27.976,-62.486 -62.485,-62.486c-34.509,-0 -62.484,27.976 -62.484,62.486l0,187.511c0,137.853 112.149,250.003 249.999,250.003c137.851,-0 250.001,-112.15 250.001,-250.003l0,-187.511c0,-34.51 -27.976,-62.486 -62.485,-62.486" style="fill-rule:nonzero;"/><path d="M1537.51,468.511c-17.121,-0 -31,-13.879 -31,-31c0,-17.121 13.879,-31 31,-31c17.121,-0 31,13.879 31,31c0,17.121 -13.879,31 -31,31m-275.883,-218.509l-143.33,143.329c-24.402,24.402 -24.402,63.966 0,88.368c24.402,24.402 63.967,24.402 88.369,-0l143.33,-143.329l143.328,143.329c24.402,24.4 63.967,24.402 88.369,-0c24.403,-24.402 24.403,-63.966 0.001,-88.368l-143.33,-143.329l0.001,-0.004l143.329,-143.329c24.402,-24.402 24.402,-63.965 0,-88.367c-24.402,-24.402 -63.967,-24.402 -88.369,-0l-143.329,143.328l-143.329,-143.328c-24.402,-24.401 -63.967,-24.402 -88.369,-0c-24.402,24.402 -24.402,63.965 0,88.367l143.329,143.329l0,0.004Z" style="fill-rule:nonzero;"/><path d="M437.511,468.521c-17.121,-0 -31,-13.879 -31,-31c0,-17.121 13.879,-31 31,-31c17.121,-0 31,13.879 31,31c0,17.121 -13.879,31 -31,31m23.915,-463.762c-23.348,-9.672 -50.226,-4.327 -68.096,13.544l-143.331,143.329l-143.33,-143.329c-17.871,-17.871 -44.747,-23.216 -68.096,-13.544c-23.349,9.671 -38.574,32.455 -38.574,57.729l0,375.026c0,34.51 27.977,62.486 62.487,62.486c34.51,-0 62.486,-27.976 62.486,-62.486l0,-224.173l80.843,80.844c24.404,24.402 63.965,24.402 88.369,-0l80.843,-80.844l0,224.173c0,34.51 27.976,62.486 62.486,62.486c34.51,-0 62.486,-27.976 62.486,-62.486l0,-375.026c0,-25.274 -15.224,-48.058 -38.573,-57.729" style="fill-rule:nonzero;"/></g>
+                </svg>
+              </svg>
             </small>
           </li>
           <li class="plyr__cite plyr__cite--youtube" hidden>
@@ -253,15 +295,16 @@
       <p>
         If you think Plyr's good,
         <a
-          href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&amp;url=http%3A%2F%2Fplyr.io&amp;via=Sam_Potts"
+          href="https://x.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&amp;url=http%3A%2F%2Fplyr.io&amp;via=Sam_Potts"
           target="_blank"
           class="link js-shr"
-          >tweet it</a
+          >share it on Twitter</a
         >
         👍
       </p>
     </aside>
 
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
     <script src="dist/demo.js" crossorigin="anonymous"></script>
   </body>
 </html>
