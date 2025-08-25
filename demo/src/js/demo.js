@@ -25,7 +25,7 @@ import sources from './sources';
     });
   }
 
-  function createPlyrInstance (selector, config) {
+  function createPlyrInstance(selector, config) {
     return new Plyr(selector, config);
   }
 
@@ -163,7 +163,7 @@ import sources from './sources';
 
       document.querySelector(`.plyr__cite--${type}`).hidden = false;
 
-      if (type === "mux") {
+      if (type === 'mux') {
         showHlsPlayer();
       } else {
         showMainPlayer();
@@ -180,7 +180,7 @@ import sources from './sources';
       const sourceConfig = sources[type];
       const hlsSource = sourceConfig.hls_source;
       if (hlsSource) {
-        window.playerHls = createPlyrInstance("#player-hls", sourceConfig);
+        window.playerHls = createPlyrInstance('#player-hls', sourceConfig);
         const video = playerHls.media;
         if (Hls.isSupported()) {
           var hls = new Hls();

@@ -6,7 +6,7 @@ const sources = {
     poster: 'https://image.mux.com/lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML/thumbnail.jpg',
     previewThumbnails: {
       enabled: true,
-      src: 'https://image.mux.com/lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML/storyboard.vtt'
+      src: 'https://image.mux.com/lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML/storyboard.vtt',
     },
   },
   video: {
