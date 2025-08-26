@@ -412,6 +412,7 @@ const defaults = {
   previewThumbnails: {
     enabled: false,
     src: '',
+    withCredentials: false,
   },
 
   // Vimeo plugin

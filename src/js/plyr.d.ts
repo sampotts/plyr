@@ -583,6 +583,7 @@ declare namespace Plyr {
   interface PreviewThumbnailsOptions {
     enabled?: boolean;
     src?: string | string[];
+    withCredentials?: boolean;
   }
 
   interface MediaMetadataArtwork {
