@@ -169,7 +169,7 @@ class PreviewThumbnails {
   // Process individual VTT file
   getThumbnail = (url) => {
     return new Promise((resolve) => {
-      fetch(url).then((response) => {
+      fetch(url, undefined, this.player.config.previewThumbnails.withCredentials).then((response) => {
         const thumbnail = {
           frames: parseVtt(response),
           height: null,
