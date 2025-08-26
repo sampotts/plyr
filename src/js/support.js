@@ -35,28 +35,8 @@ const support = {
   },
 
   // Picture-in-picture support
-  // Safari & Chrome only currently
   pip: (() => {
-    // While iPhone's support picture-in-picture for some apps, seemingly Safari isn't one of them
-    // It will throw the following error when trying to enter picture-in-picture
-    // `NotSupportedError: The Picture-in-Picture mode is not supported.`
-    if (browser.isIPhone) {
-      return false;
-    }
-
-    // Safari
-    // https://developer.apple.com/documentation/webkitjs/adding_picture_in_picture_to_your_safari_media_controls
-    if (is.function(createElement('video').webkitSetPresentationMode)) {
-      return true;
-    }
-
-    // Chrome
-    // https://developers.google.com/web/updates/2018/10/watch-video-using-picture-in-picture
-    if (document.pictureInPictureEnabled && !createElement('video').disablePictureInPicture) {
-      return true;
-    }
-
-    return false;
+    return (document.pictureInPictureEnabled && !createElement('video').disablePictureInPicture);
   })(),
 
   // Airplay support
