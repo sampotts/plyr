@@ -845,7 +845,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [TomTom.com](http://prioritydriving.tomtom.com/)
 - [DIGBMX](http://digbmx.com/)
 - [Grime Archive](https://grimearchive.com/)
-- [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+- [Koel - Music streaming solution that works](https://koel.dev/)
 - [Oscar Radio](http://oscar-radio.xyz/)
 - [Sparkk TV](https://www.sparkktv.com/)
 - [@halfhalftravel](https://www.halfhalftravel.com/)
