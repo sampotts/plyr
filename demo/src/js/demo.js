@@ -25,6 +25,10 @@ import sources from './sources';
     });
   }
 
+  function createPlyrInstance(selector, config) {
+    return new Plyr(selector, config);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const selector = '#player';
 
@@ -39,7 +43,7 @@ import sources from './sources';
     });
 
     // Setup the player
-    const player = new Plyr(selector, {
+    const player = createPlyrInstance(selector, {
       debug: true,
       title: 'View From A Blue Moon',
       iconUrl: 'dist/demo.svg',
@@ -104,6 +108,46 @@ import sources from './sources';
     let currentType = window.location.hash.substring(1);
     const hasInitialType = currentType.length;
 
+    /* The audio player needs the container element shown/hidden
+     * The video player needs the media element shown/hidden
+     * */
+    function showHlsPlayer() {
+      if (window.player.elements && window.player.elements.container) {
+        window.player.elements.container.hidden = true;
+        if (window.player.media) {
+          window.player.media.hidden = true;
+          window.player.pause();
+        }
+      }
+      if (window.playerHls.elements && window.playerHls.elements.container) {
+        window.playerHls.elements.container.hidden = false;
+        if (window.playerHls.media) {
+          window.playerHls.media.hidden = false;
+        }
+      }
+    }
+
+    /* The audio player needs the container element shown/hidden
+     * The video player needs the media element shown/hidden
+     * */
+    function showMainPlayer() {
+      if (window.player.elements && window.player.elements.container) {
+        window.player.elements.container.hidden = false;
+        window.player.hidden = false;
+        if (window.player.media) {
+          window.player.media.hidden = false;
+          window.player.media.pause();
+        }
+      }
+      if (window.playerHls.elements && window.playerHls.elements.container) {
+        window.playerHls.elements.container.hidden = true;
+        window.playerHls.hidden = true;
+        if (window.playerHls.media) {
+          window.playerHls.media.hidden = true;
+        }
+      }
+    }
+
     function render(type) {
       // Remove active classes
       Array.from(buttons).forEach((button) => button.parentElement.classList.toggle('active', false));
@@ -118,6 +162,12 @@ import sources from './sources';
       });
 
       document.querySelector(`.plyr__cite--${type}`).hidden = false;
+
+      if (type === 'mux') {
+        showHlsPlayer();
+      } else {
+        showMainPlayer();
+      }
     }
 
     // Set a new source
@@ -127,12 +177,26 @@ import sources from './sources';
         return;
       }
 
-      // Set the new source
-      player.source = sources[type];
-
+      const sourceConfig = sources[type];
+      const hlsSource = sourceConfig.hls_source;
+      if (hlsSource) {
+        window.playerHls = createPlyrInstance('#player-hls', sourceConfig);
+        const video = playerHls.media;
+        if (Hls.isSupported()) {
+          var hls = new Hls();
+          hls.loadSource(hlsSource);
+          hls.attachMedia(video);
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = videoSrc;
+        }
+      } else {
+        if (window.playerHls) {
+          window.playerHls.destroy();
+        }
+        player.source = sourceConfig;
+      }
       // Set the current type for next time
       currentType = type;
-
       render(type);
     }
 

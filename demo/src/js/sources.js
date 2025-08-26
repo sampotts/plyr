@@ -1,4 +1,14 @@
 const sources = {
+  mux: {
+    type: 'video',
+    title: 'View From A Blue Moon',
+    hls_source: 'https://stream.mux.com/lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML.m3u8',
+    poster: 'https://image.mux.com/lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML/thumbnail.jpg',
+    previewThumbnails: {
+      enabled: true,
+      src: 'https://image.mux.com/lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML/storyboard.vtt',
+    },
+  },
   video: {
     type: 'video',
     title: 'View From A Blue Moon',

@@ -35,7 +35,21 @@
 .plyr__cite {
   color: $color-gray-500;
 
+  small {
+    display: flex;
+    justify-content: center;
+  }
+
+  small > :not(:last-child) {
+    margin-right: 10px;
+  }
+
   .icon {
     margin-right: math.div($spacing-base, 6);
   }
+}
+
+.plyr__cite--mux .icon {
+  height: 20px;
+  width: 53px;
 }
