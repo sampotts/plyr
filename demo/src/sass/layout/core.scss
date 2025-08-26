@@ -28,6 +28,10 @@ body {
   overflow: auto;
 }
 
+.grid header {
+  line-height: $line-height-loose;
+}
+
 main {
   margin: auto;
   padding-bottom: 1px; // Collapsing margins

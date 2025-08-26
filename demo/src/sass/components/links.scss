@@ -3,12 +3,15 @@
 // ==========================================================================
 
 .link {
+  display: inline-flex;
+  gap: 0.25rem;
   align-items: center;
   border-bottom: 1px dashed currentColor;
   color: $color-link;
   position: relative;
   text-decoration: none;
   transition: all 0.2s ease;
+  vertical-align: top;
 
   &::after {
     background: currentColor;
@@ -23,7 +26,8 @@
   }
 
   &:hover,
-  &:focus {
+  &:focus,
+  &.active {
     border-bottom-color: transparent;
     outline: 0;
 

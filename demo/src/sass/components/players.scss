@@ -38,10 +38,8 @@
   small {
     display: flex;
     justify-content: center;
-  }
-
-  small > :not(:last-child) {
-    margin-right: 10px;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .icon {

@@ -28,6 +28,7 @@
   color: $color-button-text;
   display: inline-flex;
   font-weight: $font-weight-bold;
+  line-height: $line-height-base;
   gap: 0.25rem;
   padding-left: ($spacing-base * 1.25);
   padding-right: ($spacing-base * 1.25);
@@ -72,6 +73,7 @@
   border: 1px solid $color-gray-100;
   color: $color-button-count-text;
   margin-left: ($spacing-base * 0.75);
+  line-height: $line-height-base;
 
   &::before {
     background-color: $color-button-count-background;
