@@ -1,9 +1,13 @@
+@use "../settings/breakpoints";
+@use "../settings/controls";
+@use "../settings/type";
+
 // --------------------------------------------------------------
 // Time
 // --------------------------------------------------------------
 
 .plyr__time {
-  font-size: $plyr-font-size-time;
+  font-size: type.$plyr-font-size-time;
 }
 
 // Media duration hidden on small screens
@@ -11,10 +15,10 @@
   // Add a slash in before
   &::before {
     content: '\2044';
-    margin-right: $plyr-control-spacing;
+    margin-right: controls.$plyr-control-spacing;
   }
 
-  @media (max-width: ($plyr-bp-md - 1px)) {
+  @media (max-width: (breakpoints.$plyr-bp-md - 1px)) {
     display: none;
   }
 }

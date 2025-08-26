@@ -2,21 +2,24 @@
 // Preview Thumbnails
 // --------------------------------------------------------------
 
-@import './settings';
+@use "settings";
+@use "../../lib/css-vars";
 
 .plyr__preview-thumb {
-  background-color: $plyr-preview-background;
-  border-radius: $plyr-preview-radius;
+  background-color: settings.$plyr-preview-background;
+  border-radius: settings.$plyr-preview-radius;
   bottom: 100%;
-  box-shadow: $plyr-preview-shadow;
-  margin-bottom: calc(#{$plyr-preview-padding} * 2);
+  box-shadow: settings.$plyr-preview-shadow;
+  margin-bottom: calc(#{settings.$plyr-preview-padding} * 2);
   opacity: 0;
   padding: 3px;
   pointer-events: none;
   position: absolute;
   transform: translate(0, 10px) scale(0.8);
   transform-origin: 50% 100%;
-  transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
+  transition:
+    transform 0.2s 0.1s ease,
+    opacity 0.2s 0.1s ease;
   z-index: 2;
 
   &--is-shown {
@@ -26,13 +29,15 @@
 
   // The background triangle
   &::before {
-    border-left: $plyr-preview-arrow-size solid transparent;
-    border-right: $plyr-preview-arrow-size solid transparent;
-    border-top: $plyr-preview-arrow-size solid $plyr-preview-background;
-    bottom: calc(#{$plyr-preview-arrow-size} * -1);
-    content: '';
+    border-left: settings.$plyr-preview-arrow-size solid transparent;
+    border-right: settings.$plyr-preview-arrow-size solid transparent;
+    border-top: settings.$plyr-preview-arrow-size solid
+      settings.$plyr-preview-background;
+    bottom: calc(#{settings.$plyr-preview-arrow-size} * -1);
+    content: "";
     height: 0;
-    left: calc(50% + var(--preview-arrow-offset));
+    // left: calc(50% + css-vars.var(--preview-arrow-offset));
+    left: calc(50% + var(--preview-arrow-offset, 0px));
     position: absolute;
     transform: translateX(-50%);
     width: 0;
@@ -40,8 +45,8 @@
   }
 
   &__image-container {
-    background: $plyr-preview-image-background;
-    border-radius: calc(#{$plyr-preview-radius} - 1px);
+    background: settings.$plyr-preview-image-background;
+    border-radius: calc(#{settings.$plyr-preview-radius} - 1px);
     overflow: hidden;
     position: relative;
     z-index: 0;
@@ -58,7 +63,7 @@
     &::after {
       border-radius: inherit;
       box-shadow: inset 0 0 0 1px rgba(#000, 15%);
-      content: '';
+      content: "";
       pointer-events: none;
     }
 
@@ -71,20 +76,20 @@
 
   // Seek time text
   &__time-container {
-    background: $plyr-preview-time-container-background;
-    border-bottom-left-radius: calc(#{$plyr-preview-radius} - 1px);
-    border-bottom-right-radius: calc(#{$plyr-preview-radius} - 1px);
+    background: settings.$plyr-preview-time-container-background;
+    border-bottom-left-radius: calc(#{settings.$plyr-preview-radius} - 1px);
+    border-bottom-right-radius: calc(#{settings.$plyr-preview-radius} - 1px);
     bottom: 0;
     left: 0;
     line-height: 1.1;
-    padding: $plyr-preview-time-container-padding;
+    padding: settings.$plyr-preview-time-container-padding;
     position: absolute;
     right: 0;
     z-index: 3;
 
     span {
-      color: $plyr-preview-time-color;
-      font-size: $plyr-preview-time-font-size;
+      color: settings.$plyr-preview-time-color;
+      font-size: settings.$plyr-preview-time-font-size;
     }
   }
 }

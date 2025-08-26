@@ -1,3 +1,7 @@
+@use "../settings/breakpoints";
+@use "../settings/captions";
+@use "../settings/controls";
+
 // --------------------------------------------------------------
 // Captions
 // --------------------------------------------------------------
@@ -11,9 +15,9 @@
   animation: plyr-fade-in 0.3s ease;
   bottom: 0;
   display: none;
-  font-size: $plyr-font-size-captions-small;
+  font-size: captions.$plyr-font-size-captions-small;
   left: 0;
-  padding: $plyr-control-spacing;
+  padding: controls.$plyr-control-spacing;
   position: absolute;
   text-align: center;
   transition: transform 0.4s ease-in-out;
@@ -23,13 +27,13 @@
     display: none;
   }
 
-  @media (min-width: $plyr-bp-sm) {
-    font-size: $plyr-font-size-captions-base;
-    padding: calc(#{$plyr-control-spacing} * 2);
+  @media (min-width: breakpoints.$plyr-bp-sm) {
+    font-size: captions.$plyr-font-size-captions-base;
+    padding: calc(#{controls.$plyr-control-spacing} * 2);
   }
 
-  @media (min-width: $plyr-bp-md) {
-    font-size: $plyr-font-size-captions-medium;
+  @media (min-width: breakpoints.$plyr-bp-md) {
+    font-size: captions.$plyr-font-size-captions-medium;
   }
 }
 
@@ -39,14 +43,14 @@
 
 // If the lower controls are shown and not empty
 .plyr:not(.plyr--hide-controls) .plyr__controls:not(:empty) ~ .plyr__captions {
-  transform: translateY(calc(#{$plyr-control-spacing} * -4));
+  transform: translateY(calc(#{controls.$plyr-control-spacing} * -4));
 }
 
 .plyr__caption {
-  background: $plyr-captions-background;
+  background: captions.$plyr-captions-background;
   border-radius: 2px;
   box-decoration-break: clone;
-  color: $plyr-captions-text-color;
+  color: captions.$plyr-captions-text-color;
   line-height: 185%;
   padding: 0.2em 0.5em;
   white-space: pre-wrap;

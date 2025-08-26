@@ -1,5 +1,8 @@
+@use "../lib/css-vars";
+@use "colors";
+
 // ==========================================================================
 // Cosmetic
 // ==========================================================================
 
-$plyr-focus-visible-color: var(--plyr-focus-visible-color, var(--plyr-color-main, $plyr-color-main)) !default;
+$plyr-focus-visible-color: css-vars.var(--plyr-focus-visible-color, css-vars.var(--plyr-color-main, colors.$plyr-color-main)) !default;

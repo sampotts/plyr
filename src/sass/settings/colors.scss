@@ -1,9 +1,11 @@
+@use "../lib/css-vars";
+
 // ==========================================================================
 // Colors
 // ==========================================================================
 
-$plyr-color-main: var(--plyr-color-main, hsl(198deg 100% 50%)) !default;
-$plyr-video-background: var(--plyr-video-background, rgb(0 0 0 / 100%)) !default;
+$plyr-color-main: css-vars.var(--plyr-color-main, hsl(198deg 100% 50%)) !default;
+$plyr-video-background: css-vars.var(--plyr-video-background, rgb(0 0 0 / 100%)) !default;
 
 // Grayscale
 $plyr-color-gray-900: hsl(216deg 15% 16%) !default;

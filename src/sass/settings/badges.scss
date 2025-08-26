@@ -1,7 +1,10 @@
+@use "../lib/css-vars";
+@use "colors";
+
 // ==========================================================================
 // Badges
 // ==========================================================================
 
-$plyr-badge-background: var(--plyr-badge-background, $plyr-color-gray-700) !default;
-$plyr-badge-text-color: var(--plyr-badge-text-color, #fff) !default;
-$plyr-badge-border-radius: var(--plyr-badge-border-radius, 2px) !default;
+$plyr-badge-background: css-vars.var(--plyr-badge-background, colors.$plyr-color-gray-700) !default;
+$plyr-badge-text-color: css-vars.var(--plyr-badge-text-color, #fff) !default;
+$plyr-badge-border-radius: css-vars.var(--plyr-badge-border-radius, 2px) !default;
