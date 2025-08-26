@@ -12,7 +12,7 @@
   overflow: visible; // IE11
   padding: $plyr-control-padding;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.1s ease-in-out;
 
   svg {
     display: block;

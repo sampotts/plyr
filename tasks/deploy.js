@@ -1,25 +1,25 @@
-/* eslint-disable import/no-extraneous-dependencies */
 // ==========================================================================
-// Publish a version to CDN and demo
+// Publish a version to CDN and demo (ESM version)
 // ==========================================================================
-/* eslint no-console: "off" */
 
-const path = require('path');
-const gulp = require('gulp');
-// Utils
-const gitbranch = require('git-branch');
-const rename = require('gulp-rename');
-const replace = require('gulp-replace');
-const { green, cyan, bold } = require('colorette');
-const log = require('fancy-log');
-const open = require('gulp-open');
-const size = require('gulp-size');
-// Deployment
-const aws = require('aws-sdk');
-const publish = require('gulp-awspublish');
-// Configs
-const pkg = require('../package.json');
-const deploy = require('../deploy.json');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import gulp from 'gulp';
+import gitbranch from 'git-branch';
+import rename from 'gulp-rename';
+import replace from 'gulp-replace';
+import { green, cyan, bold } from 'colorette';
+import log from 'fancy-log';
+import open from 'gulp-open';
+import size from 'gulp-size';
+import aws from 'aws-sdk';
+import publish from 'gulp-awspublish';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const pkg = JSON.parse(readFileSync(join(path.resolve(), 'package.json'), 'utf-8'));
+const deploy = JSON.parse(readFileSync(join(path.resolve(), 'deploy.json'), 'utf-8'));
+
 // Info from package
 const { version } = pkg;
 const minSuffix = '.min';
@@ -38,6 +38,7 @@ Object.values(deploy).forEach((target) => {
 });
 
 // Paths
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const paths = {
   demo: path.join(root, 'demo/'),
@@ -82,7 +83,6 @@ const options = {
   symlinks(ver, filename) {
     return {
       headers: {
-        // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
         'x-amz-website-redirect-location': `/${ver}/${filename}`,
         'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
       },
@@ -115,7 +115,7 @@ const canDeploy = () => {
   return true;
 };
 
-gulp.task('version', (done) => {
+export const versionTask = (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -136,10 +136,9 @@ gulp.task('version', (done) => {
     .pipe(replace(semver, `v${version}`))
     .pipe(replace(cdnpath, `${domain}/${version}/`))
     .pipe(gulp.dest('./'));
-});
+};
 
-// Publish version to CDN bucket
-gulp.task('cdn', (done) => {
+export const cdnTask = (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -154,26 +153,22 @@ gulp.task('cdn', (done) => {
   log(`Uploading ${green(bold(pkg.version))} to ${cyan(domain)}...`);
 
   // Upload to CDN
-  return (
-    gulp
-      .src(paths.upload)
-      .pipe(renameFile)
-      // Remove min suffix from source map URL
-      .pipe(
-        replace(
-          /sourceMappingURL=([\w-?.]+)/,
-          (match, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
-        ),
-      )
-      .pipe(size(sizeOptions))
-      .pipe(replace(localPath, versionPath))
-      .pipe(publisher.publish(options.cdn.headers))
-      .pipe(publish.reporter())
-  );
-});
+  return gulp
+    .src(paths.upload)
+    .pipe(renameFile)
+    .pipe(
+      replace(
+        /sourceMappingURL=([\w-?.]+)/,
+        (match, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
+      ),
+    )
+    .pipe(size(sizeOptions))
+    .pipe(replace(localPath, versionPath))
+    .pipe(publisher.publish(options.cdn.headers))
+    .pipe(publish.reporter());
+};
 
-// Publish to demo bucket
-gulp.task('demo', (done) => {
+export const demoTask = (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -195,7 +190,6 @@ gulp.task('demo', (done) => {
     .pipe(gulp.dest(root));
 
   // Replace local file paths with remote paths in demo HTML
-  // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
   const index = `${paths.demo}index.html`;
   const error = `${paths.demo}error.html`;
   const pages = [index];
@@ -210,17 +204,15 @@ gulp.task('demo', (done) => {
     .pipe(
       rename((p) => {
         if (options.demo.uploadPath) {
-          // eslint-disable-next-line no-param-reassign
           p.dirname += options.demo.uploadPath;
         }
       }),
     )
     .pipe(publisher.publish(options.demo.headers))
     .pipe(publish.reporter());
-});
+};
 
-// Open the demo site to check it's ok
-gulp.task('open', () => {
+export const openTask = () => {
   const { domain } = deploy.demo;
 
   return gulp.src(__filename).pipe(
@@ -228,7 +220,8 @@ gulp.task('open', () => {
       uri: `https://${domain}/${branch.isBeta ? 'beta' : ''}`,
     }),
   );
-});
+};
 
-// Do everything
-gulp.task('deploy', gulp.series('cdn', 'demo', 'open'));
+export const deployTask = gulp.series(cdnTask, demoTask, openTask);
+
+export default deployTask;

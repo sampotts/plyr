@@ -866,7 +866,7 @@ If you want to be added to the list, open a pull request. It'd be awesome to see
 
 # Thanks
 
-- [Cloudflare](https://www.cloudflare.com/) and [Fastly](https://www.fastly.com/) for providing the CDN services.
+- [Cloudflare](https://www.cloudflare.com/) for providing the CDN services.
 - [Sentry](https://sentry.io/) for error logging service on the demo website.
 
 ## Contributors

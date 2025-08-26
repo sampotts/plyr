@@ -1,65 +1,58 @@
-/* eslint-disable import/no-extraneous-dependencies */
 // ==========================================================================
-// Gulp build script
+// Gulp build script (ESM version)
 // ==========================================================================
-/* eslint no-console: "off" */
 
-const path = require('path');
-const gulp = require('gulp');
-// JavaScript
-const terser = require('gulp-terser');
-const rollup = require('gulp-better-rollup');
-const babel = require('rollup-plugin-babel');
-const commonjs = require('rollup-plugin-commonjs');
-const resolve = require('rollup-plugin-node-resolve');
-// CSS
-const sass = require('gulp-sass')(require('sass'));
-const postcss = require('gulp-postcss');
-const autoprefixer = require('autoprefixer');
-const cssnano = require('cssnano');
-const customprops = require('postcss-custom-properties');
-// Images
-const svgstore = require('gulp-svgstore');
-const imagemin = require('gulp-imagemin');
-// Utils
-const del = require('del');
-const filter = require('gulp-filter');
-const header = require('gulp-header');
-const rename = require('gulp-rename');
-const plumber = require('gulp-plumber');
-const size = require('gulp-size');
-const sourcemaps = require('gulp-sourcemaps');
-const browserSync = require('browser-sync').create();
-const gulpIf = require('gulp-if');
-// Configs
-const build = require('../build.json');
-// Info from package
+import path from 'node:path';
+import gulp from 'gulp';
+import terser from 'gulp-terser';
+import rollup from 'gulp-better-rollup';
+import babel from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import sass from 'gulp-sass';
+import * as dartSass from 'sass';
+import postcss from 'gulp-postcss';
+import autoprefixer from 'autoprefixer';
+import cssnano from 'cssnano';
+import customprops from 'postcss-custom-properties';
+import svgstore from 'gulp-svgstore';
+import imagemin from 'gulp-imagemin';
+import imageminSvgo from 'imagemin-svgo';
+import { deleteAsync } from 'del';
+import filter from 'gulp-filter';
+import header from 'gulp-header';
+import rename from 'gulp-rename';
+import plumber from 'gulp-plumber';
+import size from 'gulp-size';
+import sourcemaps from 'gulp-sourcemaps';
+import browserSync from 'browser-sync';
+import gulpIf from 'gulp-if';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const jobs = JSON.parse(readFileSync(join(path.resolve(), 'build.json'), 'utf-8'));
+
+const bs = browserSync.create();
+const sassCompiler = sass(dartSass);
 const minSuffix = '.min';
+
 // Paths
-const root = path.join(__dirname, '..');
+const root = path.resolve();
 const paths = {
   plyr: {
-    // Source paths
     src: {
       sass: path.join(root, 'src/sass/**/*.scss'),
       js: path.join(root, 'src/js/**/*.js'),
       sprite: path.join(root, 'src/sprite/*.svg'),
     },
-
-    // Output paths
     output: path.join(root, 'dist/'),
   },
   demo: {
-    // Source paths
     src: {
       sass: path.join(root, 'demo/src/sass/**/*.scss'),
       js: path.join(root, 'demo/src/js/**/*.js'),
     },
-
-    // Output paths
     output: path.join(root, 'demo/dist/'),
-
-    // Demo
     root: path.join(root, 'demo/'),
   },
 };
@@ -71,23 +64,18 @@ const tasks = {
   sprite: [],
 };
 
-// Size plugin
+// Size plugin options
 const sizeOptions = { showFiles: true, gzip: true };
 
-// Clean out /dist
-gulp.task('clean', (done) => {
+// Clean task
+export async function clean() {
   const dirs = [paths.plyr.output, paths.demo.output].map((dir) => path.join(dir, '**/*'));
-
-  // Don't delete the mp4
   dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
+  return await deleteAsync(dirs);
+};
 
-  del(dirs);
-
-  done();
-});
-
-// JavaScript
-Object.entries(build.js).forEach(([filename, entry]) => {
+// JavaScript tasks
+Object.entries(jobs.js).forEach(([filename, entry]) => {
   const { dist, formats, namespace, polyfill, src } = entry;
 
   formats.forEach((format) => {
@@ -107,11 +95,11 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                 resolve(),
                 commonjs(),
                 babel({
+                  babelHelpers: 'bundled',
                   presets: [
                     [
                       '@babel/env',
                       {
-                        // debug: true,
                         useBuiltIns: polyfill ? 'usage' : false,
                         corejs: polyfill ? 3 : undefined,
                         bugfixes: true,
@@ -134,12 +122,8 @@ Object.entries(build.js).forEach(([filename, entry]) => {
             },
           ),
         )
-        .pipe(gulpIf(() => extension !== 'mjs', header('typeof navigator === "object" && '))) // "Support" SSR (#935)
-        .pipe(
-          rename({
-            extname: `.${extension}`,
-          }),
-        )
+        .pipe(gulpIf(() => extension !== 'mjs', header('typeof navigator === "object" && ')))
+        .pipe(rename({ extname: `.${extension}` }))
         .pipe(gulp.dest(dist))
         .pipe(filter(`**/*.${extension}`))
         .pipe(terser())
@@ -151,8 +135,8 @@ Object.entries(build.js).forEach(([filename, entry]) => {
   });
 });
 
-// CSS
-Object.entries(build.css).forEach(([filename, entry]) => {
+// CSS tasks
+Object.entries(jobs.css).forEach(([filename, entry]) => {
   const { dist, src } = entry;
   const name = `css:${filename}`;
   tasks.css.push(name);
@@ -161,14 +145,12 @@ Object.entries(build.css).forEach(([filename, entry]) => {
     gulp
       .src(src)
       .pipe(plumber())
-      .pipe(sass())
+      .pipe(sassCompiler())
       .pipe(
         postcss([
           customprops(),
           autoprefixer(),
-          cssnano({
-            preset: 'default',
-          }),
+          cssnano({ preset: 'default' }),
         ]),
       )
       .pipe(size(sizeOptions))
@@ -176,8 +158,8 @@ Object.entries(build.css).forEach(([filename, entry]) => {
   );
 });
 
-// SVG Sprites
-Object.entries(build.sprite).forEach(([filename, entry]) => {
+// SVG Sprite tasks
+Object.entries(jobs.sprite).forEach(([filename, entry]) => {
   const { dist, src } = entry;
   const name = `sprite:${filename}`;
   tasks.sprite.push(name);
@@ -188,8 +170,17 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
       .pipe(plumber())
       .pipe(
         imagemin([
-          imagemin.svgo({
-            plugins: [{ removeViewBox: false }],
+          imageminSvgo({
+            plugins: [
+              {
+                name: 'preset-default',
+                params: {
+                  overrides: {
+                    removeViewBox: false, // Keep viewBox attribute
+                  },
+                },
+              },
+            ],
           }),
         ]),
       )
@@ -200,37 +191,33 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
   );
 });
 
-// Build all tasks
-gulp.task('js', gulp.parallel(...tasks.js));
-gulp.task('css', gulp.parallel(...tasks.css));
-gulp.task('sprites', gulp.parallel(...tasks.sprite));
+// Build tasks
+export const js = gulp.parallel(...tasks.js);
+export const css = gulp.parallel(...tasks.css);
+export const sprites = gulp.parallel(...tasks.sprite);
 
-// Watch for file changes
-gulp.task('watch', () => {
-  // Plyr core
-  gulp.watch(paths.plyr.src.js, gulp.parallel('js'));
-  gulp.watch(paths.plyr.src.sass, gulp.parallel('css'));
-  gulp.watch(paths.plyr.src.sprite, gulp.parallel('sprites'));
+// Watch task
+export const watch = () => {
+  gulp.watch(paths.plyr.src.js, js);
+  gulp.watch(paths.plyr.src.sass, css);
+  gulp.watch(paths.plyr.src.sprite, sprites);
+  gulp.watch(paths.demo.src.js, js);
+  gulp.watch(paths.demo.src.sass, css);
+};
 
-  // Demo
-  gulp.watch(paths.demo.src.js, gulp.parallel('js'));
-  gulp.watch(paths.demo.src.sass, gulp.parallel('css'));
-});
-
-// Serve via browser sync
-gulp.task('serve', () =>
-  browserSync.init({
+// Serve task
+export const serve = () =>
+  bs.init({
     server: {
       baseDir: paths.demo.root,
     },
     notify: false,
     watch: true,
     ghostMode: false,
-  }),
-);
+  });
 
 // Build distribution
-gulp.task('build', gulp.series('clean', gulp.parallel('js', 'css', 'sprites')));
+export const build = gulp.series(clean, gulp.parallel(js, css, sprites));
 
-// Default gulp task
-gulp.task('default', gulp.series('build', gulp.parallel('serve', 'watch')));
+// Default task
+export default gulp.series(build, gulp.parallel(serve, watch));

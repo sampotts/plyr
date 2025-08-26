@@ -56,6 +56,10 @@ import sources from './sources';
       captions: {
         active: true,
       },
+      fullscreen: {
+        iosNative: true,
+      },
+      playsinline: true,
       /* ads: {
         enabled: isProduction,
         publisherId: '918848828995742',

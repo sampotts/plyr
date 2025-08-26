@@ -1,12 +1,12 @@
 {
-    // See http://go.microsoft.com/fwlink/?LinkId=827846
-    // for the documentation about the extensions.json format
-    "recommendations": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "wayou.vscode-todo-highlight",
-        "wix.vscode-import-cost",
-        "stylelint.vscode-stylelint",
-        "pflannery.vscode-versionlens"
-    ]
+  // See http://go.microsoft.com/fwlink/?LinkId=827846
+  // for the documentation about the extensions.json format
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "hyrious.import-cost",
+    "pflannery.vscode-versionlens",
+    "streetsidesoftware.code-spell-checker",
+    "DavidAnson.vscode-markdownlint"
+  ]
 }

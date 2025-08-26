@@ -1,0 +1,101 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@sentry/browser':
+        specifier: ^10.5.0
+        version: 10.5.0
+      core-js:
+        specifier: ^3.45.1
+        version: 3.45.1
+      custom-event-polyfill:
+        specifier: ^1.0.7
+        version: 1.0.7
+      shr-buttons:
+        specifier: 2.0.3
+        version: 2.0.3
+      url-polyfill:
+        specifier: ^1.1.13
+        version: 1.1.13
+
+packages:
+
+  '@sentry-internal/browser-utils@10.5.0':
+    resolution: {integrity: sha512-4KIJdEj/8Ip9yqJleVSFe68r/U5bn5o/lYUwnFNEnDNxmpUbOlr7x3DXYuRFi1sfoMUxK9K1DrjnBkR7YYF00g==}
+    engines: {node: '>=18'}
+
+  '@sentry-internal/feedback@10.5.0':
+    resolution: {integrity: sha512-x79P4VZwUxb1EGZb9OQ5EEgrDWFCUlrbzHBwV/oocQA5Ss1SFz5u6cP5Ak7yJtILiJtdGzAyAoQOy4GKD13D4Q==}
+    engines: {node: '>=18'}
+
+  '@sentry-internal/replay-canvas@10.5.0':
+    resolution: {integrity: sha512-5nrRKd5swefd9+sFXFZ/NeL3bz/VxBls3ubAQ3afak15FikkSyHq3oKRKpMOtDsiYKXE3Bc0y3rF5A+y3OXjIA==}
+    engines: {node: '>=18'}
+
+  '@sentry-internal/replay@10.5.0':
+    resolution: {integrity: sha512-Dp4coE/nPzhFrYH3iVrpVKmhNJ1m/jGXMEDBCNg3wJZRszI41Hrj0jCAM0Y2S3Q4IxYOmFYaFbGtVpAznRyOHg==}
+    engines: {node: '>=18'}
+
+  '@sentry/browser@10.5.0':
+    resolution: {integrity: sha512-o5pEJeZ/iZ7Fmaz2sIirThfnmSVNiP5ZYhacvcDi0qc288TmBbikCX3fXxq3xiSkhXfe1o5QIbNyovzfutyuVw==}
+    engines: {node: '>=18'}
+
+  '@sentry/core@10.5.0':
+    resolution: {integrity: sha512-jTJ8NhZSKB2yj3QTVRXfCCngQzAOLThQUxCl9A7Mv+XF10tP7xbH/88MVQ5WiOr2IzcmrB9r2nmUe36BnMlLjA==}
+    engines: {node: '>=18'}
+
+  core-js@3.45.1:
+    resolution: {integrity: sha512-L4NPsJlCfZsPeXukyzHFlg/i7IIVwHSItR0wg0FLNqYClJ4MQYTYLbC7EkjKYRLZF2iof2MUgN0EGy7MdQFChg==}
+
+  custom-event-polyfill@1.0.7:
+    resolution: {integrity: sha512-TDDkd5DkaZxZFM8p+1I3yAlvM3rSr1wbrOliG4yJiwinMZN8z/iGL7BTlDkrJcYTmgUSb4ywVCc3ZaUtOtC76w==}
+
+  shr-buttons@2.0.3:
+    resolution: {integrity: sha512-sPAgHiw4uaIt9TnxTfyZEedDChcldSVtnBHE44cpe/mSC7rqm4IEKZRLYqnVlTcGM+FSDNBPUNpSf50Q2ntd+w==}
+
+  url-polyfill@1.1.13:
+    resolution: {integrity: sha512-tXzkojrv2SujumYthZ/WjF7jaSfNhSXlYMpE5AYdL2I3D7DCeo+mch8KtW2rUuKjDg+3VXODXHVgipt8yGY/eQ==}
+
+snapshots:
+
+  '@sentry-internal/browser-utils@10.5.0':
+    dependencies:
+      '@sentry/core': 10.5.0
+
+  '@sentry-internal/feedback@10.5.0':
+    dependencies:
+      '@sentry/core': 10.5.0
+
+  '@sentry-internal/replay-canvas@10.5.0':
+    dependencies:
+      '@sentry-internal/replay': 10.5.0
+      '@sentry/core': 10.5.0
+
+  '@sentry-internal/replay@10.5.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 10.5.0
+      '@sentry/core': 10.5.0
+
+  '@sentry/browser@10.5.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 10.5.0
+      '@sentry-internal/feedback': 10.5.0
+      '@sentry-internal/replay': 10.5.0
+      '@sentry-internal/replay-canvas': 10.5.0
+      '@sentry/core': 10.5.0
+
+  '@sentry/core@10.5.0': {}
+
+  core-js@3.45.1: {}
+
+  custom-event-polyfill@1.0.7: {}
+
+  shr-buttons@2.0.3: {}
+
+  url-polyfill@1.1.13: {}
