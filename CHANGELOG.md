@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.8.2
+
+- Add missing types export in package.json.
+
 ### v3.8.1
 
 - Fix exports-related regression in 3.8.0. Sorry!
