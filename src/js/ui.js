@@ -21,7 +21,8 @@ const ui = {
   toggleNativeControls(toggle = false) {
     if (toggle && this.isHTML5) {
       this.media.setAttribute('controls', '');
-    } else {
+    }
+    else {
       this.media.removeAttribute('controls');
     }
   },
@@ -277,7 +278,7 @@ const ui = {
     // Loop through values (as they are the keys when the object is spread 🤔)
     Object.values({ ...this.media.style })
       // We're only fussed about Plyr specific properties
-      .filter((key) => !is.empty(key) && is.string(key) && key.startsWith('--plyr'))
+      .filter(key => !is.empty(key) && is.string(key) && key.startsWith('--plyr'))
       .forEach((key) => {
         // Set on the container
         this.elements.container.style.setProperty(key, this.media.style.getPropertyValue(key));

@@ -23,7 +23,9 @@
   background-color: $color-button-background;
   background-image: linear-gradient(0deg, transparent, rgba(255, 255, 255, 0.05));
   border: 1px solid darken($color-button-background, 5);
-  box-shadow: 0 0.8px 1px hsl(var(--shadow-color) / 0.05), 0 1.3px 1.6px -1px hsl(var(--shadow-color) / 0.06),
+  box-shadow:
+    0 0.8px 1px hsl(var(--shadow-color) / 0.05),
+    0 1.3px 1.6px -1px hsl(var(--shadow-color) / 0.06),
     0 2.8px 3.4px -2px hsl(var(--shadow-color) / 0.07);
   color: $color-button-text;
   display: inline-flex;

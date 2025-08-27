@@ -13,7 +13,7 @@ export function generateId(prefix) {
 export function format(input, ...args) {
   if (is.empty(input)) return input;
 
-  return input.toString().replace(/{(\d+)}/g, (_, i) => args[i].toString());
+  return input.toString().replace(/\{(\d+)\}/g, (_, i) => args[i].toString());
 }
 
 // Get percentage
@@ -26,12 +26,14 @@ export function getPercentage(current, max) {
 }
 
 // Replace all occurrences of a string in a string
-export const replaceAll = (input = '', find = '', replace = '') =>
-  input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
+export function replaceAll(input = '', find = '', replace = '') {
+  return input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
+}
 
 // Convert to title case
-export const toTitleCase = (input = '') =>
-  input.toString().replace(/\w\S*/g, (text) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase());
+export function toTitleCase(input = '') {
+  return input.toString().replace(/\w\S*/g, text => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase());
+}
 
 // Convert string to pascalCase
 export function toPascalCase(input = '') {
@@ -67,7 +69,7 @@ export function stripHTML(source) {
   const element = document.createElement('div');
   fragment.appendChild(element);
   element.innerHTML = source;
-  return fragment.firstChild.innerText;
+  return fragment.firstChild.textContent;
 }
 
 // Like outerHTML, but also works for DocumentFragment

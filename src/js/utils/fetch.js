@@ -9,9 +9,7 @@ export default function fetch(url, responseType = 'text', withCredentials = fals
       const request = new XMLHttpRequest();
 
       // Check for CORS support
-      if (!('withCredentials' in request)) {
-        return;
-      }
+      if (!('withCredentials' in request)) return;
 
       // Set to true if needed for CORS
       if (withCredentials) {
@@ -22,10 +20,12 @@ export default function fetch(url, responseType = 'text', withCredentials = fals
         if (responseType === 'text') {
           try {
             resolve(JSON.parse(request.responseText));
-          } catch (_) {
+          }
+          catch {
             resolve(request.responseText);
           }
-        } else {
+        }
+        else {
           resolve(request.response);
         }
       });
@@ -35,12 +35,10 @@ export default function fetch(url, responseType = 'text', withCredentials = fals
       });
 
       request.open('GET', url, true);
-
-      // Set the required response type
       request.responseType = responseType;
-
       request.send();
-    } catch (error) {
+    }
+    catch (error) {
       reject(error);
     }
   });

@@ -14,19 +14,15 @@ class Storage {
   // Check for actual support (see if we can use it)
   static get supported() {
     try {
-      if (!('localStorage' in window)) {
-        return false;
-      }
-
+      if (!('localStorage' in window)) return false;
       const test = '___test';
-
       // Try to use it (it might be disabled, e.g. user is in private mode)
       // see: https://github.com/sampotts/plyr/issues/131
       window.localStorage.setItem(test, test);
       window.localStorage.removeItem(test);
-
       return true;
-    } catch (_) {
+    }
+    catch {
       return false;
     }
   }
@@ -35,15 +31,9 @@ class Storage {
     if (!Storage.supported || !this.enabled) {
       return null;
     }
-
     const store = window.localStorage.getItem(this.key);
-
-    if (is.empty(store)) {
-      return null;
-    }
-
+    if (is.empty(store)) return null;
     const json = JSON.parse(store);
-
     return is.string(key) && key.length ? json[key] : json;
   };
 
@@ -53,7 +43,7 @@ class Storage {
       return;
     }
 
-    // Can only store objectst
+    // Can only store objects
     if (!is.object(object)) {
       return;
     }
@@ -72,9 +62,8 @@ class Storage {
     // Update storage
     try {
       window.localStorage.setItem(this.key, JSON.stringify(storage));
-    } catch (_) {
-      // Do nothing
     }
+    catch { }
   };
 }
 

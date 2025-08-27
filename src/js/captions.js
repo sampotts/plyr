@@ -34,9 +34,9 @@ const captions = {
     if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
       // Clear menu and hide
       if (
-        is.array(this.config.controls) &&
-        this.config.controls.includes('settings') &&
-        this.config.settings.includes('captions')
+        is.array(this.config.controls)
+        && this.config.controls.includes('settings')
+        && this.config.settings.includes('captions')
       ) {
         controls.setCaptionsMenu.call(this);
       }
@@ -62,9 +62,9 @@ const captions = {
         const url = parseUrl(src);
 
         if (
-          url !== null &&
-          url.hostname !== window.location.href.hostname &&
-          ['http:', 'https:'].includes(url.protocol)
+          url !== null
+          && url.hostname !== window.location.href.hostname
+          && ['http:', 'https:'].includes(url.protocol)
         ) {
           fetch(src, 'blob')
             .then((blob) => {
@@ -85,7 +85,7 @@ const captions = {
     // * toggled:   The real captions state
 
     const browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
-    const languages = dedupe(browserLanguages.map((language) => language.split('-')[0]));
+    const languages = dedupe(browserLanguages.map(language => language.split('-')[0]));
     let language = (this.storage.get('language') || this.captions.language || this.config.captions.language || 'auto').toLowerCase();
 
     // Use first browser language when language is 'auto'
@@ -120,12 +120,12 @@ const captions = {
     const tracks = captions.getTracks.call(this, true);
     // Get the wanted language
     const { active, language, meta, currentTrackNode } = this.captions;
-    const languageExists = Boolean(tracks.find((track) => track.language === language));
+    const languageExists = Boolean(tracks.find(track => track.language === language));
 
     // Handle tracks (add event listener and "pseudo"-default)
     if (this.isHTML5 && this.isVideo) {
       tracks
-        .filter((track) => !meta.get(track))
+        .filter(track => !meta.get(track))
         .forEach((track) => {
           this.debug.log('Track added', track);
 
@@ -137,9 +137,8 @@ const captions = {
           // Turn off native caption rendering to avoid double captions
           // Note: mode='hidden' forces a track to download. To ensure every track
           // isn't downloaded at once, only 'showing' tracks should be reassigned
-          // eslint-disable-next-line no-param-reassign
+
           if (track.mode === 'showing') {
-            // eslint-disable-next-line no-param-reassign
             track.mode = 'hidden';
           }
 
@@ -161,9 +160,9 @@ const captions = {
 
     // Update available languages in list
     if (
-      is.array(this.config.controls) &&
-      this.config.controls.includes('settings') &&
-      this.config.settings.includes('captions')
+      is.array(this.config.controls)
+      && this.config.controls.includes('settings')
+      && this.config.settings.includes('captions')
     ) {
       controls.setCaptionsMenu.call(this);
     }
@@ -312,19 +311,19 @@ const captions = {
     // For HTML5, use cache instead of current tracks when it exists (if captions.update is false)
     // Filter out removed tracks and tracks that aren't captions/subtitles (for example metadata)
     return tracks
-      .filter((track) => !this.isHTML5 || update || this.captions.meta.has(track))
-      .filter((track) => ['captions', 'subtitles'].includes(track.kind));
+      .filter(track => !this.isHTML5 || update || this.captions.meta.has(track))
+      .filter(track => ['captions', 'subtitles'].includes(track.kind));
   },
 
   // Match tracks based on languages and get the first
   findTrack(languages, force = false) {
     const tracks = captions.getTracks.call(this);
-    const sortIsDefault = (track) => Number((this.captions.meta.get(track) || {}).default);
+    const sortIsDefault = track => Number((this.captions.meta.get(track) || {}).default);
     const sorted = Array.from(tracks).sort((a, b) => sortIsDefault(b) - sortIsDefault(a));
     let track;
 
     languages.every((language) => {
-      track = sorted.find((t) => t.language === language);
+      track = sorted.find(t => t.language === language);
       return !track; // Break iteration if there is a match
     });
 
@@ -386,12 +385,12 @@ const captions = {
       const track = captions.getCurrentTrack.call(this);
 
       cues = Array.from((track || {}).activeCues || [])
-        .map((cue) => cue.getCueAsHTML())
+        .map(cue => cue.getCueAsHTML())
         .map(getHTML);
     }
 
     // Set new caption text
-    const content = cues.map((cueText) => cueText.trim()).join('\n');
+    const content = cues.map(cueText => cueText.trim()).join('\n');
     const changed = content !== this.elements.captions.innerHTML;
 
     if (changed) {

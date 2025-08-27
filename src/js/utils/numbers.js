@@ -4,9 +4,9 @@
  * Example: limit the output of this computation to between 0 and 255
  * (x * 255).clamp(0, 255)
  *
- * @param {Number} input
- * @param {Number} min The lower boundary of the output range
- * @param {Number} max The upper boundary of the output range
+ * @param {number} input
+ * @param {number} min The lower boundary of the output range
+ * @param {number} max The upper boundary of the output range
  * @returns A number within the bounds of min and max
  * @type Number
  */

@@ -16,7 +16,9 @@
   position: absolute;
   transform: translate(0, 10px) scale(0.8);
   transform-origin: 50% 100%;
-  transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
+  transition:
+    transform 0.2s 0.1s ease,
+    opacity 0.2s 0.1s ease;
   z-index: 2;
 
   &--is-shown {
@@ -90,17 +92,14 @@
 }
 
 .plyr__preview-scrubbing {
-  bottom: 0;
   filter: blur(1px);
   height: 100%;
-  left: 0;
+  inset: 0;
   margin: auto; // Required when video is different dimensions to container (e.g. fullscreen)
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
   position: absolute;
-  right: 0;
-  top: 0;
   transition: opacity 0.3s ease;
   width: 100%;
   z-index: 1;

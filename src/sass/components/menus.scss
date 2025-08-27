@@ -40,7 +40,9 @@
 
     > div {
       overflow: hidden;
-      transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      transition:
+        height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     // Arrow
@@ -166,7 +168,9 @@
         opacity: 0;
         top: 50%;
         transform: translateY(-50%) scale(0);
-        transition: transform 0.3s ease, opacity 0.3s ease;
+        transition:
+          transform 0.3s ease,
+          opacity 0.3s ease;
         width: 6px;
       }
 

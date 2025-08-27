@@ -1,6 +1,6 @@
 {
   "plugins": ["stylelint-selector-bem-pattern"],
-  "extends": ["stylelint-config-sass-guidelines", "stylelint-config-prettier"],
+  "extends": ["stylelint-config-sass-guidelines"],
   "customSyntax": "postcss-scss",
   "rules": {
     "selector-class-pattern": null,
@@ -11,6 +11,7 @@
       }
     ],
     "max-nesting-depth": 4,
+    "scss/no-global-function-names": null,
     "plugin/selector-bem-pattern": {
       "preset": "bem",
       "componentName": "(([a-z0-9]+(?!-$)-?)+)",

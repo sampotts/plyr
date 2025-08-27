@@ -1,17 +1,19 @@
 {
   "name": "plyr",
-  "version": "3.7.8",
-  "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
-  "homepage": "https://plyr.io",
-  "author": "Sam Potts <sam@potts.es>",
   "type": "module",
-  "main": "dist/plyr.js",
-  "types": "src/js/plyr.d.ts",
-  "module": "dist/plyr.min.mjs",
-  "jsnext:main": "dist/plyr.min.mjs",
-  "browser": "dist/plyr.min.js",
-  "sass": "src/sass/plyr.scss",
-  "style": "dist/plyr.css",
+  "version": "3.7.8",
+  "packageManager": "pnpm@10.15.0",
+  "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
+  "author": "Sam Potts <sam@potts.es>",
+  "license": "MIT",
+  "homepage": "https://plyr.io",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sampotts/plyr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sampotts/plyr/issues"
+  },
   "keywords": [
     "HTML5 Video",
     "HTML5 Audio",
@@ -21,35 +23,42 @@
     "WordPress",
     "HLS"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/sampotts/plyr.git"
-  },
-  "bugs": {
-    "url": "https://github.com/sampotts/plyr/issues"
-  },
+  "main": "dist/plyr.js",
+  "module": "dist/plyr.min.mjs",
+  "types": "src/js/plyr.d.ts",
+  "jsnext:main": "dist/plyr.min.mjs",
+  "browser": "dist/plyr.min.js",
+  "sass": "src/sass/plyr.scss",
+  "style": "dist/plyr.css",
   "browserslist": "> 1%",
   "scripts": {
     "build": "gulp build",
-    "lint": "eslint src/js && npm run remark && stylelint **/*.scss",
-    "lint:fix": "eslint --fix src/js && stylelint **/*.scss --fix",
+    "lint": "stylelint **/*.scss && eslint src demo && pnpm remark",
+    "lint:fix": "stylelint **/*.scss --fix && eslint src demo --fix",
     "remark": "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",
-    "deploy": "npm run lint && gulp version && gulp build && gulp deploy",
-    "format": "prettier --write \"./{src,demo/src}/**/*.{js,scss}\"",
+    "deploy": "pnpm run lint && gulp version && gulp build && gulp deploy",
     "spellcheck": "cspell \"**/*.{js,md,scss,json}\" --no-must-find-files",
     "start": "gulp"
   },
+  "dependencies": {
+    "core-js": "^3.45.1",
+    "custom-event-polyfill": "^1.0.7",
+    "loadjs": "^4.3.0",
+    "rangetouch": "^2.0.1",
+    "url-polyfill": "^1.1.13"
+  },
   "devDependencies": {
+    "@antfu/eslint-config": "^5.2.1",
     "@babel/core": "^7.28.3",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.27.1",
     "@babel/preset-env": "^7.28.3",
+    "@eslint/eslintrc": "^3.3.1",
+    "@prettier/plugin-xml": "^3.4.2",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
-    "@sampotts/eslint-config": "2.0.3",
     "autoprefixer": "^10.4.21",
     "aws-sdk": "^2.1692.0",
     "babel-eslint": "^10.1.0",
@@ -58,9 +67,11 @@
     "cspell": "^9.2.0",
     "cssnano": "^7.1.1",
     "del": "^8.0.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.34.0",
+    "eslint-plugin-format": "^1.0.1",
     "fancy-log": "^2.0.0",
     "git-branch": "^2.0.1",
+    "globals": "^16.3.0",
     "gulp": "^5.0.1",
     "gulp-awspublish": "^8.0.0",
     "gulp-better-rollup": "^4.0.1",
@@ -82,22 +93,12 @@
     "postcss": "^8.5.6",
     "postcss-custom-properties": "^14.0.6",
     "postcss-scss": "^4.0.9",
-    "prettier-eslint": "^16.4.2",
-    "prettier-stylelint": "^0.4.2",
     "remark-cli": "^12.0.1",
     "remark-validate-links": "^13.1.0",
     "rollup": "^4.48.1",
     "sass": "^1.91.0",
     "stylelint": "^16.23.1",
-    "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-sass-guidelines": "^12.1.0",
     "stylelint-selector-bem-pattern": "^4.0.1"
-  },
-  "dependencies": {
-    "core-js": "^3.45.1",
-    "custom-event-polyfill": "^1.0.7",
-    "loadjs": "^4.3.0",
-    "rangetouch": "^2.0.1",
-    "url-polyfill": "^1.1.13"
   }
 }

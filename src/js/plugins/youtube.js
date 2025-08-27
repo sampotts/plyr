@@ -20,7 +20,8 @@ function parseId(url) {
   }
 
   const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  return url.match(regex) ? RegExp.$2 : url;
+  const match = url.match(regex);
+  return match && match[2] ? match[2] : url;
 }
 
 // Set playback state and trigger change (only on actual change)
@@ -55,7 +56,8 @@ const youtube = {
     // Setup API
     if (is.object(window.YT) && is.function(window.YT.Player)) {
       youtube.ready.call(this);
-    } else {
+    }
+    else {
       // Reference current global callback
       const callback = window.onYouTubeIframeAPIReady;
 
@@ -128,13 +130,13 @@ const youtube = {
 
     // Only load the poster when using custom controls
     if (config.customControls) {
-      const posterSrc = (s) => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
+      const posterSrc = s => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
 
       // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
       loadImage(posterSrc('maxres'), 121) // Highest quality and un-padded
         .catch(() => loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
         .catch(() => loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
-        .then((image) => ui.setPoster.call(player, image.src))
+        .then(image => ui.setPoster.call(player, image.src))
         .then((src) => {
           // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
           if (!src.includes('maxres')) {
@@ -176,8 +178,8 @@ const youtube = {
           if (!player.media.error) {
             const code = event.data;
             // Messages copied from https://developers.google.com/youtube/iframe_api_reference#onError
-            const message =
-              {
+            const message
+              = {
                 2: 'The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.',
                 5: 'The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.',
                 100: 'The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.',
@@ -304,7 +306,7 @@ const youtube = {
           // Get available speeds
           const speeds = instance.getAvailablePlaybackRates();
           // Filter based on config
-          player.options.speed = speeds.filter((s) => player.config.speed.options.includes(s));
+          player.options.speed = speeds.filter(s => player.config.speed.options.includes(s));
 
           // Set the tabindex to avoid focus entering iframe
           if (player.supported.ui && config.customControls) {
@@ -385,7 +387,8 @@ const youtube = {
                 // YouTube needs a call to `stopVideo` before playing again
                 instance.stopVideo();
                 instance.playVideo();
-              } else {
+              }
+              else {
                 triggerEvent.call(player, player.media, 'ended');
               }
 
@@ -395,7 +398,8 @@ const youtube = {
               // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
               if (config.customControls && !player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                 player.media.pause();
-              } else {
+              }
+              else {
                 assurePlaybackState.call(player, true);
 
                 triggerEvent.call(player, player.media, 'playing');

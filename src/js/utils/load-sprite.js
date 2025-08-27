@@ -18,7 +18,6 @@ export default function loadSprite(url, id) {
   const exists = () => document.getElementById(id) !== null;
 
   const update = (container, data) => {
-    // eslint-disable-next-line no-param-reassign
     container.innerHTML = data;
 
     // Check again incase of race condition
@@ -67,9 +66,8 @@ export default function loadSprite(url, id) {
                 content: result,
               }),
             );
-          } catch (_) {
-            // Do nothing
           }
+          catch {}
         }
 
         update(container, result);

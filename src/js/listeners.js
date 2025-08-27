@@ -113,7 +113,7 @@ class Listeners {
         case '8':
         case '9':
           if (!repeat) {
-            seekByIncrement(parseInt(key, 10));
+            seekByIncrement(Number.parseInt(key, 10));
           }
           break;
 
@@ -172,7 +172,8 @@ class Listeners {
 
       // Store last key for next cycle
       this.lastKey = key;
-    } else {
+    }
+    else {
       this.lastKey = null;
     }
   }
@@ -267,7 +268,8 @@ class Listeners {
         if (useNativeAspectRatio) {
           target.style.width = null;
           target.style.height = null;
-        } else {
+        }
+        else {
           target.style.maxWidth = null;
           target.style.margin = null;
         }
@@ -281,7 +283,8 @@ class Listeners {
       if (useNativeAspectRatio) {
         target.style.width = overflow ? 'auto' : '100%';
         target.style.height = overflow ? '100%' : 'auto';
-      } else {
+      }
+      else {
         target.style.maxWidth = overflow ? `${(viewportHeight / videoHeight) * videoWidth}px` : null;
         target.style.margin = overflow ? '0 auto' : null;
       }
@@ -321,12 +324,11 @@ class Listeners {
     const { elements } = player;
 
     // Time change on media
-    on.call(player, player.media, 'timeupdate seeking seeked', (event) => controls.timeUpdate.call(player, event));
+    on.call(player, player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(player, event));
 
     // Display duration
-    on.call(player, player.media, 'durationchange loadeddata loadedmetadata', (event) =>
-      controls.durationUpdate.call(player, event),
-    );
+    on.call(player, player.media, 'durationchange loadeddata loadedmetadata', event =>
+      controls.durationUpdate.call(player, event));
 
     // Handle the media finishing
     on.call(player, player.media, 'ended', () => {
@@ -341,20 +343,18 @@ class Listeners {
     });
 
     // Check for buffer progress
-    on.call(player, player.media, 'progress playing seeking seeked', (event) =>
-      controls.updateProgress.call(player, event),
-    );
+    on.call(player, player.media, 'progress playing seeking seeked', event =>
+      controls.updateProgress.call(player, event));
 
     // Handle volume changes
-    on.call(player, player.media, 'volumechange', (event) => controls.updateVolume.call(player, event));
+    on.call(player, player.media, 'volumechange', event => controls.updateVolume.call(player, event));
 
     // Handle play/pause
-    on.call(player, player.media, 'playing play pause ended emptied timeupdate', (event) =>
-      ui.checkPlaying.call(player, event),
-    );
+    on.call(player, player.media, 'playing play pause ended emptied timeupdate', event =>
+      ui.checkPlaying.call(player, event));
 
     // Loading state
-    on.call(player, player.media, 'waiting canplay seeked playing', (event) => ui.checkLoading.call(player, event));
+    on.call(player, player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(player, event));
 
     // Click video
     if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
@@ -389,7 +389,8 @@ class Listeners {
             },
             'play',
           );
-        } else {
+        }
+        else {
           this.proxy(
             event,
             () => {
@@ -487,7 +488,7 @@ class Listeners {
       player,
       element,
       type,
-      (event) => this.proxy(event, defaultHandler, customHandlerKey),
+      event => this.proxy(event, defaultHandler, customHandlerKey),
       passive && !hasCustomHandler,
     );
   };
@@ -667,7 +668,8 @@ class Listeners {
       if (play && done) {
         seek.removeAttribute(attribute);
         silencePromise(player.play());
-      } else if (!done && player.playing) {
+      }
+      else if (!done && player.playing) {
         seek.setAttribute(attribute, '');
         player.pause();
       }
@@ -678,7 +680,7 @@ class Listeners {
     // it takes over further interactions on the page. This is a hack
     if (browser.isIos) {
       const inputs = getElements.call(player, 'input[type="range"]');
-      Array.from(inputs).forEach((input) => this.bind(input, inputEvent, (event) => repaint(event.target)));
+      Array.from(inputs).forEach(input => this.bind(input, inputEvent, event => repaint(event.target)));
     }
 
     // Seek
@@ -702,9 +704,8 @@ class Listeners {
     );
 
     // Seek tooltip
-    this.bind(elements.progress, 'mouseenter mouseleave mousemove', (event) =>
-      controls.updateSeekTooltip.call(player, event),
-    );
+    this.bind(elements.progress, 'mouseenter mouseleave mousemove', event =>
+      controls.updateSeekTooltip.call(player, event));
 
     // Preview thumbnails plugin
     // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
@@ -745,7 +746,7 @@ class Listeners {
     // Polyfill for lower fill in <input type="range"> for webkit
     if (browser.isWebKit) {
       Array.from(getElements.call(player, 'input[type="range"]')).forEach((element) => {
-        this.bind(element, 'input', (event) => controls.updateRangeFill.call(player, event.target));
+        this.bind(element, 'input', event => controls.updateRangeFill.call(player, event.target));
       });
     }
 
@@ -782,7 +783,7 @@ class Listeners {
     // Also update controls.hover state for any non-player children of fullscreen element (as above)
     if (elements.fullscreen) {
       Array.from(elements.fullscreen.children)
-        .filter((c) => !c.contains(elements.container))
+        .filter(c => !c.contains(elements.container))
         .forEach((child) => {
           this.bind(child, 'mouseenter mouseleave', (event) => {
             if (elements.controls) {
@@ -831,7 +832,7 @@ class Listeners {
         // Other browsers on OS X will be inverted until support improves
         const inverted = event.webkitDirectionInvertedFromDevice;
         // Get delta from event. Invert if `inverted` is true
-        const [x, y] = [event.deltaX, -event.deltaY].map((value) => (inverted ? -value : value));
+        const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
         // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
         const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
 

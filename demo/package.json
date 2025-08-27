@@ -2,8 +2,8 @@
   "name": "plyr-demo",
   "version": "1.0.0",
   "description": "Demo for Plyr",
-  "homepage": "https://plyr.io",
   "author": "Sam Potts <sam@potts.es>",
+  "homepage": "https://plyr.io",
   "dependencies": {
     "@sentry/browser": "^10.5.0",
     "core-js": "^3.45.1",

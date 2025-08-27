@@ -41,7 +41,9 @@
 }
 
 @mixin plyr-range-thumb-active($color) {
-  box-shadow: $plyr-range-thumb-shadow, 0 0 0 $plyr-range-thumb-active-shadow-width $color;
+  box-shadow:
+    $plyr-range-thumb-shadow,
+    0 0 0 $plyr-range-thumb-active-shadow-width $color;
 }
 
 // Fullscreen styles

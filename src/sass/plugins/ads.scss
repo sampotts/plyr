@@ -4,13 +4,10 @@
 
 .plyr__ads {
   border-radius: inherit;
-  bottom: 0;
   cursor: pointer;
-  left: 0;
+  inset: 0;
   overflow: hidden;
   position: absolute;
-  right: 0;
-  top: 0;
   z-index: -1; // Hide it by default
 
   // Make sure the inner container is big enough for the ad creative.

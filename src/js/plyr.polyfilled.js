@@ -5,9 +5,9 @@
 // License: The MIT License (MIT)
 // ==========================================================================
 
-import 'custom-event-polyfill';
-import 'url-polyfill';
-
 import Plyr from './plyr';
+import 'custom-event-polyfill';
+
+import 'url-polyfill';
 
 export default Plyr;

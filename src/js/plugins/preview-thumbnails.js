@@ -6,7 +6,7 @@ import { clamp } from '../utils/numbers';
 import { formatTime } from '../utils/time';
 
 // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
-const parseVtt = (vttDataString) => {
+function parseVtt(vttDataString) {
   const processedList = [];
   const frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/);
 
@@ -18,22 +18,23 @@ const parseVtt = (vttDataString) => {
       if (!is.number(result.startTime)) {
         // The line with start and end times on it is the first line of interest
         const matchTimes = line.match(
-          /([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})/,
+          /(\d{2})?:?(\d{2}):(\d{2}).(\d{2,3})( ?--> ?)(\d{2})?:?(\d{2}):(\d{2}).(\d{2,3})/,
         ); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
 
         if (matchTimes) {
-          result.startTime =
-            Number(matchTimes[1] || 0) * 60 * 60 +
-            Number(matchTimes[2]) * 60 +
-            Number(matchTimes[3]) +
-            Number(`0.${matchTimes[4]}`);
-          result.endTime =
-            Number(matchTimes[6] || 0) * 60 * 60 +
-            Number(matchTimes[7]) * 60 +
-            Number(matchTimes[8]) +
-            Number(`0.${matchTimes[9]}`);
+          result.startTime
+            = Number(matchTimes[1] || 0) * 60 * 60
+              + Number(matchTimes[2]) * 60
+              + Number(matchTimes[3])
+              + Number(`0.${matchTimes[4]}`);
+          result.endTime
+            = Number(matchTimes[6] || 0) * 60 * 60
+              + Number(matchTimes[7]) * 60
+              + Number(matchTimes[8])
+              + Number(`0.${matchTimes[9]}`);
         }
-      } else if (!is.empty(line.trim()) && is.empty(result.text)) {
+      }
+      else if (!is.empty(line.trim()) && is.empty(result.text)) {
         // If we already have the startTime, then we're definitely up to the text line(s)
         const lineSplit = line.trim().split('#xywh=');
         [result.text] = lineSplit;
@@ -51,7 +52,7 @@ const parseVtt = (vttDataString) => {
   });
 
   return processedList;
-};
+}
 
 /**
  * Preview thumbnails for seek hover and scrubbing
@@ -64,19 +65,20 @@ const parseVtt = (vttDataString) => {
  * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that YouTube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
  */
 
-const fitRatio = (ratio, outer) => {
+function fitRatio(ratio, outer) {
   const targetRatio = outer.width / outer.height;
   const result = {};
   if (ratio > targetRatio) {
     result.width = outer.width;
     result.height = (1 / ratio) * outer.width;
-  } else {
+  }
+  else {
     result.height = outer.height;
     result.width = ratio * outer.height;
   }
 
   return result;
-};
+}
 
 class PreviewThumbnails {
   /**
@@ -161,7 +163,7 @@ class PreviewThumbnails {
         // If string, convert into single-element list
         const urls = is.string(src) ? [src] : src;
         // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
-        const promises = urls.map((u) => this.getThumbnail(u));
+        const promises = urls.map(u => this.getThumbnail(u));
         // Resolve
         Promise.all(promises).then(sortAndResolve);
       }
@@ -182,9 +184,9 @@ class PreviewThumbnails {
         // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
         // If the thumbnail URLs start with with none of '/', 'http://' or 'https://', then we need to set their relative path to be the location of the VTT file
         if (
-          !thumbnail.frames[0].text.startsWith('/') &&
-          !thumbnail.frames[0].text.startsWith('http://') &&
-          !thumbnail.frames[0].text.startsWith('https://')
+          !thumbnail.frames[0].text.startsWith('/')
+          && !thumbnail.frames[0].text.startsWith('http://')
+          && !thumbnail.frames[0].text.startsWith('https://')
         ) {
           thumbnail.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
         }
@@ -217,7 +219,8 @@ class PreviewThumbnails {
     if (event.type === 'touchmove') {
       // Calculate seek hover position as approx video seconds
       this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
-    } else {
+    }
+    else {
       // Calculate seek hover position as approx video seconds
       const clientRect = this.player.elements.progress.getBoundingClientRect();
       const percentage = (100 / clientRect.width) * (event.pageX - clientRect.left);
@@ -236,7 +239,7 @@ class PreviewThumbnails {
       this.mousePosX = event.pageX;
 
       // Set time text inside image container
-      this.elements.thumb.time.innerText = formatTime(this.seekTime);
+      this.elements.thumb.time.textContent = formatTime(this.seekTime);
 
       // Get marker point for time
       const point = this.player.config.markers?.points?.find(({ time: t }) => t === Math.round(this.seekTime));
@@ -279,7 +282,8 @@ class PreviewThumbnails {
     if (Math.ceil(this.lastTime) === Math.ceil(this.player.media.currentTime)) {
       // The video was already seeked/loaded at the chosen time - hide immediately
       this.toggleScrubbingContainer(false);
-    } else {
+    }
+    else {
       // The video hasn't seeked yet. Wait for that
       once.call(this.player, this.player.media, 'timeupdate', () => {
         // Re-check mousedown - we might have already started scrubbing again
@@ -358,14 +362,15 @@ class PreviewThumbnails {
   showImageAtCurrentTime = () => {
     if (this.mouseDown) {
       this.setScrubbingContainerSize();
-    } else {
+    }
+    else {
       this.setThumbContainerSizeAndPos();
     }
 
     // Find the desired thumbnail index
     // TODO: Handle a video longer than the thumbs where thumbNum is null
     const thumbNum = this.thumbnails[0].frames.findIndex(
-      (frame) => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime,
+      frame => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime,
     );
     const hasThumb = thumbNum >= 0;
     let qualityIndex = 0;
@@ -425,7 +430,8 @@ class PreviewThumbnails {
       previewImage.onload = () => this.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
       this.loadingImage = previewImage;
       this.removeOldImages(previewImage);
-    } else {
+    }
+    else {
       // Update the existing image
       this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
       this.currentImageElement.dataset.index = thumbNum;
@@ -469,7 +475,7 @@ class PreviewThumbnails {
       if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
         // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
         // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
-        // eslint-disable-next-line no-param-reassign
+
         image.dataset.deleting = true;
 
         // This has to be set before the timeout - to prevent issues switching between hover and scrub
@@ -495,7 +501,8 @@ class PreviewThumbnails {
           let thumbnailsClone;
           if (forward) {
             thumbnailsClone = this.thumbnails[0].frames.slice(thumbNum);
-          } else {
+          }
+          else {
             thumbnailsClone = this.thumbnails[0].frames.slice(0, thumbNum).reverse();
           }
 
@@ -597,7 +604,8 @@ class PreviewThumbnails {
   set currentImageElement(element) {
     if (this.mouseDown) {
       this.currentScrubbingImageElement = element;
-    } else {
+    }
+    else {
       this.currentThumbnailImageElement = element;
     }
   }
@@ -637,10 +645,12 @@ class PreviewThumbnails {
       const thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
       imageContainer.style.height = `${this.thumbContainerHeight}px`;
       imageContainer.style.width = `${thumbWidth}px`;
-    } else if (imageContainer.clientHeight > 20 && imageContainer.clientWidth < 20) {
+    }
+    else if (imageContainer.clientHeight > 20 && imageContainer.clientWidth < 20) {
       const thumbWidth = Math.floor(imageContainer.clientHeight * this.thumbAspectRatio);
       imageContainer.style.width = `${thumbWidth}px`;
-    } else if (imageContainer.clientHeight < 20 && imageContainer.clientWidth > 20) {
+    }
+    else if (imageContainer.clientHeight < 20 && imageContainer.clientWidth > 20) {
       const thumbHeight = Math.floor(imageContainer.clientWidth / this.thumbAspectRatio);
       imageContainer.style.height = `${thumbHeight}px`;
     }
@@ -683,13 +693,12 @@ class PreviewThumbnails {
     // Find difference between height and preview container height
     const multiplier = this.thumbContainerHeight / frame.h;
 
-    // eslint-disable-next-line no-param-reassign
     previewImage.style.height = `${previewImage.naturalHeight * multiplier}px`;
-    // eslint-disable-next-line no-param-reassign
+
     previewImage.style.width = `${previewImage.naturalWidth * multiplier}px`;
-    // eslint-disable-next-line no-param-reassign
+
     previewImage.style.left = `-${frame.x * multiplier}px`;
-    // eslint-disable-next-line no-param-reassign
+
     previewImage.style.top = `-${frame.y * multiplier}px`;
   };
 }

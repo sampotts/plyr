@@ -27,8 +27,8 @@ class Fullscreen {
 
     // Get the fullscreen element
     // Checks container is an ancestor, defaults to null
-    this.player.elements.fullscreen =
-      player.config.fullscreen.container && closest(this.player.elements.container, player.config.fullscreen.container);
+    this.player.elements.fullscreen
+      = player.config.fullscreen.container && closest(this.player.elements.container, player.config.fullscreen.container);
 
     // Register event listeners
     // Handle event (incase user presses escape etc)
@@ -53,7 +53,7 @@ class Fullscreen {
     });
 
     // Tap focus when in fullscreen
-    on.call(this, this.player.elements.container, 'keydown', (event) => this.trapFocus(event));
+    on.call(this, this.player.elements.container, 'keydown', event => this.trapFocus(event));
 
     // Update the UI
     this.update();
@@ -62,10 +62,10 @@ class Fullscreen {
   // Determine if native supported
   static get nativeSupported() {
     return !!(
-      document.fullscreenEnabled ||
-      document.webkitFullscreenEnabled ||
-      document.mozFullScreenEnabled ||
-      document.msFullscreenEnabled
+      document.fullscreenEnabled
+      || document.webkitFullscreenEnabled
+      || document.mozFullScreenEnabled
+      || document.msFullscreenEnabled
     );
   }
 
@@ -110,10 +110,10 @@ class Fullscreen {
       Fullscreen.nativeSupported || this.player.config.fullscreen.fallback,
       // YouTube has no way to trigger fullscreen, so on devices with no native support, playsinline
       // must be enabled and iosNative fullscreen must be disabled to offer the fullscreen fallback
-      !this.player.isYouTube ||
-        Fullscreen.nativeSupported ||
-        !browser.isIos ||
-        (this.player.config.playsinline && !this.player.config.fullscreen.iosNative),
+      !this.player.isYouTube
+      || Fullscreen.nativeSupported
+      || !browser.isIos
+      || (this.player.config.playsinline && !this.player.config.fullscreen.iosNative),
     ].every(Boolean);
   }
 
@@ -162,7 +162,8 @@ class Fullscreen {
         x: window.scrollX ?? 0,
         y: window.scrollY ?? 0,
       };
-    } else {
+    }
+    else {
       window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
     }
 
@@ -189,10 +190,11 @@ class Fullscreen {
       if (toggle) {
         this.cleanupViewport = !hasProperty;
         if (!hasProperty) viewport.content += `,${property}`;
-      } else if (this.cleanupViewport) {
+      }
+      else if (this.cleanupViewport) {
         viewport.content = viewport.content
           .split(',')
-          .filter((part) => part.trim() !== property)
+          .filter(part => part.trim() !== property)
           .join(',');
       }
     }
@@ -216,7 +218,8 @@ class Fullscreen {
       // Move focus to first element that can be tabbed if Shift isn't used
       first.focus();
       event.preventDefault();
-    } else if (focused === first && event.shiftKey) {
+    }
+    else if (focused === first && event.shiftKey) {
       // Move focus to last element that can be tabbed if Shift is used
       last.focus();
       event.preventDefault();
@@ -233,7 +236,8 @@ class Fullscreen {
       else mode = 'Fallback';
 
       this.player.debug.log(`${mode} fullscreen enabled`);
-    } else {
+    }
+    else {
       this.player.debug.log('Fullscreen not supported and fallback disabled');
     }
 
@@ -249,14 +253,18 @@ class Fullscreen {
     if (browser.isIos && this.player.config.fullscreen.iosNative) {
       if (this.player.isVimeo) {
         this.player.embed.requestFullscreen();
-      } else {
+      }
+      else {
         this.target.webkitEnterFullscreen();
       }
-    } else if (!Fullscreen.nativeSupported || this.forceFallback) {
+    }
+    else if (!Fullscreen.nativeSupported || this.forceFallback) {
       this.toggleFallback(true);
-    } else if (!this.prefix) {
+    }
+    else if (!this.prefix) {
       this.target.requestFullscreen({ navigationUI: 'hide' });
-    } else if (!is.empty(this.prefix)) {
+    }
+    else if (!is.empty(this.prefix)) {
       this.target[`${this.prefix}Request${this.property}`]();
     }
   };
@@ -269,15 +277,19 @@ class Fullscreen {
     if (browser.isIos && this.player.config.fullscreen.iosNative) {
       if (this.player.isVimeo) {
         this.player.embed.exitFullscreen();
-      } else {
+      }
+      else {
         this.target.webkitEnterFullscreen();
       }
       silencePromise(this.player.play());
-    } else if (!Fullscreen.nativeSupported || this.forceFallback) {
+    }
+    else if (!Fullscreen.nativeSupported || this.forceFallback) {
       this.toggleFallback(false);
-    } else if (!this.prefix) {
+    }
+    else if (!this.prefix) {
       (document.cancelFullScreen || document.exitFullscreen).call(document);
-    } else if (!is.empty(this.prefix)) {
+    }
+    else if (!is.empty(this.prefix)) {
       const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
       document[`${this.prefix}${action}${this.property}`]();
     }

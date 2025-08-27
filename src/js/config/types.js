@@ -15,11 +15,11 @@ export const types = {
 
 /**
  * Get provider by URL
- * @param {String} url
+ * @param {string} url
  */
 export function getProviderByUrl(url) {
   // YouTube
-  if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(url)) {
+  if (/^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(url)) {
     return providers.youtube;
   }
 

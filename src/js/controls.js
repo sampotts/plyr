@@ -89,7 +89,8 @@ const controls = {
       }
 
       return true;
-    } catch (error) {
+    }
+    catch (error) {
       // Log it
       this.debug.warn('It looks like there is a problem with your custom controls HTML', error);
 
@@ -111,7 +112,7 @@ const controls = {
       icon,
       extend(attributes, {
         'aria-hidden': 'true',
-        focusable: 'false',
+        'focusable': 'false',
       }),
     );
 
@@ -194,12 +195,13 @@ const controls = {
 
     // Set class name
     if (Object.keys(attributes).includes('class')) {
-      if (!attributes.class.split(' ').some((c) => c === this.config.classNames.control)) {
+      if (!attributes.class.split(' ').includes(this.config.classNames.control)) {
         extend(attributes, {
           class: `${attributes.class} ${this.config.classNames.control}`,
         });
       }
-    } else {
+    }
+    else {
       attributes.class = this.config.classNames.control;
     }
 
@@ -280,7 +282,8 @@ const controls = {
           class: 'label--not-pressed',
         }),
       );
-    } else {
+    }
+    else {
       button.appendChild(controls.createIcon.call(this, props.icon));
       button.appendChild(controls.createLabel.call(this, props.label));
     }
@@ -296,7 +299,8 @@ const controls = {
       }
 
       this.elements.buttons[type].push(button);
-    } else {
+    }
+    else {
       this.elements.buttons[type] = button;
     }
 
@@ -311,14 +315,14 @@ const controls = {
       extend(
         getAttributesFromSelector(this.config.selectors.inputs[type]),
         {
-          type: 'range',
-          min: 0,
-          max: 100,
-          step: 0.01,
-          value: 0,
-          autocomplete: 'off',
+          'type': 'range',
+          'min': 0,
+          'max': 100,
+          'step': 0.01,
+          'value': 0,
+          'autocomplete': 'off',
           // A11y fixes for https://github.com/sampotts/plyr/issues/905
-          role: 'slider',
+          'role': 'slider',
           'aria-label': i18n.get(type, this.config),
           'aria-valuemin': 0,
           'aria-valuemax': 100,
@@ -346,10 +350,10 @@ const controls = {
       extend(
         getAttributesFromSelector(this.config.selectors.display[type]),
         {
-          min: 0,
-          max: 100,
-          value: 0,
-          role: 'progressbar',
+          'min': 0,
+          'max': 100,
+          'value': 0,
+          'role': 'progressbar',
           'aria-hidden': true,
         },
         attributes,
@@ -366,7 +370,7 @@ const controls = {
       }[type];
       const suffix = suffixKey ? i18n.get(suffixKey, this.config) : '';
 
-      progress.innerText = `% ${suffix.toLowerCase()}`;
+      progress.textContent = `% ${suffix.toLowerCase()}`;
     }
 
     this.elements.display[type] = progress;
@@ -381,9 +385,9 @@ const controls = {
     const container = createElement(
       'div',
       extend(attributes, {
-        class: `${attributes.class ? attributes.class : ''} ${this.config.classNames.display.time} `.trim(),
+        'class': `${attributes.class ? attributes.class : ''} ${this.config.classNames.display.time} `.trim(),
         'aria-label': i18n.get(type, this.config),
-        role: 'timer',
+        'role': 'timer',
       }),
       '00:00',
     );
@@ -423,7 +427,8 @@ const controls = {
         // Show the respective menu
         if (!isRadioButton && [' ', 'ArrowRight'].includes(event.key)) {
           controls.showMenuPanel.call(this, type, true);
-        } else {
+        }
+        else {
           let target;
 
           if (event.key !== ' ') {
@@ -433,7 +438,8 @@ const controls = {
               if (!is.element(target)) {
                 target = menuItem.parentNode.firstElementChild;
               }
-            } else {
+            }
+            else {
               target = menuItem.previousElementSibling;
 
               if (!is.element(target)) {
@@ -464,9 +470,9 @@ const controls = {
     const menuItem = createElement(
       'button',
       extend(attributes, {
-        type: 'button',
-        role: 'menuitemradio',
-        class: `${this.config.classNames.control} ${attributes.class ? attributes.class : ''}`.trim(),
+        'type': 'button',
+        'role': 'menuitemradio',
+        'class': `${this.config.classNames.control} ${attributes.class ? attributes.class : ''}`.trim(),
         'aria-checked': checked,
         value,
       }),
@@ -493,8 +499,8 @@ const controls = {
         // Ensure exclusivity
         if (check) {
           Array.from(menuItem.parentNode.children)
-            .filter((node) => matches(node, '[role="menuitemradio"]'))
-            .forEach((node) => node.setAttribute('aria-checked', 'false'));
+            .filter(node => matches(node, '[role="menuitemradio"]'))
+            .forEach(node => node.setAttribute('aria-checked', 'false'));
         }
 
         menuItem.setAttribute('aria-checked', check ? 'true' : 'false');
@@ -524,7 +530,7 @@ const controls = {
             break;
 
           case 'speed':
-            this.speed = parseFloat(value);
+            this.speed = Number.parseFloat(value);
             break;
 
           default:
@@ -562,8 +568,7 @@ const controls = {
       return;
     }
 
-    // eslint-disable-next-line no-param-reassign
-    target.innerText = controls.formatTime(time, inverted);
+    target.textContent = controls.formatTime(time, inverted);
   },
 
   // Update volume UI and storage
@@ -589,7 +594,6 @@ const controls = {
       return;
     }
 
-    // eslint-disable-next-line
     target.value = value;
 
     // Webkit range fill
@@ -668,11 +672,13 @@ const controls = {
         'aria-valuetext',
         format.replace('{currentTime}', currentTime).replace('{duration}', duration),
       );
-    } else if (matches(range, this.config.selectors.inputs.volume)) {
+    }
+    else if (matches(range, this.config.selectors.inputs.volume)) {
       const percent = range.value * 100;
       range.setAttribute('aria-valuenow', percent);
       range.setAttribute('aria-valuetext', `${percent.toFixed(1)}%`);
-    } else {
+    }
+    else {
       range.setAttribute('aria-valuenow', range.value);
     }
 
@@ -689,17 +695,17 @@ const controls = {
   updateSeekTooltip(event) {
     // Bail if setting not true
     if (
-      !this.config.tooltips.seek ||
-      !is.element(this.elements.inputs.seek) ||
-      !is.element(this.elements.display.seekTooltip) ||
-      this.duration === 0
+      !this.config.tooltips.seek
+      || !is.element(this.elements.inputs.seek)
+      || !is.element(this.elements.display.seekTooltip)
+      || this.duration === 0
     ) {
       return;
     }
 
     const tipElement = this.elements.display.seekTooltip;
     const visible = `${this.config.classNames.tooltip}--visible`;
-    const toggle = (show) => toggleClass(tipElement, visible, show);
+    const toggle = show => toggleClass(tipElement, visible, show);
 
     // Hide on touch
     if (this.touch) {
@@ -714,23 +720,26 @@ const controls = {
     if (is.event(event)) {
       const scrollLeft = event.pageX - event.clientX;
       percent = (100 / clientRect.width) * (event.pageX - clientRect.left - scrollLeft);
-    } else if (hasClass(tipElement, visible)) {
-      percent = parseFloat(tipElement.style.left, 10);
-    } else {
+    }
+    else if (hasClass(tipElement, visible)) {
+      percent = Number.parseFloat(tipElement.style.left, 10);
+    }
+    else {
       return;
     }
 
     // Set bounds
     if (percent < 0) {
       percent = 0;
-    } else if (percent > 100) {
+    }
+    else if (percent > 100) {
       percent = 100;
     }
 
     const time = (this.duration / 100) * percent;
 
     // Display the time a click would seek to
-    tipElement.innerText = controls.formatTime(time);
+    tipElement.textContent = controls.formatTime(time);
 
     // Get marker point for time
     const point = this.config.markers?.points?.find(({ time: t }) => t === Math.round(time));
@@ -828,7 +837,8 @@ const controls = {
 
     if (setting === 'captions') {
       value = this.currentTrack;
-    } else {
+    }
+    else {
       value = !is.empty(input) ? input : this[setting];
 
       // Get default
@@ -910,7 +920,7 @@ const controls = {
 
     // Set options if passed and filter based on uniqueness and config
     if (is.array(options)) {
-      this.options.quality = dedupe(options).filter((quality) => this.config.quality.options.includes(quality));
+      this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
     }
 
     // Toggle the pane and tab
@@ -1068,7 +1078,7 @@ const controls = {
     const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
     // Filter out invalid speeds
-    this.options.speed = this.options.speed.filter((o) => o >= this.minimumSpeed && o <= this.maximumSpeed);
+    this.options.speed = this.options.speed.filter(o => o >= this.minimumSpeed && o <= this.maximumSpeed);
 
     // Toggle the pane and tab
     const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
@@ -1101,7 +1111,7 @@ const controls = {
   // Check if we need to hide/show the settings menu
   checkMenu() {
     const { buttons } = this.elements.settings;
-    const visible = !is.empty(buttons) && Object.values(buttons).some((button) => !button.hidden);
+    const visible = !is.empty(buttons) && Object.values(buttons).some(button => !button.hidden);
 
     toggleHidden(this.elements.settings.menu, !visible);
   },
@@ -1115,7 +1125,7 @@ const controls = {
     let target = pane;
 
     if (!is.element(target)) {
-      target = Object.values(this.elements.settings.panels).find((p) => !p.hidden);
+      target = Object.values(this.elements.settings.panels).find(p => !p.hidden);
     }
 
     const firstItem = target.querySelector('[role^="menuitem"]');
@@ -1139,9 +1149,11 @@ const controls = {
 
     if (is.boolean(input)) {
       show = input;
-    } else if (is.keyboardEvent(input) && input.key === 'Escape') {
+    }
+    else if (is.keyboardEvent(input) && input.key === 'Escape') {
       show = false;
-    } else if (is.event(input)) {
+    }
+    else if (is.event(input)) {
       // If Plyr is in a shadowDOM, the event target is set to the component, instead of the
       // Element in the shadowDOM. The path, if available, is complete.
       const target = is.function(input.composedPath) ? input.composedPath()[0] : input.target;
@@ -1167,7 +1179,8 @@ const controls = {
     // Focus the first item if key interaction
     if (show && is.keyboardEvent(input)) {
       controls.focusFirstMenuItem.call(this, null, true);
-    } else if (!show && !hidden) {
+    }
+    else if (!show && !hidden) {
       // If closing, re-focus the button
       setFocus.call(this, button, is.keyboardEvent(input));
     }
@@ -1207,7 +1220,7 @@ const controls = {
 
     // Hide all other panels
     const container = target.parentNode;
-    const current = Array.from(container.children).find((node) => !node.hidden);
+    const current = Array.from(container.children).find(node => !node.hidden);
 
     // If we can do fancy animations, we'll animate the height/width
     if (support.transitions && !support.reducedMotion) {
@@ -1458,11 +1471,11 @@ const controls = {
           const menuItem = createElement(
             'button',
             extend(getAttributesFromSelector(this.config.selectors.buttons.settings), {
-              type: 'button',
-              class: `${this.config.classNames.control} ${this.config.classNames.control}--forward`,
-              role: 'menuitem',
+              'type': 'button',
+              'class': `${this.config.classNames.control} ${this.config.classNames.control}--forward`,
+              'role': 'menuitem',
               'aria-haspopup': true,
-              hidden: '',
+              'hidden': '',
             }),
           );
 
@@ -1659,7 +1672,8 @@ const controls = {
     if (is.element(this.config.controls) || is.string(this.config.controls)) {
       // HTMLElement or Non-empty string passed as the option
       container = this.config.controls;
-    } else {
+    }
+    else {
       // Create controls
       container = controls.create.call(this, {
         id: this.id,
@@ -1738,7 +1752,8 @@ const controls = {
         .forEach((button) => {
           if (is.array(button) || is.nodeList(button)) {
             Array.from(button).filter(Boolean).forEach(addProperty);
-          } else {
+          }
+          else {
             addProperty(button);
           }
         });
@@ -1773,7 +1788,8 @@ const controls = {
           artwork: this.config.mediaMetadata.artwork,
         });
       }
-    } catch (_) {
+    }
+    catch {
       // Do nothing
     }
   },
@@ -1790,7 +1806,7 @@ const controls = {
     const pointsFragment = document.createDocumentFragment();
     let tipElement = null;
     const tipVisible = `${this.config.classNames.tooltip}--visible`;
-    const toggleTip = (show) => toggleClass(tipElement, tipVisible, show);
+    const toggleTip = show => toggleClass(tipElement, tipVisible, show);
 
     // Inject markers to progress container
     points.forEach((point) => {

@@ -3,7 +3,6 @@
 // ==========================================================================
 
 import { transitionEndEvent } from './utils/animation';
-import browser from './utils/browser';
 import { createElement } from './utils/elements';
 import is from './utils/is';
 
@@ -70,7 +69,8 @@ const support = {
 
     try {
       return Boolean(type && this.media.canPlayType(type).replace(/no/, ''));
-    } catch (_) {
+    }
+    catch {
       return false;
     }
   },

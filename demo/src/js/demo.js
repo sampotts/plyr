@@ -4,14 +4,14 @@
 // Please see README.md in the root or github.com/sampotts/plyr
 // ==========================================================================
 
-import 'custom-event-polyfill';
-import 'url-polyfill';
-
 import * as Sentry from '@sentry/browser';
 import Shr from 'shr-buttons';
 
 import Plyr from '../../../src/js/plyr';
 import sources from './sources';
+
+import 'custom-event-polyfill';
+import 'url-polyfill';
 
 const commonConfig = {
   iconUrl: 'dist/demo.svg',
@@ -37,10 +37,13 @@ const commonConfig = {
 
   // Sentry for demo site (https://plyr.io) only
   if (isProduction) {
-    Sentry.init({
-      dsn: 'https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555',
-      whitelistUrls: [production].map((d) => new RegExp(`https://(([a-z0-9])+(.))*${d}`)),
-    });
+    try {
+      Sentry.init({
+        dsn: 'https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555',
+        whitelistUrls: [production].map(d => new RegExp(`https://(([a-z0-9])+(.))*${d}`)),
+      });
+    }
+    catch {}
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -62,7 +65,7 @@ const commonConfig = {
     const historySupport = Boolean(window.history && window.history.pushState);
     let currentType = window.location.hash.substring(1);
     const hasInitialType = Boolean(currentType);
-     // If there's no current type set, assume video
+    // If there's no current type set, assume video
     if (!hasInitialType) currentType = 'video';
 
     // Setup the player as video by default
@@ -116,14 +119,13 @@ const commonConfig = {
 
     function render(type) {
       // Remove active classes
-      Array.from(buttons).forEach((button) => button.classList.toggle('active', false));
+      Array.from(buttons).forEach(button => button.classList.toggle('active', false));
 
       // Set active on parent
       document.querySelector(`[data-source="${type}"]`).classList.toggle('active', true);
 
       // Show cite
       Array.from(document.querySelectorAll('.plyr__cite')).forEach((cite) => {
-        // eslint-disable-next-line no-param-reassign
         cite.hidden = true;
       });
 
@@ -131,7 +133,8 @@ const commonConfig = {
 
       if (type === 'mux') {
         showHlsPlayer();
-      } else {
+      }
+      else {
         showMainPlayer();
       }
     }
@@ -146,16 +149,20 @@ const commonConfig = {
       const sourceConfig = sources[type];
       const hlsSource = sourceConfig.hlsSource;
       if (hlsSource) {
-        window.playerHls = new Plyr('#player-hls', { ...commonConfig, ...sourceConfig });
+        const playerHls = new Plyr('#player-hls', { ...commonConfig, ...sourceConfig });
+        window.playerHls = playerHls;
         const video = playerHls.media;
         if (Hls.isSupported()) {
           const hls = new Hls();
           hls.loadSource(hlsSource);
           hls.attachMedia(video);
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        }
+        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          // eslint-disable-next-line no-undef
           video.src = videoSrc;
         }
-      } else {
+      }
+      else {
         if (window.playerHls) {
           window.playerHls.destroy();
         }
@@ -184,8 +191,6 @@ const commonConfig = {
         setSource(event.state.type);
       }
     });
-
-
 
     // Replace current history state
     if (historySupport && types.includes(currentType)) {
