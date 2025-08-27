@@ -29,6 +29,10 @@ const commonConfig = {
     iosNative: true,
   },
   playsinline: true,
+  vimeo: {
+    // Prevent Vimeo blocking plyr.io demo site
+    referrerPolicy: 'no-referrer',
+  },
 };
 
 (() => {
@@ -77,44 +81,22 @@ const commonConfig = {
     // Expose for tinkering in the console
     window.player = player;
 
-    /* The audio player needs the container element shown/hidden
-     * The video player needs the media element shown/hidden
-     * */
-    function showHlsPlayer() {
-      if (window.player.elements && window.player.elements.container) {
-        window.player.elements.container.hidden = true;
-        if (window.player.media) {
-          window.player.media.hidden = true;
-          window.player.pause();
-        }
-      }
-      if (window.playerHls.elements && window.playerHls.elements.container) {
-        window.playerHls.elements.container.hidden = false;
-        if (window.playerHls.media) {
-          window.playerHls.media.hidden = false;
+    function togglePlayerVisibility(player, show) {
+      if (player?.elements?.container) {
+        player.elements.container.hidden = !show;
+        if (player.media) {
+          player.media.hidden = !show;
+          if (!show) player.pause();
         }
       }
     }
-
-    /* The audio player needs the container element shown/hidden
-     * The video player needs the media element shown/hidden
-     * */
+    function showHlsPlayer() {
+      togglePlayerVisibility(window.player, false);
+      togglePlayerVisibility(window.playerHls, true);
+    }
     function showMainPlayer() {
-      if (window.player.elements && window.player.elements.container) {
-        window.player.elements.container.hidden = false;
-        window.player.hidden = false;
-        if (window.player.media) {
-          window.player.media.hidden = false;
-          window.player.media.pause();
-        }
-      }
-      if (window.playerHls.elements && window.playerHls.elements.container) {
-        window.playerHls.elements.container.hidden = true;
-        window.playerHls.hidden = true;
-        if (window.playerHls.media) {
-          window.playerHls.media.hidden = true;
-        }
-      }
+      togglePlayerVisibility(window.player, true);
+      togglePlayerVisibility(window.playerHls, false);
     }
 
     function render(type) {
@@ -163,9 +145,7 @@ const commonConfig = {
         }
       }
       else {
-        if (window.playerHls) {
-          window.playerHls.destroy();
-        }
+        window.playerHls?.destroy();
         player.source = sourceConfig;
       }
       // Set the current type for next time

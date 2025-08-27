@@ -129,10 +129,6 @@ const sources = {
         provider: 'vimeo',
       },
     ],
-    vimeo: {
-      // Prevent Vimeo blocking plyr.io demo site
-      referrerPolicy: 'no-referrer',
-    },
   },
 };
 
