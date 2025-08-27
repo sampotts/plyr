@@ -12,6 +12,8 @@
     ],
     "max-nesting-depth": 4,
     "scss/no-global-function-names": null,
+    "scss/dollar-variable-colon-space-after": "always-single-line",
+    "@stylistic/function-parentheses-space-inside": "never-single-line",
     "plugin/selector-bem-pattern": {
       "preset": "bem",
       "componentName": "(([a-z0-9]+(?!-$)-?)+)",
