@@ -134,13 +134,13 @@ See [initialising](#initializing) for more information on advanced setups.
 You can use our CDN (provided by [Cloudflare](https://www.cloudflare.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills separately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.8.2/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.8.3/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.8.2/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.8.3/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
@@ -154,13 +154,13 @@ Include the `plyr.css` stylesheet into your `<head>`.
 If you want to use our CDN (provided by [Cloudflare](https://www.cloudflare.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.8.2/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.8.3/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Cloudflare](https://www.cloudflare.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.8.2/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.8.3/plyr.svg`.
 
 ### Self hosting
 
@@ -399,7 +399,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                                                                    |
 | `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                                                         |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                                                   |
-| `iconUrl`            | String                     | `https://cdn.plyr.io/3.8.2/plyr.svg`                                                                                           | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                                                                                     |
+| `iconUrl`            | String                     | `https://cdn.plyr.io/3.8.3/plyr.svg`                                                                                           | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                                                                                     |
 | `iconPrefix`         | String                     | `plyr`                                                                                                                         | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.                                                                                                                                                                                                  |
 | `blankVideo`         | String                     | `https://cdn.plyr.io/static/blank.mp4`                                                                                         | Specify a URL or path to a blank video file used to properly cancel network requests.                                                                                                                                                                                                                                                                                                                                                   |
 | `autoplay`&sup2;     | Boolean                    | `false`                                                                                                                        | Autoplay the media on load. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                                                                                                                                                         |
