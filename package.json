@@ -67,6 +67,7 @@
     "cspell": "^9.2.0",
     "cssnano": "^7.1.1",
     "del": "^8.0.0",
+    "dotenv": "^17.2.1",
     "eslint": "^9.34.0",
     "eslint-plugin-format": "^1.0.1",
     "fancy-log": "^2.0.0",

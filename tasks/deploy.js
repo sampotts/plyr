@@ -2,20 +2,22 @@
 // Publish a version to CDN and demo (ESM version)
 // ==========================================================================
 
-import path from 'node:path';
+import { readFileSync } from 'node:fs';
+
+import path, { join } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import gulp from 'gulp';
+import aws from 'aws-sdk';
+import { bold, cyan, green } from 'colorette';
+import log from 'fancy-log';
 import gitbranch from 'git-branch';
+import gulp from 'gulp';
+import publish from 'gulp-awspublish';
+import open from 'gulp-open';
 import rename from 'gulp-rename';
 import replace from 'gulp-replace';
-import { green, cyan, bold } from 'colorette';
-import log from 'fancy-log';
-import open from 'gulp-open';
 import size from 'gulp-size';
-import aws from 'aws-sdk';
-import publish from 'gulp-awspublish';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import 'dotenv/config';
 
 const pkg = JSON.parse(readFileSync(join(path.resolve(), 'package.json'), 'utf-8'));
 const deploy = JSON.parse(readFileSync(join(path.resolve(), 'deploy.json'), 'utf-8'));
@@ -25,17 +27,19 @@ const { version } = pkg;
 const minSuffix = '.min';
 
 // Get AWS config
-Object.values(deploy).forEach((target) => {
-  Object.assign(target, {
-    publisher: publish.create({
-      region: target.region,
-      params: {
-        Bucket: target.bucket,
-      },
-      credentials: new aws.SharedIniFileCredentials({ profile: 'plyr' }),
-    }),
-  });
-});
+const jobs = Object.fromEntries(Object.entries((deploy).map(([name, config]) => [name, {
+  ...config,
+  publisher: publish.create({
+    region: config.region,
+    params: {
+      Bucket: config.bucket,
+    },
+    accessKeyId: config.type === 'r2' ? process.env.R2_ACCESS_KEY_ID : undefined,
+    secretAccessKey: config.type === 'r2' ? process.env.R2_SECRET_ACCESS_KEY : undefined,
+    endpoint: config.type === 'r2' ? new aws.Endpoint(process.env.R2_ENDPOINT) : undefined,
+    credentials: config.type === 's3' ? new aws.SharedIniFileCredentials({ profile: 'plyr' }) : undefined,
+  }),
+}])));
 
 // Paths
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -56,7 +60,8 @@ const paths = {
 const currentBranch = (() => {
   try {
     return gitbranch.sync();
-  } catch (_) {
+  }
+  catch {
     return null;
   }
 })();
@@ -93,35 +98,34 @@ const options = {
 // Size plugin
 const sizeOptions = { showFiles: true, gzip: true };
 
-const regex =
-  '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
+const regex = '(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?';
 const semver = new RegExp(`v${regex}`, 'gi');
-const localPath = new RegExp('(../)?dist/', 'gi');
-const versionPath = `https://${deploy.cdn.domain}/${version}/`;
-const cdnpath = new RegExp(`${deploy.cdn.domain}/${regex}/`, 'gi');
+const localPath = /(..\/)?dist\//gi;
+const versionPath = `https://${jobs.cdn.domain}/${version}/`;
+const cdnPath = new RegExp(`${jobs.cdn.domain}/${regex}/`, 'gi');
 
 const renameFile = rename((p) => {
-  p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
-  p.dirname = p.dirname.replace('.', version); // eslint-disable-line
+  p.basename = p.basename.replace(minSuffix, '');
+  p.dirname = p.dirname.replace('.', version);
 });
 
 // Check we're on the correct branch to deploy
-const canDeploy = () => {
+function canDeploy() {
   if (![branch.isMaster, branch.isBeta].some(Boolean)) {
     console.error(`Must be on an allowed branch to publish! (current: ${branch.current})`);
     return false;
   }
 
   return true;
-};
+}
 
-export const versionTask = (done) => {
+export function versionTask(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { domain } = deploy.cdn;
+  const { domain } = jobs.cdn;
 
   log(`Updating version in files to ${green(bold(version))}...`);
 
@@ -130,21 +134,21 @@ export const versionTask = (done) => {
 
   return gulp
     .src(
-      files.map((file) => path.join(root, `src/js/${file}`)),
+      files.map(file => path.join(root, `src/js/${file}`)),
       { base: '.' },
     )
     .pipe(replace(semver, `v${version}`))
-    .pipe(replace(cdnpath, `${domain}/${version}/`))
+    .pipe(replace(cdnPath, `${domain}/${version}/`))
     .pipe(gulp.dest('./'));
-};
+}
 
-export const cdnTask = (done) => {
+export function cdnTask(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { domain, publisher } = deploy.cdn;
+  const { domain, publisher } = jobs.cdn;
 
   if (!publisher) {
     throw new Error('No publisher instance. Check AWS configuration.');
@@ -158,7 +162,7 @@ export const cdnTask = (done) => {
     .pipe(renameFile)
     .pipe(
       replace(
-        /sourceMappingURL=([\w-?.]+)/,
+        /sourceMappingURL=([\w\-?.]+)/,
         (match, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
       ),
     )
@@ -166,16 +170,16 @@ export const cdnTask = (done) => {
     .pipe(replace(localPath, versionPath))
     .pipe(publisher.publish(options.cdn.headers))
     .pipe(publish.reporter());
-};
+}
 
-export const demoTask = (done) => {
+export function demoTask(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { publisher } = deploy.demo;
-  const { domain } = deploy.cdn;
+  const { publisher } = jobs.demo;
+  const { domain } = jobs.cdn;
 
   if (!publisher) {
     throw new Error('No publisher instance. Check AWS configuration.');
@@ -186,7 +190,7 @@ export const demoTask = (done) => {
   // Replace versioned files in README.md
   gulp
     .src([`${root}/README.md`])
-    .pipe(replace(cdnpath, `${domain}/${version}/`))
+    .pipe(replace(cdnPath, `${domain}/${version}/`))
     .pipe(gulp.dest(root));
 
   // Replace local file paths with remote paths in demo HTML
@@ -210,17 +214,17 @@ export const demoTask = (done) => {
     )
     .pipe(publisher.publish(options.demo.headers))
     .pipe(publish.reporter());
-};
+}
 
-export const openTask = () => {
-  const { domain } = deploy.demo;
+export function openTask() {
+  const { domain } = jobs.demo;
 
   return gulp.src(__filename).pipe(
     open({
       uri: `https://${domain}/${branch.isBeta ? 'beta' : ''}`,
     }),
   );
-};
+}
 
 export const deployTask = gulp.series(cdnTask, demoTask, openTask);
 

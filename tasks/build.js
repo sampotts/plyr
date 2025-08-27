@@ -2,33 +2,32 @@
 // Gulp build script (ESM version)
 // ==========================================================================
 
-import path from 'node:path';
-import gulp from 'gulp';
-import terser from 'gulp-terser';
-import rollup from 'gulp-better-rollup';
+import { readFileSync } from 'node:fs';
+import path, { join } from 'node:path';
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import sass from 'gulp-sass';
-import * as dartSass from 'sass';
-import postcss from 'gulp-postcss';
 import autoprefixer from 'autoprefixer';
+import browserSync from 'browser-sync';
 import cssnano from 'cssnano';
-import customprops from 'postcss-custom-properties';
-import svgstore from 'gulp-svgstore';
-import imagemin from 'gulp-imagemin';
-import imageminSvgo from 'imagemin-svgo';
 import { deleteAsync } from 'del';
+import gulp from 'gulp';
+import rollup from 'gulp-better-rollup';
 import filter from 'gulp-filter';
 import header from 'gulp-header';
-import rename from 'gulp-rename';
+import gulpIf from 'gulp-if';
+import imagemin from 'gulp-imagemin';
 import plumber from 'gulp-plumber';
+import postcss from 'gulp-postcss';
+import rename from 'gulp-rename';
+import sass from 'gulp-sass';
 import size from 'gulp-size';
 import sourcemaps from 'gulp-sourcemaps';
-import browserSync from 'browser-sync';
-import gulpIf from 'gulp-if';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import svgstore from 'gulp-svgstore';
+import terser from 'gulp-terser';
+import imageminSvgo from 'imagemin-svgo';
+import customprops from 'postcss-custom-properties';
+import * as dartSass from 'sass';
 
 const jobs = JSON.parse(readFileSync(join(path.resolve(), 'build.json'), 'utf-8'));
 
@@ -69,7 +68,7 @@ const sizeOptions = { showFiles: true, gzip: true };
 
 // Clean task
 export async function clean() {
-  const dirs = [paths.plyr.output, paths.demo.output].map((dir) => path.join(dir, '**/*'));
+  const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
   dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
   return await deleteAsync(dirs);
 };
@@ -130,8 +129,7 @@ Object.entries(jobs.js).forEach(([filename, entry]) => {
         .pipe(rename({ suffix: minSuffix }))
         .pipe(size(sizeOptions))
         .pipe(sourcemaps.write(''))
-        .pipe(gulp.dest(dist)),
-    );
+        .pipe(gulp.dest(dist)));
   });
 });
 
@@ -154,8 +152,7 @@ Object.entries(jobs.css).forEach(([filename, entry]) => {
         ]),
       )
       .pipe(size(sizeOptions))
-      .pipe(gulp.dest(dist)),
-  );
+      .pipe(gulp.dest(dist)));
 });
 
 // SVG Sprite tasks
@@ -187,8 +184,7 @@ Object.entries(jobs.sprite).forEach(([filename, entry]) => {
       .pipe(svgstore())
       .pipe(rename({ basename: path.parse(filename).name }))
       .pipe(size(sizeOptions))
-      .pipe(gulp.dest(dist)),
-  );
+      .pipe(gulp.dest(dist)));
 });
 
 // Build tasks
@@ -197,17 +193,17 @@ export const css = gulp.parallel(...tasks.css);
 export const sprites = gulp.parallel(...tasks.sprite);
 
 // Watch task
-export const watch = () => {
+export function watch() {
   gulp.watch(paths.plyr.src.js, js);
   gulp.watch(paths.plyr.src.sass, css);
   gulp.watch(paths.plyr.src.sprite, sprites);
   gulp.watch(paths.demo.src.js, js);
   gulp.watch(paths.demo.src.sass, css);
-};
+}
 
 // Serve task
-export const serve = () =>
-  bs.init({
+export function serve() {
+  return bs.init({
     server: {
       baseDir: paths.demo.root,
     },
@@ -215,6 +211,7 @@ export const serve = () =>
     watch: true,
     ghostMode: false,
   });
+}
 
 // Build distribution
 export const build = gulp.series(clean, gulp.parallel(js, css, sprites));
