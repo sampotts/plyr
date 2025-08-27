@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.8.1
+
+- Fix exports-related regression in 3.8.0. Sorry!
+
 ### v3.8.0
 
 - Add @babel/plugin-transform-nullish-coalescing-operator and @rollup/plugin-babel (#2783)
