@@ -3,8 +3,7 @@
 // Definitions by: ondratra <https://github.com/ondratra>
 // TypeScript Version: 3.0
 
-export = Plyr;
-export as namespace Plyr;
+
 
 declare class Plyr {
   /**
@@ -724,3 +723,7 @@ declare namespace Plyr {
     ui: boolean;
   }
 }
+
+export = Plyr;
+export as namespace Plyr;
+export default Plyr;

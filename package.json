@@ -25,19 +25,15 @@
   "exports": {
     ".": {
       "types": "./src/js/plyr.d.ts",
-      "import": "./dist/plyr.mjs",
+      "import": "./src/js/plyr.js",
       "require": "./dist/plyr.js",
       "browser": "./dist/plyr.min.js",
       "default": "./dist/plyr.js"
     },
     "./dist/plyr.css": "./dist/plyr.css",
-    "./plyr.css": "./dist/plyr.css",
+    "./css": "./dist/plyr.css",
     "./plyr.scss": "./src/sass/plyr.scss"
   },
-  "main": "./dist/plyr.js",
-  "module": "./dist/plyr.min.mjs",
-  "types": "./src/js/plyr.d.ts",
-  "browser": "./dist/plyr.min.js",
   "sass": "./src/sass/plyr.scss",
   "style": "./dist/plyr.css",
   "browserslist": "> 1%",
