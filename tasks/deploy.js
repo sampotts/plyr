@@ -1,48 +1,51 @@
-// ==========================================================================
-// Publish a version to CDN and demo (ESM version)
-// ==========================================================================
-
 import { readFileSync } from 'node:fs';
-
 import path, { join } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { S3Client } from '@aws-sdk/client-s3';
 import aws from 'aws-sdk';
 import { bold, cyan, green } from 'colorette';
 import log from 'fancy-log';
 import gitbranch from 'git-branch';
 import gulp from 'gulp';
-import publish from 'gulp-awspublish';
 import open from 'gulp-open';
 import rename from 'gulp-rename';
 import replace from 'gulp-replace';
 import size from 'gulp-size';
+
+import { publish } from './utils/publish.js';
 import 'dotenv/config';
 
+// Convert `import.meta.url` to `__filename` and `__dirname`
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const pkg = JSON.parse(readFileSync(join(path.resolve(), 'package.json'), 'utf-8'));
-const deploy = JSON.parse(readFileSync(join(path.resolve(), 'deploy.json'), 'utf-8'));
+const config = JSON.parse(readFileSync(join(path.resolve(), 'deploy.json'), 'utf-8'));
 
 // Info from package
 const { version } = pkg;
 const minSuffix = '.min';
 
 // Get AWS config
-const jobs = Object.fromEntries(Object.entries((deploy).map(([name, config]) => [name, {
-  ...config,
-  publisher: publish.create({
-    region: config.region,
-    params: {
-      Bucket: config.bucket,
-    },
-    accessKeyId: config.type === 'r2' ? process.env.R2_ACCESS_KEY_ID : undefined,
-    secretAccessKey: config.type === 'r2' ? process.env.R2_SECRET_ACCESS_KEY : undefined,
-    endpoint: config.type === 'r2' ? new aws.Endpoint(process.env.R2_ENDPOINT) : undefined,
-    credentials: config.type === 's3' ? new aws.SharedIniFileCredentials({ profile: 'plyr' }) : undefined,
-  }),
-}])));
+const jobs = Object.fromEntries(Object.entries(config).map(([name, options]) => [name, {
+  ...options,
+  client: options.type === 'r2'
+    ? new S3Client({
+      region: 'auto',
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+      },
+      endpoint: `https://${process.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    })
+    : new S3Client({
+      region: options.region,
+      credentials: new aws.SharedIniFileCredentials({ profile: 'plyr' }),
+    }),
+}]));
 
 // Paths
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const paths = {
   demo: path.join(root, 'demo/'),
@@ -85,14 +88,6 @@ const options = {
       'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
     },
   },
-  symlinks(ver, filename) {
-    return {
-      headers: {
-        'x-amz-website-redirect-location': `/${ver}/${filename}`,
-        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-      },
-    };
-  },
 };
 
 // Size plugin
@@ -119,7 +114,7 @@ function canDeploy() {
   return true;
 }
 
-export function versionTask(done) {
+export function prepare(done) {
   if (!canDeploy()) {
     done();
     return null;
@@ -142,17 +137,13 @@ export function versionTask(done) {
     .pipe(gulp.dest('./'));
 }
 
-export function cdnTask(done) {
+function cdn(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { domain, publisher } = jobs.cdn;
-
-  if (!publisher) {
-    throw new Error('No publisher instance. Check AWS configuration.');
-  }
+  const { domain, client, bucket } = jobs.cdn;
 
   log(`Uploading ${green(bold(pkg.version))} to ${cyan(domain)}...`);
 
@@ -163,34 +154,27 @@ export function cdnTask(done) {
     .pipe(
       replace(
         /sourceMappingURL=([\w\-?.]+)/,
-        (match, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
+        (_, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
       ),
     )
     .pipe(size(sizeOptions))
     .pipe(replace(localPath, versionPath))
-    .pipe(publisher.publish(options.cdn.headers))
-    .pipe(publish.reporter());
+    .pipe(publish(client, bucket, options.cdn.headers));
 }
 
-export function demoTask(done) {
+function demo(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { publisher } = jobs.demo;
-  const { domain } = jobs.cdn;
-
-  if (!publisher) {
-    throw new Error('No publisher instance. Check AWS configuration.');
-  }
-
+  const { client, bucket, domain } = jobs.demo;
   log(`Uploading ${green(bold(pkg.version))} to ${cyan(domain)}...`);
 
   // Replace versioned files in README.md
   gulp
     .src([`${root}/README.md`])
-    .pipe(replace(cdnPath, `${domain}/${version}/`))
+    .pipe(replace(cdnPath, `${jobs.cdn.domain}/${version}/`))
     .pipe(gulp.dest(root));
 
   // Replace local file paths with remote paths in demo HTML
@@ -212,11 +196,10 @@ export function demoTask(done) {
         }
       }),
     )
-    .pipe(publisher.publish(options.demo.headers))
-    .pipe(publish.reporter());
+    .pipe(publish(client, bucket, options.demo.headers));
 }
 
-export function openTask() {
+function preview() {
   const { domain } = jobs.demo;
 
   return gulp.src(__filename).pipe(
@@ -226,6 +209,4 @@ export function openTask() {
   );
 }
 
-export const deployTask = gulp.series(cdnTask, demoTask, openTask);
-
-export default deployTask;
+export const deploy = gulp.series(cdn, demo, preview);

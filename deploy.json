@@ -2,8 +2,7 @@
   "cdn": {
     "type": "r2",
     "bucket": "plyr",
-    "domain": "cdn.plyr.io",
-    "region": "auto"
+    "domain": "cdn.plyr.io"
   },
   "demo": {
     "type": "s3",

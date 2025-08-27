@@ -24,7 +24,8 @@ function parseId(url) {
     return url;
   }
 
-  const regex = /^.*(vimeo.com\/|video\/)(\d).*/;
+  // eslint-disable-next-line regexp/optimal-quantifier-concatenation
+  const regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
   const match = url.match(regex);
   return match ? match[2] : url;
 }
@@ -65,7 +66,7 @@ const vimeo = {
     // Set speed options from config
     player.options.speed = player.config.speed.options;
 
-    // Set intial ratio
+    // Set initial ratio
     setAspectRatio.call(player);
 
     // Load the SDK if not already

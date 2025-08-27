@@ -1,7 +1,3 @@
-// ==========================================================================
-// Gulp build script (ESM version)
-// ==========================================================================
-
 import { readFileSync } from 'node:fs';
 import path, { join } from 'node:path';
 import babel from '@rollup/plugin-babel';

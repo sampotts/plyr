@@ -1,7 +1,7 @@
 {
   "name": "plyr",
   "type": "module",
-  "version": "3.7.8",
+  "version": "3.8.0",
   "packageManager": "pnpm@10.15.0",
   "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
   "author": "Sam Potts <sam@potts.es>",
@@ -36,7 +36,7 @@
     "lint": "stylelint **/*.scss && eslint src demo && pnpm remark",
     "lint:fix": "stylelint **/*.scss --fix && eslint src demo --fix",
     "remark": "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",
-    "deploy": "pnpm run lint && gulp version && gulp build && gulp deploy",
+    "deploy": "pnpm run lint && gulp prepare && gulp build && gulp deploy",
     "spellcheck": "cspell \"**/*.{js,md,scss,json}\" --no-must-find-files",
     "start": "gulp"
   },
@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
+    "@aws-sdk/client-s3": "^3.876.0",
     "@babel/core": "^7.28.3",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
@@ -74,7 +75,6 @@
     "git-branch": "^2.0.1",
     "globals": "^16.3.0",
     "gulp": "^5.0.1",
-    "gulp-awspublish": "^8.0.0",
     "gulp-better-rollup": "^4.0.1",
     "gulp-filter": "^9.0.1",
     "gulp-header": "^2.0.9",
@@ -91,6 +91,7 @@
     "gulp-svgstore": "^9.0.0",
     "gulp-terser": "^2.1.0",
     "imagemin-svgo": "^11.0.1",
+    "mime": "^4.0.7",
     "postcss": "^8.5.6",
     "postcss-custom-properties": "^14.0.6",
     "postcss-scss": "^4.0.9",
@@ -100,6 +101,7 @@
     "sass": "^1.91.0",
     "stylelint": "^16.23.1",
     "stylelint-config-sass-guidelines": "^12.1.0",
-    "stylelint-selector-bem-pattern": "^4.0.1"
+    "stylelint-selector-bem-pattern": "^4.0.1",
+    "through2": "^4.0.2"
   }
 }
