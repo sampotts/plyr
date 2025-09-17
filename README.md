@@ -818,7 +818,7 @@ Some awesome folks have made plugins for CMSs and Components for JavaScript fram
 | Neos        | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                      | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby       | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))              | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
 | REDAXO      | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io))   | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
-| svelte-plyr | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward/svelte-plyr](https://github.com/benwoodward/svelte-plyr)     |
+| Svelte      | Pol Vallverdu ([@polvallverdu](https://github.com/polvallverdu))            | [https://github.com/polvallverdu/plyr-sv](https://github.com/polvallverdu/plyr-sv)           |
 
 # Issues
 
