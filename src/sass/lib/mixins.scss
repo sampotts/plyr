@@ -14,7 +14,7 @@
 @mixin plyr-font-smoothing($mode: true) {
   @if $mode {
     -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: $plyr-font-smoothing; // Used the correct Var
   }
 }
 
