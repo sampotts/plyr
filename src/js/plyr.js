@@ -16,6 +16,7 @@ import html5 from './html5';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
+import captionsAutoscroll from './plugins/captions-autoscroll';
 import PreviewThumbnails from './plugins/preview-thumbnails';
 import source from './source';
 import Storage from './storage';
@@ -101,6 +102,11 @@ class Plyr {
       currentTrack: -1,
       meta: new WeakMap(),
     };
+    // Captions autoscroll plugin (keeps active cue in view)
+
+    if (this.config.captions?.enabled !== false) {
+      this.captionsAutoscroll = captionsAutoscroll(this);
+    }
 
     // Fullscreen
     this.fullscreen = {
