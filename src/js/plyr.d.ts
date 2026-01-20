@@ -143,6 +143,11 @@ declare class Plyr {
   elements: Plyr.Elements;
 
   /**
+   * Returns the Video Element
+   */
+  media: HTMLVideoElement;
+
+  /**
    * Returns the current video Provider
    */
   readonly provider: Plyr.Provider;
