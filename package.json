@@ -25,6 +25,7 @@
   "exports": {
     ".": {
       "types": "./src/js/plyr.d.ts",
+      "import": "./dist/plyr.mjs",
       "require": "./dist/plyr.js",
       "browser": "./dist/plyr.min.js",
       "default": "./dist/plyr.js"
