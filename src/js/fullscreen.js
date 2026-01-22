@@ -55,6 +55,16 @@ class Fullscreen {
     // Tap focus when in fullscreen
     on.call(this, this.player.elements.container, 'keydown', event => this.trapFocus(event));
 
+    // Handle iOS native fullscreen caption sync
+    if (browser.isIos && this.player.config.fullscreen.iosNative) {
+      on.call(this.player, this.player.media, 'webkitbeginfullscreen', () => {
+        this.syncCaptionsToNative(true);
+      });
+      on.call(this.player, this.player.media, 'webkitendfullscreen', () => {
+        this.syncCaptionsToNative(false);
+      });
+    }
+
     // Update the UI
     this.update();
   }
@@ -245,6 +255,25 @@ class Fullscreen {
     toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.supported);
   };
 
+  // Sync captions for iOS native fullscreen
+  // When entering native fullscreen, set track mode to 'showing' so iOS can render captions
+  // When exiting, set back to 'hidden' so Plyr can control caption rendering
+  syncCaptionsToNative = (enteringFullscreen) => {
+    const { currentTrackNode, toggled } = this.player.captions;
+
+    // Only sync if captions are enabled and we have a valid track
+    if (!currentTrackNode) return;
+
+    if (enteringFullscreen && toggled) {
+      // Enable native caption rendering for iOS fullscreen
+      currentTrackNode.mode = 'showing';
+    }
+    else if (!enteringFullscreen) {
+      // Restore Plyr-controlled rendering
+      currentTrackNode.mode = 'hidden';
+    }
+  };
+
   // Make an element fullscreen
   enter = () => {
     if (!this.supported) return;
@@ -279,7 +308,7 @@ class Fullscreen {
         this.player.embed.exitFullscreen();
       }
       else {
-        this.target.webkitEnterFullscreen();
+        this.target.webkitExitFullscreen();
       }
       silencePromise(this.player.play());
     }
