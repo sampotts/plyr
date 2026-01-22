@@ -2,8 +2,10 @@
 // Faux poster overlay
 // --------------------------------------------------------------
 
+@use '../settings/colors';
+
 .plyr__poster {
-  background-color: var(--plyr-video-background, $plyr-video-background);
+  background-color: var(--plyr-video-background, colors.$plyr-video-background);
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-size: contain;
