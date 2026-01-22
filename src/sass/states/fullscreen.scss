@@ -10,8 +10,9 @@
 
 // Fallback for unsupported browsers
 .plyr--fullscreen-fallback {
-  @include mixins.plyr-fullscreen-active;
   position: fixed;
   inset: 0;
   z-index: 10000000;
+
+  @include mixins.plyr-fullscreen-active;
 }
