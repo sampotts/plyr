@@ -2,8 +2,12 @@
 // Playback progress
 // --------------------------------------------------------------
 
+@use '../settings/colors';
+@use '../settings/progress';
+@use '../settings/sliders';
+
 // Offset the range thumb in order to be able to calculate the relative progress (#954)
-$plyr-progress-offset: $plyr-range-thumb-height;
+$plyr-progress-offset: sliders.$plyr-range-thumb-height;
 
 .plyr__progress {
   left: calc(#{$plyr-progress-offset} * 0.5);
@@ -35,9 +39,9 @@ $plyr-progress-offset: $plyr-range-thumb-height;
   background: transparent;
   border: 0;
   border-radius: 100px;
-  height: $plyr-range-track-height;
+  height: sliders.$plyr-range-track-height;
   left: 0;
-  margin-top: calc((#{$plyr-range-track-height} / 2) * -1);
+  margin-top: calc((#{sliders.$plyr-range-track-height} / 2) * -1);
   padding: 0;
   position: absolute;
   top: 50%;
@@ -49,7 +53,7 @@ $plyr-progress-offset: $plyr-range-thumb-height;
   &::-webkit-progress-value {
     background: currentColor;
     border-radius: 100px;
-    min-width: $plyr-range-track-height;
+    min-width: sliders.$plyr-range-track-height;
     transition: width 0.2s ease;
   }
 
@@ -57,7 +61,7 @@ $plyr-progress-offset: $plyr-range-thumb-height;
   &::-moz-progress-bar {
     background: currentColor;
     border-radius: 100px;
-    min-width: $plyr-range-track-height;
+    min-width: sliders.$plyr-range-track-height;
     transition: width 0.2s ease;
   }
 
@@ -73,35 +77,35 @@ $plyr-progress-offset: $plyr-range-thumb-height;
   animation: plyr-progress 1s linear infinite;
   background-image: linear-gradient(
     -45deg,
-    $plyr-progress-loading-background 25%,
+    progress.$plyr-progress-loading-background 25%,
     transparent 25%,
     transparent 50%,
-    $plyr-progress-loading-background 50%,
-    $plyr-progress-loading-background 75%,
+    progress.$plyr-progress-loading-background 50%,
+    progress.$plyr-progress-loading-background 75%,
     transparent 75%,
     transparent
   );
   background-repeat: repeat-x;
-  background-size: $plyr-progress-loading-size $plyr-progress-loading-size;
+  background-size: progress.$plyr-progress-loading-size progress.$plyr-progress-loading-size;
   color: transparent;
 }
 
 .plyr--video.plyr--loading .plyr__progress__buffer {
-  background-color: $plyr-video-progress-buffered-background;
+  background-color: progress.$plyr-video-progress-buffered-background;
 }
 
 .plyr--audio.plyr--loading .plyr__progress__buffer {
-  background-color: $plyr-audio-progress-buffered-background;
+  background-color: progress.$plyr-audio-progress-buffered-background;
 }
 
 // Markers
 .plyr__progress__marker {
-  background-color: $plyr-progress-marker-background;
+  background-color: progress.$plyr-progress-marker-background;
   border-radius: 1px;
-  height: $plyr-range-track-height;
+  height: sliders.$plyr-range-track-height;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: $plyr-progress-marker-width;
+  width: progress.$plyr-progress-marker-width;
   z-index: 3;
 }

@@ -2,14 +2,16 @@
 // Volume
 // --------------------------------------------------------------
 
+@use '../settings/controls';
+
 .plyr__volume {
   align-items: center;
   display: flex;
   position: relative;
 
   input[type='range'] {
-    margin-left: calc(#{$plyr-control-spacing} / 2);
-    margin-right: calc(#{$plyr-control-spacing} / 2);
+    margin-left: calc(#{controls.$plyr-control-spacing} / 2);
+    margin-right: calc(#{controls.$plyr-control-spacing} / 2);
     max-width: 90px;
     min-width: 60px;
     position: relative;
