@@ -1,5 +1,14 @@
 # Changelog
 
+### v3.8.4
+
+- Fix import path for ESM import in package.json (fixes #2882)
+- Hide default vimeo captions (fixes #877)
+
+### v3.8.3
+
+- Fix regression in v3.8.2
+
 ### v3.8.2
 
 - Add missing types export in package.json.
