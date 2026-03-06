@@ -58,6 +58,8 @@
     }
 
     [role='menu'] {
+      max-height: $plyr-menu-max-height;
+      overflow-y: auto;
       padding: $plyr-control-padding;
     }
 
