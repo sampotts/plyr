@@ -562,6 +562,13 @@ class Plyr {
       volume = min;
     }
 
+    // Remember the last audible volume so we can restore it when unmuting (see listeners.js)
+    // Decreases are ignored, so ramping down to zero doesn't leave a near-silent volume behind
+    // The previously requested volume is used for the comparison, as this.volume lags behind for embeds
+    if (volume > 0 && (!this.lastVolume || volume >= this.config.volume)) {
+      this.lastVolume = volume;
+    }
+
     // Update config
     this.config.volume = volume;
 

@@ -2,6 +2,7 @@
 // Plyr Event Listeners
 // ==========================================================================
 
+import defaults from './config/defaults';
 import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
@@ -11,6 +12,21 @@ import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';
 import { getAspectRatio, getViewportSize, supportsCSS } from './utils/style';
+
+// Toggle the mute state
+// A volume of zero is displayed as muted (see controls.updateVolume), so it has to be treated as such here,
+// otherwise the toggle would have no audible or visible effect
+function toggleMuted(player) {
+  const muted = !(player.muted || player.volume === 0);
+
+  // Restore an audible volume if the player was silenced using the volume control
+  // Set before muted, so the muted setter doesn't have to deal with a silent, unmuted player
+  if (!muted && player.volume === 0) {
+    player.volume = player.lastVolume > 0 ? player.lastVolume : defaults.volume;
+  }
+
+  player.muted = muted;
+}
 
 class Listeners {
   constructor(player) {
@@ -134,7 +150,7 @@ class Listeners {
 
         case 'm':
           if (!repeat) {
-            player.muted = !player.muted;
+            toggleMuted(player);
           }
           break;
 
@@ -546,7 +562,7 @@ class Listeners {
       elements.buttons.mute,
       'click',
       () => {
-        player.muted = !player.muted;
+        toggleMuted(player);
       },
       'mute',
     );
@@ -774,6 +790,17 @@ class Listeners {
       },
       'volume',
     );
+
+    // Remember the volume the user settled on, so it can be restored when unmuting (see toggleMuted)
+    if (inputEvent !== 'change') {
+      this.bind(elements.inputs.volume, 'change', (event) => {
+        const value = Number(event.target.value);
+
+        if (value > 0) {
+          player.lastVolume = value;
+        }
+      });
+    }
 
     // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
     this.bind(elements.controls, 'mouseenter mouseleave', (event) => {
