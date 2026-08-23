@@ -724,6 +724,5 @@ declare namespace Plyr {
   }
 }
 
-export = Plyr;
 export as namespace Plyr;
 export default Plyr;

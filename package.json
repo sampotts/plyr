@@ -30,8 +30,14 @@
       "browser": "./dist/plyr.min.js",
       "default": "./dist/plyr.js"
     },
-    "./dist/plyr.css": "./dist/plyr.css",
-    "./css": "./dist/plyr.css",
+    "./dist/plyr.css": {
+      "types": "./src/css.d.ts",
+      "default": "./dist/plyr.css"
+    },
+    "./css": {
+      "types": "./src/css.d.ts",
+      "default": "./dist/plyr.css"
+    },
     "./plyr.scss": "./src/sass/plyr.scss"
   },
   "sass": "./src/sass/plyr.scss",
