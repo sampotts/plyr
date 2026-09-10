@@ -158,6 +158,9 @@ const captions = {
       toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks));
     }
 
+    // Wire up the "Upload captions" file input (no-op unless upload is enabled)
+    captions.setupUpload.call(this);
+
     // Update available languages in list
     if (
       is.array(this.config.controls)
@@ -165,6 +168,126 @@ const captions = {
       && this.config.settings.includes('captions')
     ) {
       controls.setCaptionsMenu.call(this);
+    }
+  },
+
+  // Add a caption/subtitle track to the media programmatically.
+  // `options` accepts either inline WebVTT `text` or a `src`/`url` to a track
+  // file, plus optional `label`, `srclang`, `kind` (default 'captions') and
+  // `default`. Returns the created HTMLTrackElement, or null if invalid.
+  addTrack(options = {}) {
+    const { text, label, srclang, kind = 'captions', default: isDefault = false } = options;
+    // Accept `url` as an alias for `src`
+    let src = options.src || options.url;
+
+    if (!src && !is.string(text)) {
+      this.debug.warn('captions.addTrack requires either `text` or `src`/`url`');
+      return null;
+    }
+
+    // Build a blob URL from inline WebVTT text when no src is provided
+    if (!src) {
+      src = window.URL.createObjectURL(new Blob([text], { type: 'text/vtt;charset=utf-8' }));
+    }
+
+    const attributes = { src, kind };
+    if (!is.empty(label)) {
+      attributes.label = label;
+    }
+    if (!is.empty(srclang)) {
+      attributes.srclang = srclang;
+    }
+    if (isDefault) {
+      attributes.default = '';
+    }
+
+    const track = createElement('track', attributes);
+    this.media.appendChild(track);
+
+    // Refresh the menu so the new track is selectable even when
+    // `config.captions.update` is false
+    captions.update.call(this);
+
+    return track;
+  },
+
+  // Create the hidden file input backing the "Upload captions" menu item and
+  // wire the change handler. Reads the selected file, optionally runs it through
+  // the `process` hook, then adds the resulting track. Idempotent.
+  setupUpload() {
+    const { upload } = this.config.captions;
+
+    if (!upload || !upload.enabled || !this.supported.ui) {
+      return;
+    }
+
+    const parent = this.elements.settings.panels.captions;
+
+    // Needs the captions settings panel to attach to
+    if (!is.element(parent)) {
+      return;
+    }
+
+    const selector = this.config.classNames.captions.upload;
+
+    // Only create the input once
+    if (parent.querySelector(`.${selector}`)) {
+      return;
+    }
+
+    const input = createElement('input', {
+      type: 'file',
+      accept: upload.formats.map(format => `.${format}`).join(','),
+      class: selector,
+      hidden: '',
+    });
+
+    on.call(this, input, 'change', () => {
+      const [file] = input.files || [];
+
+      // Reset so selecting the same file again still fires `change`
+      input.value = '';
+
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        const text = is.string(reader.result) ? reader.result : '';
+        const { name: label } = file;
+
+        // Run the file through the developer's `process` hook if provided,
+        // otherwise treat it as valid WebVTT as-is.
+        Promise.resolve(
+          is.function(upload.process) ? upload.process.call(this, { file, text, label }) : { text, label },
+        )
+          .then((result) => {
+            // Falsy result means the developer handled/rejected the file
+            if (!result) {
+              return;
+            }
+
+            // A bare string is treated as WebVTT text
+            const track = is.string(result) ? { text: result } : result;
+            captions.addTrack.call(this, { label, ...track });
+          })
+          .catch(error => this.debug.warn('captions upload `process` hook failed', error));
+      });
+      reader.readAsText(file);
+    });
+
+    parent.appendChild(input);
+  },
+
+  // Open the file picker backing the "Upload captions" menu item
+  openUploadDialog() {
+    const input = this.elements.settings.panels.captions.querySelector(
+      `.${this.config.classNames.captions.upload}`,
+    );
+
+    if (is.element(input)) {
+      input.click();
     }
   },
 

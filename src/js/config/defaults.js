@@ -107,6 +107,25 @@ const defaults = {
     // Listen to new tracks added after Plyr is initialized.
     // This is needed for streaming captions, but may result in unselectable options
     update: false,
+    // Allow users to upload their own caption files from the local filesystem.
+    // When enabled, an "Upload captions" item is added to the captions menu.
+    // Plyr ships no parsers, so anything other than WebVTT requires a `process`
+    // hook to convert the file first. See CAPTIONS.md for a subsrt example.
+    upload: {
+      enabled: false,
+      // File extensions offered in the picker (used for the `accept` attribute).
+      // Any format other than `vtt` requires a `process` hook (below) to convert
+      // the file to WebVTT before it can be added as a track.
+      formats: ['vtt'],
+      // Optional hook to transform a selected file before it is added as a track.
+      // Called (with the player as `this`) with `{ file, text, label }` and may
+      // return, or resolve to, one of:
+      //   - a string       -> treated as WebVTT text
+      //   - a track object  -> { text | src, label?, srclang?, kind?, default? }
+      //   - a falsy value   -> abort (the developer handled the file themselves)
+      // If omitted, the file is added as-is (assumed to already be valid WebVTT).
+      process: null,
+    },
   },
 
   // Fullscreen settings
@@ -164,6 +183,7 @@ const defaults = {
     unmute: 'Unmute',
     enableCaptions: 'Enable captions',
     disableCaptions: 'Disable captions',
+    uploadCaptions: 'Upload captions',
     download: 'Download',
     enterFullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
@@ -366,6 +386,7 @@ const defaults = {
     captions: {
       enabled: 'plyr--captions-enabled',
       active: 'plyr--captions-active',
+      upload: 'plyr__captions-upload',
     },
     fullscreen: {
       enabled: 'plyr--fullscreen-enabled',

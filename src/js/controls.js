@@ -464,14 +464,14 @@ const controls = {
   },
 
   // Create a settings menu item
-  createMenuItem({ value, list, type, title, badge = null, checked = false }) {
+  createMenuItem({ value, list, type, title, badge = null, checked = false, role = 'menuitemradio' }) {
     const attributes = getAttributesFromSelector(this.config.selectors.inputs[type]);
 
     const menuItem = createElement(
       'button',
       extend(attributes, {
         'type': 'button',
-        'role': 'menuitemradio',
+        'role': role,
         'class': `${this.config.classNames.control} ${attributes.class ? attributes.class : ''}`.trim(),
         'aria-checked': checked,
         value,
@@ -518,11 +518,21 @@ const controls = {
         event.preventDefault();
         event.stopPropagation();
 
+        // Should we navigate back to the home panel after this event?
+        let shouldMenuPanelGoHome = true;
         menuItem.checked = true;
 
         switch (type) {
           case 'language':
-            this.currentTrack = Number(value);
+            if (value === -2) {
+              // The "Upload captions" item: open the file picker and keep the
+              // menu open rather than switching track.
+              shouldMenuPanelGoHome = false;
+              captions.openUploadDialog.call(this);
+            }
+            else {
+              this.currentTrack = Number(value);
+            }
             break;
 
           case 'quality':
@@ -537,7 +547,9 @@ const controls = {
             break;
         }
 
-        controls.showMenuPanel.call(this, 'home', is.keyboardEvent(event));
+        if (shouldMenuPanelGoHome) {
+          controls.showMenuPanel.call(this, 'home', is.keyboardEvent(event));
+        }
       },
       type,
       false,
@@ -1026,7 +1038,10 @@ const controls = {
     const type = 'captions';
     const list = this.elements.settings.panels.captions.querySelector('[role="menu"]');
     const tracks = captions.getTracks.call(this);
-    const toggle = Boolean(tracks.length);
+    const { upload } = this.config.captions;
+    const uploadEnabled = Boolean(upload && upload.enabled);
+    // Show the menu if there are tracks, or if caption uploads are enabled
+    const toggle = Boolean(tracks.length) || uploadEnabled;
 
     // Toggle the pane and tab
     controls.toggleMenuButton.call(this, type, toggle);
@@ -1060,6 +1075,17 @@ const controls = {
       list,
       type: 'language',
     });
+
+    // Add the "Upload captions" option when uploads are enabled
+    if (uploadEnabled) {
+      options.unshift({
+        value: -2,
+        title: i18n.get('uploadCaptions', this.config),
+        list,
+        type: 'language',
+        role: 'button',
+      });
+    }
 
     // Generate options
     options.forEach(controls.createMenuItem.bind(this));

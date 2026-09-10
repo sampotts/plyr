@@ -962,6 +962,17 @@ class Plyr {
   }
 
   /**
+   * Add a caption/subtitle track to the media programmatically
+   * @param {object} options - Track options. Provide either inline WebVTT
+   *   `text` or a `src`/`url` to a track file, plus optional `label`,
+   *   `srclang`, `kind` (default 'captions') and `default`.
+   * @returns {HTMLTrackElement|null} The created track element, or null if invalid
+   */
+  addCaptionTrack(options) {
+    return captions.addTrack.call(this, options);
+  }
+
+  /**
    * Set the caption track by index
    * @param {number} input - Caption index
    */
