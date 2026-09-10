@@ -147,8 +147,13 @@ const captions = {
         });
     }
 
+    // Update track by track node if track and language exist
+    if (tracks.includes(currentTrackNode) && languageExists) {
+      captions.setNode.call(this, currentTrackNode);
+      captions.toggle.call(this, active && languageExists);
+    }
     // Update language first time it matches, or if the previous matching track was removed
-    if ((languageExists && this.language !== language) || !tracks.includes(currentTrackNode)) {
+    else if ((languageExists && this.language !== language) || !tracks.includes(currentTrackNode)) {
       captions.setLanguage.call(this, language);
       captions.toggle.call(this, active && languageExists);
     }
@@ -285,6 +290,17 @@ const captions = {
       // If we change the active track while a cue is already displayed we need to update it
       captions.updateCues.call(this);
     }
+  },
+
+  setNode(input, passive = true) {
+    if (!is.track(input)) {
+      this.debug.warn('Invalid track argument', input);
+      return;
+    }
+
+    // Set currentTrack
+    const tracks = captions.getTracks.call(this);
+    captions.set.call(this, tracks.indexOf(input), passive);
   },
 
   // Set captions by language
