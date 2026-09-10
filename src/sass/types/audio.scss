@@ -2,6 +2,11 @@
 // Audio styles
 // --------------------------------------------------------------
 
+@use '../lib/mixins';
+@use '../settings/controls';
+@use '../settings/progress';
+@use '../settings/sliders';
+
 // Container
 .plyr--audio {
   display: block;
@@ -9,10 +14,10 @@
 
 // Controls container
 .plyr--audio .plyr__controls {
-  background: $plyr-audio-controls-background;
+  background: controls.$plyr-audio-controls-background;
   border-radius: inherit;
-  color: $plyr-audio-control-color;
-  padding: $plyr-control-spacing;
+  color: controls.$plyr-audio-control-color;
+  padding: controls.$plyr-control-spacing;
 }
 
 // Control elements
@@ -20,42 +25,42 @@
   &:focus-visible,
   &:hover,
   &[aria-expanded='true'] {
-    background: $plyr-audio-control-background-hover;
-    color: $plyr-audio-control-color-hover;
+    background: controls.$plyr-audio-control-background-hover;
+    color: controls.$plyr-audio-control-color-hover;
   }
 }
 
 // Range inputs
 .plyr--full-ui.plyr--audio input[type='range'] {
   &::-webkit-slider-runnable-track {
-    background-color: $plyr-audio-range-track-background;
+    background-color: sliders.$plyr-audio-range-track-background;
   }
 
   &::-moz-range-track {
-    background-color: $plyr-audio-range-track-background;
+    background-color: sliders.$plyr-audio-range-track-background;
   }
 
   &::-ms-track {
-    background-color: $plyr-audio-range-track-background;
+    background-color: sliders.$plyr-audio-range-track-background;
   }
 
   // Pressed styles
   &:active {
     &::-webkit-slider-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+      @include mixins.plyr-range-thumb-active(sliders.$plyr-audio-range-thumb-active-shadow-color);
     }
 
     &::-moz-range-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+      @include mixins.plyr-range-thumb-active(sliders.$plyr-audio-range-thumb-active-shadow-color);
     }
 
     &::-ms-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+      @include mixins.plyr-range-thumb-active(sliders.$plyr-audio-range-thumb-active-shadow-color);
     }
   }
 }
 
 // Progress
 .plyr--audio .plyr__progress__buffer {
-  color: $plyr-audio-progress-buffered-background;
+  color: progress.$plyr-audio-progress-buffered-background;
 }

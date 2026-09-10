@@ -2,9 +2,15 @@
 // Mixins
 // ==========================================================================
 
+@use '../settings/breakpoints';
+@use '../settings/captions';
+@use '../settings/cosmetics';
+@use '../settings/sliders';
+@use '../settings/type';
+
 // Nicer focus styles
 // ---------------------------------------
-@mixin plyr-focus-visible($color: $plyr-focus-visible-color) {
+@mixin plyr-focus-visible($color: cosmetics.$plyr-focus-visible-color) {
   outline: 2px dashed $color;
   outline-offset: 2px;
 }
@@ -23,27 +29,27 @@
 @mixin plyr-range-track() {
   background: transparent;
   border: 0;
-  border-radius: calc(#{$plyr-range-track-height} / 2);
-  height: $plyr-range-track-height;
+  border-radius: calc(#{sliders.$plyr-range-track-height} / 2);
+  height: sliders.$plyr-range-track-height;
   transition: box-shadow 0.3s ease;
   user-select: none;
 }
 
 @mixin plyr-range-thumb() {
-  background: $plyr-range-thumb-background;
+  background: sliders.$plyr-range-thumb-background;
   border: 0;
   border-radius: 100%;
-  box-shadow: $plyr-range-thumb-shadow;
-  height: $plyr-range-thumb-height;
+  box-shadow: sliders.$plyr-range-thumb-shadow;
+  height: sliders.$plyr-range-thumb-height;
   position: relative;
   transition: all 0.2s ease;
-  width: $plyr-range-thumb-height;
+  width: sliders.$plyr-range-thumb-height;
 }
 
 @mixin plyr-range-thumb-active($color) {
   box-shadow:
-    $plyr-range-thumb-shadow,
-    0 0 0 $plyr-range-thumb-active-shadow-width $color;
+    sliders.$plyr-range-thumb-shadow,
+    0 0 0 sliders.$plyr-range-thumb-active-shadow-width $color;
 }
 
 // Fullscreen styles
@@ -74,9 +80,15 @@
   }
 
   // Large captions in full screen on larger screens
-  @media (min-width: $plyr-bp-lg) {
+  @media (min-width: breakpoints.$plyr-bp-lg) {
     .plyr__captions {
-      font-size: $plyr-font-size-captions-large;
+      $caption-font-size: type.$plyr-font-size-xlarge;
+
+      @if captions.$plyr-font-size-captions-large != null {
+        $caption-font-size: captions.$plyr-font-size-captions-large;
+      }
+
+      font-size: $caption-font-size;
     }
   }
 }

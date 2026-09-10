@@ -2,18 +2,22 @@
 // Base styling
 // --------------------------------------------------------------
 
+@use 'lib/mixins';
+@use 'settings/helpers';
+@use 'settings/type';
+
 // Base
 .plyr {
-  @include plyr-font-smoothing($plyr-font-smoothing);
+  @include mixins.plyr-font-smoothing(type.$plyr-font-smoothing);
 
   align-items: center;
   direction: ltr;
   display: flex;
   flex-direction: column;
-  font-family: $plyr-font-family;
+  font-family: type.$plyr-font-family;
   font-variant-numeric: tabular-nums; // Force monosace-esque number widths
-  font-weight: $plyr-font-weight-regular;
-  line-height: $plyr-line-height;
+  font-weight: type.$plyr-font-weight-regular;
+  line-height: type.$plyr-line-height;
   max-width: 100%;
   min-width: 200px;
   position: relative;
@@ -44,7 +48,7 @@
 
 // border-box everything
 // http://paulirish.com/2012/box-sizing-border-box-ftw/
-@if $plyr-border-box {
+@if helpers.$plyr-border-box {
   .plyr--full-ui {
     box-sizing: border-box;
 
@@ -57,7 +61,7 @@
 }
 
 // Fix 300ms delay
-@if $plyr-touch-action {
+@if helpers.$plyr-touch-action {
   .plyr--full-ui {
     a,
     button,

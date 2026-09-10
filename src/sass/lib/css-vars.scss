@@ -14,7 +14,7 @@ $css-vars-use-native: false !default;
 // Assigns a variable to the global map
 ///
 @function css-var-assign($varName: null, $varValue: null) {
-  @return map-merge(
+  @return map.merge(
     $css-vars,
     (
       $varName: $varValue,
@@ -30,13 +30,13 @@ $css-vars-use-native: false !default;
 // color: var(--main-color);
 // background: var(--main-background, green);
 ///
-@function var($args...) {
+@function css-var($args...) {
   // CHECK PARAMS
-  @if length($args) == 0 {
+  @if list.length($args) == 0 {
     @error 'Variable name is expected to be passed to the var() function';
   }
 
-  @if str-length(nth($args, 1)) < 2 or str-slice(nth($args, 1), 0, 2) != '--' {
+  @if str-length(list.nth($args, 1)) < 2 or str-slice(list.nth($args, 1), 0, 2) != '--' {
     @error "Variable name is expected to start from '--'";
   }
 
@@ -51,7 +51,7 @@ $css-vars-use-native: false !default;
   } @else {
     @if not $var-value {
       // variable is not provided so far
-      @if length($args) == 2 {
+      @if list.length($args) == 2 {
         $var-value: list.nth($args, 2);
       }
     }
@@ -77,7 +77,7 @@ $css-vars-use-native: false !default;
   }
 
   @if type_of($var-map) != map {
-    @error 'Map of variables is expected, instead got another type passed: #{type_of($var, ap)}';
+    @error 'Map of variables is expected, instead got: #{type-of($var-map)}';
   }
 
   // PROCESS
@@ -97,7 +97,7 @@ $css-vars-use-native: false !default;
     // Sass or debug
     // merge variables and values to the global map (provides no output)
     @each $var-name, $var-value in $var-map {
-      $css-vars: css-var-assign($varName, $varValue) !global; // store in global variable
+      $css-vars: css-var-assign($var-name, $var-value) !global; // store in global variable
     }
   }
 }
