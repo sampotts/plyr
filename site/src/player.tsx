@@ -1,5 +1,6 @@
 import '@videojs/react/video/minimal-skin.css';
-import { MuxVideo } from '@videojs/react/media/mux-video';
+// The /spf entry streams with Video.js's own engine instead of hls.js, which halves the bundle.
+import { MuxVideo } from '@videojs/react/media/mux-video/spf';
 import { MinimalVideoSkin, VideoPlayer } from '@videojs/react/video';
 
 // "View From A Blue Moon" trailer, hosted on Mux. The stream carries an English subtitle track and
