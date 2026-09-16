@@ -42,6 +42,7 @@
     "./plyr.scss": "./src/sass/plyr.scss"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "prepare": "vp config --no-agent",
     "dev": "pnpm --filter plyr-site dev",
     "start": "pnpm --filter plyr-site dev",
