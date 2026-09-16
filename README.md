@@ -136,7 +136,7 @@ You can use our CDN (provided by [Cloudflare](https://www.cloudflare.com/)) for 
 <!-- x-release-please-start-version -->
 
 ```html
-<script src="https://cdn.plyr.io/3.8.4/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.8.5/plyr.js"></script>
 ```
 
 <!-- x-release-please-end -->
@@ -146,7 +146,7 @@ You can use our CDN (provided by [Cloudflare](https://www.cloudflare.com/)) for 
 <!-- x-release-please-start-version -->
 
 ```html
-<script src="https://cdn.plyr.io/3.8.4/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.8.5/plyr.polyfilled.js"></script>
 ```
 
 <!-- x-release-please-end -->
@@ -164,7 +164,7 @@ If you want to use our CDN (provided by [Cloudflare](https://www.cloudflare.com/
 <!-- x-release-please-start-version -->
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.8.4/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.8.5/plyr.css" />
 ```
 
 <!-- x-release-please-end -->
@@ -172,7 +172,7 @@ If you want to use our CDN (provided by [Cloudflare](https://www.cloudflare.com/
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Cloudflare](https://www.cloudflare.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.8.4/plyr.svg`. <!-- x-release-please-version -->
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.8.5/plyr.svg`. <!-- x-release-please-version -->
 
 ### Self hosting
 
@@ -411,7 +411,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                                    |
 | `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                         |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                   |
-| `iconUrl`            | String                     | `https://cdn.plyr.io/3.8.4/plyr.svg`                                                                                           | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info. <!-- x-release-please-version -->                                                                                                                                                                                                                                                                                   |
+| `iconUrl`            | String                     | `https://cdn.plyr.io/3.8.5/plyr.svg`                                                                                           | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info. <!-- x-release-please-version -->                                                                                                                                                                                                                                                                                   |
 | `iconPrefix`         | String                     | `plyr`                                                                                                                         | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.                                                                                                                                                                  |
 | `blankVideo`         | String                     | `https://cdn.plyr.io/static/blank.mp4`                                                                                         | Specify a URL or path to a blank video file used to properly cancel network requests.                                                                                                                                                                                                                                                                                                                   |
 | `autoplay`&sup2;     | Boolean                    | `false`                                                                                                                        | Autoplay the media on load. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                                                                                                                         |
