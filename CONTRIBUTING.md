@@ -80,4 +80,4 @@ The `site/` workspace is a small React 19 and TypeScript app built with Vite. Th
 
 Run `pnpm dev` for the dev server at http://localhost:3000, or `pnpm preview` to serve the production build.
 
-The site deploys to Vercel from `vercel.json` in the repository root, so importing the repository into Vercel needs no further configuration: it installs the workspace with pnpm, runs `pnpm build:site`, and serves `site/dist` as a static site. Vercel skips the build when a commit changes nothing under `site/` (see `ignoreCommand`). The site has no dependency on the player source, and publishing the player to `cdn.plyr.io` is a separate process (see Releases).
+The site deploys to Vercel. The Vercel project has its **Root Directory** set to `site`, and `site/vercel.json` supplies the rest: pnpm installs the workspace from the repository lockfile, `pnpm build` runs, and `dist` is served as a static site. Because a root directory is set, Vercel skips deployments for commits that change nothing under `site/`. The site has no dependency on the player source, and publishing the player to `cdn.plyr.io` is a separate process (see Releases).

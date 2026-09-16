@@ -15,7 +15,7 @@ on:
     # .github/release-please/release-please-config.json).
     paths-ignore:
       - 'site/**'
-      - 'vercel.json'
+      - 'site/vercel.json'
       - '.vscode/**'
       - '.claude/**'
       - '.gitpod.yml'

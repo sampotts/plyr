@@ -13,7 +13,6 @@ tasks
 vite.config.ts
 pnpm-workspace.yaml
 pnpm-lock.yaml
-vercel.json
 .nvmrc
 .claude
 tsconfig.json

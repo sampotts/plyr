@@ -50,7 +50,7 @@ jobs:
               - '.github/workflows/ci.yml'
             site:
               - 'site/**'
-              - 'vercel.json'
+              - 'site/vercel.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
               - '.github/workflows/ci.yml'
