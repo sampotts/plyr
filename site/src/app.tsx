@@ -1,9 +1,11 @@
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Button } from './button';
 import { Player } from './player';
 
 export function App() {
   return (
     <>
+      <SpeedInsights />
       <div className="mx-auto flex min-h-screen w-full max-w-lg flex-1 flex-col-reverse items-center gap-12 p-4 lg:max-w-7xl lg:flex-row lg:gap-20 lg:p-12">
         <header className="flex flex-col gap-8 pb-4 text-center md:text-left lg:max-w-96 lg:flex-1 lg:pb-0">
           <h1 className="text-[clamp(2.5rem,5vw,4rem)] leading-[1.15] font-bold tracking-tight text-balance text-brand">

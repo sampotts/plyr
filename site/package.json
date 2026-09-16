@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@vercel/speed-insights": "^2.0.0",
     "@videojs/mux-video": "10.0.0-rc.2",
     "@videojs/react": "10.0.0-rc.2",
     "class-variance-authority": "^0.7.1",
