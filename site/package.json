@@ -7,6 +7,7 @@
   "author": "Sam Potts <sam@potts.es>",
   "type": "module",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "vp dev",
     "build": "node scripts/build.ts",
     "preview": "vp preview",
