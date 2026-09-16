@@ -6,5 +6,5 @@
   "outputDirectory": "site/dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- site/ vercel.json pnpm-lock.yaml"
+  "ignoreCommand": "[ -n \"$VERCEL_GIT_PREVIOUS_SHA\" ] && git diff --quiet \"$VERCEL_GIT_PREVIOUS_SHA\" \"$VERCEL_GIT_COMMIT_SHA\" -- site/ vercel.json pnpm-lock.yaml"
 }

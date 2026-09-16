@@ -6,6 +6,7 @@ const ignorePatterns = [
   '**/build/**',
   '**/.vercel/**',
   '**/.server/**',
+  '**/.vite-hooks/**',
   '**/*.svg',
   'pnpm-lock.yaml',
 ];
@@ -18,12 +19,17 @@ export default defineConfig({
     options: { typeAware: false, typeCheck: false },
   },
   fmt: {
-    ignorePatterns,
+    // CHANGELOG.md is written by release-please in its own style.
+    ignorePatterns: [...ignorePatterns, 'CHANGELOG.md'],
     singleQuote: true,
     semi: true,
     printWidth: 120,
     tabWidth: 2,
     trailingComma: 'all',
     sortTailwindcss: { stylesheet: './site/src/site.css' },
+  },
+  // Pre-commit (see .vite-hooks/pre-commit): lint and format the staged files.
+  staged: {
+    '*': 'vp check --fix --no-error-on-unmatched-pattern',
   },
 });

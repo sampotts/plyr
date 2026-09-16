@@ -55,6 +55,8 @@ So that you can start straight away.
 
 ## Tooling
 
+A pre-commit hook lints and formats the files you stage (`vp staged`, configured under `staged` in `vite.config.ts` and installed by `pnpm install` through the `prepare` script). If a commit is rejected, fix the reported problems and commit again; formatting fixes are applied for you.
+
 Use Node.js 22.18+ (22.x), 24.11+ or a newer supported release and pnpm 12. Run `pnpm lint` for Oxlint, Stylelint, and Markdown link checks, `pnpm typecheck` for TypeScript, and `pnpm fmt` to format with Oxfmt (`pnpm fmt:check` in CI). The player continues to use Sass; the website uses Tailwind through the Vite plugin.
 
 `pnpm build:player` builds the player into `dist/` with Vite+ (Rolldown and Oxc, no Babel). The JavaScript is lowered to ES2019, which matches the previously published builds: class fields, `??` and `?.` are transpiled for older Safari releases while classes, arrow functions and async/await are kept. The `browserslist` in `package.json` lists the browsers from the README and drives Autoprefixer for the CSS.

@@ -46,7 +46,7 @@ jobs:
       # A GitHub App token (rather than GITHUB_TOKEN) lets the release PR trigger the CI
       # workflow and attributes the PR and tags to the app's bot user.
       # See https://github.com/googleapis/release-please-action#github-credentials
-      - uses: actions/create-github-app-token@v2
+      - uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
@@ -68,14 +68,14 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # The push that triggered this run is the release PR merge; build the tagged commit.
           ref: ${{ needs.release-please.outputs.sha }}
 
       - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm

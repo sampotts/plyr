@@ -11,3 +11,4 @@ dist/
 site/dist/
 site/.server/
 .vercel/
+.vite-hooks/_
