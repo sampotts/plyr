@@ -3,8 +3,6 @@
 // Definitions by: ondratra <https://github.com/ondratra>
 // TypeScript Version: 3.0
 
-
-
 declare class Plyr {
   /**
    * Setup a new instance

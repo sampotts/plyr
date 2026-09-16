@@ -66,8 +66,7 @@ export default function loadSprite(url, id) {
                 content: result,
               }),
             );
-          }
-          catch {}
+          } catch {}
         }
 
         update(container, result);

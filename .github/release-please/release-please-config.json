@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "include-v-in-tag": true,
+  "include-component-in-tag": false,
+  "changelog-path": "CHANGELOG.md",
+  "pull-request-title-pattern": "chore(release): v${version}",
+  "pull-request-header": "Merging this PR publishes a new Plyr release.",
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Features"
+    },
+    {
+      "type": "fix",
+      "section": "Bug Fixes"
+    },
+    {
+      "type": "perf",
+      "section": "Performance"
+    },
+    {
+      "type": "revert",
+      "section": "Reverts"
+    },
+    {
+      "type": "docs",
+      "section": "Documentation"
+    },
+    {
+      "type": "refactor",
+      "section": "Refactoring"
+    },
+    {
+      "type": "chore",
+      "section": "Miscellaneous",
+      "hidden": true
+    },
+    {
+      "type": "ci",
+      "section": "Miscellaneous",
+      "hidden": true
+    },
+    {
+      "type": "style",
+      "section": "Miscellaneous",
+      "hidden": true
+    },
+    {
+      "type": "test",
+      "section": "Miscellaneous",
+      "hidden": true
+    }
+  ],
+  "packages": {
+    ".": {
+      "package-name": "plyr",
+      "extra-files": ["README.md", "src/js/plyr.js", "src/js/plyr.polyfilled.js", "src/js/config/defaults.js"],
+      "exclude-paths": ["site", "vercel.json", ".vscode", ".claude", ".gitpod.yml", "plyr.code-workspace"]
+    }
+  }
+}

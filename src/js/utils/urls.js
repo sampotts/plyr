@@ -20,8 +20,7 @@ export function parseUrl(input, safe = true) {
 
   try {
     return new URL(url);
-  }
-  catch {
+  } catch {
     return null;
   }
 }

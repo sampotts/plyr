@@ -27,12 +27,15 @@ export function getPercentage(current, max) {
 
 // Replace all occurrences of a string in a string
 export function replaceAll(input = '', find = '', replace = '') {
-  return input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
+  return input.replace(
+    new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'),
+    replace.toString(),
+  );
 }
 
 // Convert to title case
 export function toTitleCase(input = '') {
-  return input.toString().replace(/\w\S*/g, text => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase());
+  return input.toString().replace(/\w\S*/g, (text) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase());
 }
 
 // Convert string to pascalCase

@@ -22,19 +22,18 @@ function parseVtt(vttDataString) {
         ); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
 
         if (matchTimes) {
-          result.startTime
-            = Number(matchTimes[1] || 0) * 60 * 60
-              + Number(matchTimes[2]) * 60
-              + Number(matchTimes[3])
-              + Number(`0.${matchTimes[4]}`);
-          result.endTime
-            = Number(matchTimes[6] || 0) * 60 * 60
-              + Number(matchTimes[7]) * 60
-              + Number(matchTimes[8])
-              + Number(`0.${matchTimes[9]}`);
+          result.startTime =
+            Number(matchTimes[1] || 0) * 60 * 60 +
+            Number(matchTimes[2]) * 60 +
+            Number(matchTimes[3]) +
+            Number(`0.${matchTimes[4]}`);
+          result.endTime =
+            Number(matchTimes[6] || 0) * 60 * 60 +
+            Number(matchTimes[7]) * 60 +
+            Number(matchTimes[8]) +
+            Number(`0.${matchTimes[9]}`);
         }
-      }
-      else if (!is.empty(line.trim()) && is.empty(result.text)) {
+      } else if (!is.empty(line.trim()) && is.empty(result.text)) {
         // If we already have the startTime, then we're definitely up to the text line(s)
         const lineSplit = line.trim().split('#xywh=');
         [result.text] = lineSplit;
@@ -71,8 +70,7 @@ function fitRatio(ratio, outer) {
   if (ratio > targetRatio) {
     result.width = outer.width;
     result.height = (1 / ratio) * outer.width;
-  }
-  else {
+  } else {
     result.height = outer.height;
     result.width = ratio * outer.height;
   }
@@ -163,7 +161,7 @@ class PreviewThumbnails {
         // If string, convert into single-element list
         const urls = is.string(src) ? [src] : src;
         // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
-        const promises = urls.map(u => this.getThumbnail(u));
+        const promises = urls.map((u) => this.getThumbnail(u));
         // Resolve
         Promise.all(promises).then(sortAndResolve);
       }
@@ -184,9 +182,9 @@ class PreviewThumbnails {
         // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
         // If the thumbnail URLs start with with none of '/', 'http://' or 'https://', then we need to set their relative path to be the location of the VTT file
         if (
-          !thumbnail.frames[0].text.startsWith('/')
-          && !thumbnail.frames[0].text.startsWith('http://')
-          && !thumbnail.frames[0].text.startsWith('https://')
+          !thumbnail.frames[0].text.startsWith('/') &&
+          !thumbnail.frames[0].text.startsWith('http://') &&
+          !thumbnail.frames[0].text.startsWith('https://')
         ) {
           thumbnail.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
         }
@@ -219,8 +217,7 @@ class PreviewThumbnails {
     if (event.type === 'touchmove') {
       // Calculate seek hover position as approx video seconds
       this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
-    }
-    else {
+    } else {
       // Calculate seek hover position as approx video seconds
       const clientRect = this.player.elements.progress.getBoundingClientRect();
       const percentage = (100 / clientRect.width) * (event.pageX - clientRect.left);
@@ -282,8 +279,7 @@ class PreviewThumbnails {
     if (Math.ceil(this.lastTime) === Math.ceil(this.player.media.currentTime)) {
       // The video was already seeked/loaded at the chosen time - hide immediately
       this.toggleScrubbingContainer(false);
-    }
-    else {
+    } else {
       // The video hasn't seeked yet. Wait for that
       once.call(this.player, this.player.media, 'timeupdate', () => {
         // Re-check mousedown - we might have already started scrubbing again
@@ -362,15 +358,14 @@ class PreviewThumbnails {
   showImageAtCurrentTime = () => {
     if (this.mouseDown) {
       this.setScrubbingContainerSize();
-    }
-    else {
+    } else {
       this.setThumbContainerSizeAndPos();
     }
 
     // Find the desired thumbnail index
     // TODO: Handle a video longer than the thumbs where thumbNum is null
     const thumbNum = this.thumbnails[0].frames.findIndex(
-      frame => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime,
+      (frame) => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime,
     );
     const hasThumb = thumbNum >= 0;
     let qualityIndex = 0;
@@ -430,8 +425,7 @@ class PreviewThumbnails {
       previewImage.onload = () => this.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
       this.loadingImage = previewImage;
       this.removeOldImages(previewImage);
-    }
-    else {
+    } else {
       // Update the existing image
       this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
       this.currentImageElement.dataset.index = thumbNum;
@@ -501,8 +495,7 @@ class PreviewThumbnails {
           let thumbnailsClone;
           if (forward) {
             thumbnailsClone = this.thumbnails[0].frames.slice(thumbNum);
-          }
-          else {
+          } else {
             thumbnailsClone = this.thumbnails[0].frames.slice(0, thumbNum).reverse();
           }
 
@@ -604,8 +597,7 @@ class PreviewThumbnails {
   set currentImageElement(element) {
     if (this.mouseDown) {
       this.currentScrubbingImageElement = element;
-    }
-    else {
+    } else {
       this.currentThumbnailImageElement = element;
     }
   }
@@ -645,12 +637,10 @@ class PreviewThumbnails {
       const thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
       imageContainer.style.height = `${this.thumbContainerHeight}px`;
       imageContainer.style.width = `${thumbWidth}px`;
-    }
-    else if (imageContainer.clientHeight > 20 && imageContainer.clientWidth < 20) {
+    } else if (imageContainer.clientHeight > 20 && imageContainer.clientWidth < 20) {
       const thumbWidth = Math.floor(imageContainer.clientHeight * this.thumbAspectRatio);
       imageContainer.style.width = `${thumbWidth}px`;
-    }
-    else if (imageContainer.clientHeight < 20 && imageContainer.clientWidth > 20) {
+    } else if (imageContainer.clientHeight < 20 && imageContainer.clientWidth > 20) {
       const thumbHeight = Math.floor(imageContainer.clientWidth / this.thumbAspectRatio);
       imageContainer.style.height = `${thumbHeight}px`;
     }

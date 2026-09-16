@@ -29,8 +29,7 @@ export function wrap(elements, wrapper) {
       // append it to the parent.
       if (sibling) {
         parent.insertBefore(child, sibling);
-      }
-      else {
+      } else {
         parent.appendChild(child);
       }
     });
@@ -144,8 +143,7 @@ export function getAttributesFromSelector(sel, existingAttributes) {
         // Add to existing classname
         if (is.string(existing.class)) {
           attributes.class = `${existing.class} ${className}`;
-        }
-        else {
+        } else {
           attributes.class = className;
         }
         break;
@@ -185,7 +183,7 @@ export function toggleHidden(element, hidden) {
 // Mirror Element.classList.toggle, with IE compatibility for "force" argument
 export function toggleClass(element, className, force) {
   if (is.nodeList(element)) {
-    return Array.from(element).map(e => toggleClass(e, className, force));
+    return Array.from(element).map((e) => toggleClass(e, className, force));
   }
 
   if (is.element(element)) {
@@ -214,12 +212,12 @@ export function matches(element, selector) {
     return Array.from(document.querySelectorAll(selector)).includes(this);
   }
 
-  const method
-    = prototype.matches
-      || prototype.webkitMatchesSelector
-      || prototype.mozMatchesSelector
-      || prototype.msMatchesSelector
-      || match;
+  const method =
+    prototype.matches ||
+    prototype.webkitMatchesSelector ||
+    prototype.mozMatchesSelector ||
+    prototype.msMatchesSelector ||
+    match;
 
   return method.call(element, selector);
 }

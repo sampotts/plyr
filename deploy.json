@@ -3,11 +3,5 @@
     "type": "r2",
     "bucket": "plyr",
     "domain": "cdn.plyr.io"
-  },
-  "demo": {
-    "type": "s3",
-    "bucket": "plyr.io",
-    "domain": "plyr.io",
-    "region": "us-west-1"
   }
 }

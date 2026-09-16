@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+@source '../index.html';
+@source './**/*.{ts,tsx}';
+
+@theme {
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --color-brand: #ed6d2d;
+  /* Brand scale derived from --color-brand with CSS relative colours, using the lightness and chroma curve of
+     Tailwind's own palettes: hue is kept, lightness is fixed per step, and chroma peaks around the middle. The 500
+     step is the brand colour itself, so `bg-brand` and `bg-brand-500` are the same. */
+  --color-brand-50: oklch(from var(--color-brand) 0.98 calc(c * 0.08) h);
+  --color-brand-100: oklch(from var(--color-brand) 0.95 calc(c * 0.18) h);
+  --color-brand-200: oklch(from var(--color-brand) 0.9 calc(c * 0.36) h);
+  --color-brand-300: oklch(from var(--color-brand) 0.84 calc(c * 0.6) h);
+  --color-brand-400: oklch(from var(--color-brand) 0.75 calc(c * 0.86) h);
+  --color-brand-500: var(--color-brand);
+  --color-brand-600: oklch(from var(--color-brand) 0.62 calc(c * 1.04) h);
+  --color-brand-700: oklch(from var(--color-brand) 0.55 calc(c * 0.92) h);
+  --color-brand-800: oklch(from var(--color-brand) 0.47 calc(c * 0.74) h);
+  --color-brand-900: oklch(from var(--color-brand) 0.41 calc(c * 0.58) h);
+  --color-brand-950: oklch(from var(--color-brand) 0.27 calc(c * 0.37) h);
+  --color-focus: var(--color-brand);
+}
+
+/* `hocus:` applies to hover and keyboard focus together. Hover is gated on devices that can hover, matching
+   Tailwind's own `hover:` variant, so touch screens don't get stuck hover styles after a tap. */
+@custom-variant hocus {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  &:focus-visible {
+    @slot;
+  }
+}
+
+@layer base {
+  /* Follow the operating system: Tailwind's `dark:` variant is driven by prefers-color-scheme. */
+  :root {
+    color-scheme: light dark;
+  }
+
+  /* Inter Display: Google Fonts serves Inter as a variable font with an optical size axis, and the 32 end of
+     that axis is the Display cut. Headings pin it so they get the display letterforms at any size. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: none;
+    font-variation-settings: 'opsz' 32;
+  }
+
+  /* Site focus ring. The Video.js skin owns focus styling inside the player, so it is excluded here. */
+  :where(a, button):not(:where(.video-skin *)):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  .player {
+    --media-accent-color: var(--color-brand);
+    --media-accent-text-color: #fff;
+  }
+}
+
+/* The player root is a tab stop. The skin draws its ring outside the container in white, which vanishes on the
+   page background, so recolour it to the site focus ring. Deliberately unlayered so it beats the skin's scoped rule. */
+.player.media-container:focus-visible {
+  outline-color: var(--color-focus);
+  outline-offset: 4px;
+}

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.8.4
+// plyr.js v3.8.4 x-release-please-version
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -71,8 +71,7 @@ class Plyr {
       (() => {
         try {
           return JSON.parse(this.media.getAttribute('data-plyr-config'));
-        }
-        catch {
+        } catch {
           return {};
         }
       })(),
@@ -193,13 +192,11 @@ class Plyr {
             if (this.isYouTube) {
               this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
               this.config.youtube.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
-            }
-            else {
+            } else {
               this.config.playsinline = true;
             }
           }
-        }
-        else {
+        } else {
           // <div> with attributes
           this.provider = this.media.getAttribute(this.config.attributes.embed.provider);
 
@@ -432,8 +429,7 @@ class Plyr {
     if (this.isHTML5) {
       this.pause();
       this.restart();
-    }
-    else if (is.function(this.media.stop)) {
+    } else if (is.function(this.media.stop)) {
       this.media.stop();
     }
   };
@@ -651,9 +647,9 @@ class Plyr {
 
     // Get audio tracks
     return (
-      Boolean(this.media.mozHasAudio)
-      || Boolean(this.media.webkitAudioDecodedByteCount)
-      || Boolean(this.media.audioTracks && this.media.audioTracks.length)
+      Boolean(this.media.mozHasAudio) ||
+      Boolean(this.media.webkitAudioDecodedByteCount) ||
+      Boolean(this.media.audioTracks && this.media.audioTracks.length)
     );
   }
 
@@ -1018,8 +1014,7 @@ class Plyr {
     if (is.function(this.media.requestPictureInPicture)) {
       if (!this.pip && toggle) {
         this.media.requestPictureInPicture();
-      }
-      else if (this.pip && !toggle) {
+      } else if (this.pip && !toggle) {
         document.exitPictureInPicture();
       }
     }
@@ -1086,10 +1081,10 @@ class Plyr {
 
       // Close menu
       if (
-        hiding
-        && is.array(this.config.controls)
-        && this.config.controls.includes('settings')
-        && !is.empty(this.config.settings)
+        hiding &&
+        is.array(this.config.controls) &&
+        this.config.controls.includes('settings') &&
+        !is.empty(this.config.settings)
       ) {
         controls.toggleMenu.call(this, false);
       }
@@ -1172,8 +1167,7 @@ class Plyr {
         if (is.function(callback)) {
           callback();
         }
-      }
-      else {
+      } else {
         // Unbind listeners
         unbindListeners.call(this);
 
@@ -1217,8 +1211,7 @@ class Plyr {
 
       // Clean up
       done();
-    }
-    else if (this.isYouTube) {
+    } else if (this.isYouTube) {
       // Clear timers
       clearInterval(this.timers.buffering);
       clearInterval(this.timers.playing);
@@ -1230,8 +1223,7 @@ class Plyr {
 
       // Clean up
       done();
-    }
-    else if (this.isVimeo) {
+    } else if (this.isVimeo) {
       // Destroy Vimeo API
       // then clean up (wait, to prevent postmessage errors)
       if (this.embed !== null) {
@@ -1247,7 +1239,7 @@ class Plyr {
    * Check for support for a mime type (HTML5 only)
    * @param {string} type - Mime type
    */
-  supports = type => support.mime.call(this, type);
+  supports = (type) => support.mime.call(this, type);
 
   /**
    * Check for support
@@ -1277,11 +1269,9 @@ class Plyr {
 
     if (is.string(selector)) {
       targets = Array.from(document.querySelectorAll(selector));
-    }
-    else if (is.nodeList(selector)) {
+    } else if (is.nodeList(selector)) {
       targets = Array.from(selector);
-    }
-    else if (is.array(selector)) {
+    } else if (is.array(selector)) {
       targets = selector.filter(is.element);
     }
 
@@ -1289,7 +1279,7 @@ class Plyr {
       return null;
     }
 
-    return targets.map(t => new Plyr(t, options));
+    return targets.map((t) => new Plyr(t, options));
   }
 }
 

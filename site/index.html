@@ -1,0 +1,60 @@
+<!doctype html>
+<html
+  lang="en"
+  class="min-h-full bg-linear-150 from-brand-50/50 to-brand-100 bg-fixed dark:from-neutral-950 dark:to-brand-950/60"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plyr, meet Video.js</title>
+    <meta
+      name="description"
+      content="The folks behind Plyr, Vidstack and Media Chrome have joined forces on Video.js: one modern, accessible player with the best of all three. Plyr is being deprecated, so give Video.js a try."
+    />
+    <meta name="author" content="Sam Potts" />
+    <link rel="canonical" href="https://plyr.io/" />
+    <!-- Matches the start of the page gradient in each colour scheme (brand-50/50 over white, neutral-950). -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fffaf8" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
+
+    <!-- Icons (Video.js) -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Plyr, meet Video.js" />
+    <meta
+      property="og:description"
+      content="The folks behind Plyr, Vidstack and Media Chrome have joined forces on Video.js: one modern, accessible player with the best of all three. Plyr is being deprecated, so give Video.js a try."
+    />
+    <meta property="og:site_name" content="Plyr" />
+    <meta property="og:url" content="https://plyr.io/" />
+    <meta property="og:image" content="https://videojs.org/og/index.png" />
+
+    <!-- X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@sam_potts" />
+    <meta name="twitter:creator" content="@sam_potts" />
+    <meta name="twitter:title" content="Plyr, meet Video.js" />
+    <meta
+      name="twitter:description"
+      content="The folks behind Plyr, Vidstack and Media Chrome have joined forces on Video.js: one modern, accessible player with the best of all three. Plyr is being deprecated, so give Video.js a try."
+    />
+    <meta name="twitter:image" content="https://videojs.org/og/twitter/index.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    />
+    <!--app-head-->
+  </head>
+  <body class="text-neutral-600 dark:text-neutral-300">
+    <div id="root"><!--app-html--></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

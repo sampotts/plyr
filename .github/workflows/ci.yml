@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Lint, formatting and types cover the whole repository and are cheap, so they always run.
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm fmt:check
+      - run: pnpm typecheck
+
+  # Decide which parts of the repository a change touches. The player and the site share no code: the site is
+  # deployed by Vercel and the player is released by release-please, so each is only built when it changed.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      player: ${{ steps.filter.outputs.player }}
+      site: ${{ steps.filter.outputs.site }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            player:
+              - 'src/**'
+              - 'tasks/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'tsconfig.json'
+              - 'deploy.json'
+              - '.github/workflows/ci.yml'
+            site:
+              - 'site/**'
+              - 'vercel.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/ci.yml'
+
+  player:
+    needs: changes
+    if: needs.changes.outputs.player == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build player
+        run: pnpm build:player
+      - name: Check CDN upload plan
+        run: node tasks/deploy.ts --dry-run
+      - uses: actions/upload-artifact@v5
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  site:
+    needs: changes
+    if: needs.changes.outputs.site == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build site
+        run: pnpm build:site

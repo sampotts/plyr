@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build:site",
+  "outputDirectory": "site/dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- site/ vercel.json pnpm-lock.yaml"
+}

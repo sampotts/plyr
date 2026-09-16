@@ -35,7 +35,7 @@ const support = {
 
   // Picture-in-picture support
   pip: (() => {
-    return (document.pictureInPictureEnabled && !createElement('video').disablePictureInPicture);
+    return document.pictureInPictureEnabled && !createElement('video').disablePictureInPicture;
   })(),
 
   // Airplay support
@@ -69,8 +69,7 @@ const support = {
 
     try {
       return Boolean(type && this.media.canPlayType(type).replace(/no/, ''));
-    }
-    catch {
+    } catch {
       return false;
     }
   },

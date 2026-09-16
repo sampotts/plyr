@@ -1,8 +1,7 @@
-demo
+site
 .github
 .vscode
 *.code-workspace
-build.json
 credentials.json
 deploy.json
 yarn.lock
@@ -10,3 +9,11 @@ package-lock.json
 *.webm
 *.mp4
 !dist/blank.mp4
+tasks
+vite.config.ts
+pnpm-workspace.yaml
+pnpm-lock.yaml
+vercel.json
+.nvmrc
+.claude
+tsconfig.json

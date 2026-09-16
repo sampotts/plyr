@@ -1,4 +1,5 @@
 {
+  "ignoreFiles": ["site/**", "dist/**", "node_modules/**"],
   "plugins": ["stylelint-selector-bem-pattern"],
   "extends": ["stylelint-config-sass-guidelines"],
   "customSyntax": "postcss-scss",

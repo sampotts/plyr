@@ -21,8 +21,7 @@ class Storage {
       window.localStorage.setItem(test, test);
       window.localStorage.removeItem(test);
       return true;
-    }
-    catch {
+    } catch {
       return false;
     }
   }
@@ -62,8 +61,7 @@ class Storage {
     // Update storage
     try {
       window.localStorage.setItem(this.key, JSON.stringify(storage));
-    }
-    catch { }
+    } catch {}
   };
 }
 

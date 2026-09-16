@@ -48,11 +48,9 @@ const media = {
 
     if (this.isHTML5) {
       html5.setup.call(this);
-    }
-    else if (this.isYouTube) {
+    } else if (this.isYouTube) {
       youtube.setup.call(this);
-    }
-    else if (this.isVimeo) {
+    } else if (this.isVimeo) {
       vimeo.setup.call(this);
     }
   },

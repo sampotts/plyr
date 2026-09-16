@@ -33,8 +33,7 @@ export function extend(target = {}, ...sources) {
       }
 
       extend(target[key], source[key]);
-    }
-    else {
+    } else {
       Object.assign(target, { [key]: source[key] });
     }
   });

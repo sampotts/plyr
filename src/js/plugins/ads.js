@@ -67,10 +67,10 @@ class Ads {
     const { config } = this;
 
     return (
-      this.player.isHTML5
-      && this.player.isVideo
-      && config.enabled
-      && (!is.empty(config.publisherId) || is.url(config.tagUrl))
+      this.player.isHTML5 &&
+      this.player.isVideo &&
+      config.enabled &&
+      (!is.empty(config.publisherId) || is.url(config.tagUrl))
     );
   }
 
@@ -92,8 +92,7 @@ class Ads {
           // Script failed to load or is blocked
           this.trigger('error', new Error('Google IMA SDK failed to load'));
         });
-    }
-    else {
+    } else {
       this.ready();
     }
   };
@@ -180,10 +179,10 @@ class Ads {
     // Listen and respond to ads loaded and error events
     this.loader.addEventListener(
       google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-      event => this.onAdsManagerLoaded(event),
+      (event) => this.onAdsManagerLoaded(event),
       false,
     );
-    this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error), false);
+    this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (error) => this.onAdError(error), false);
 
     // Request video ads to be pre-loaded
     this.requestAds();
@@ -214,8 +213,7 @@ class Ads {
       request.setAdWillPlayMuted(!this.player.muted);
 
       this.loader.requestAds(request);
-    }
-    catch (error) {
+    } catch (error) {
       this.onAdError(error);
     }
   };
@@ -266,11 +264,11 @@ class Ads {
 
     // Add listeners to the required events
     // Advertisement error events
-    this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error));
+    this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (error) => this.onAdError(error));
 
     // Advertisement regular events
     Object.keys(google.ima.AdEvent.Type).forEach((type) => {
-      this.manager.addEventListener(google.ima.AdEvent.Type[type], e => this.onAdEvent(e));
+      this.manager.addEventListener(google.ima.AdEvent.Type[type], (e) => this.onAdEvent(e));
     });
 
     // Resolve our adsManager
@@ -374,8 +372,7 @@ class Ads {
 
         if (this.player.ended) {
           this.loadAds();
-        }
-        else {
+        } else {
           // The SDK won't allow new ads to be called without receiving a contentComplete()
           this.loader.contentComplete();
         }
@@ -499,8 +496,7 @@ class Ads {
           }
 
           this.initialized = true;
-        }
-        catch (adError) {
+        } catch (adError) {
           // An error may be thrown if there was a problem with the
           // VAST response
           this.onAdError(adError);

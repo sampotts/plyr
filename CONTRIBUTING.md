@@ -29,15 +29,15 @@ Please follow the instructions in our issue templates. Don't use github issues t
 
 - Fork Plyr, and create a new branch in your fork, based on the **develop** branch
 
-- To test locally, you can use the demo site. First make sure you have installed the dependencies with `npm install` or `yarn`. Run `gulp` to build and it will run a local web server for development and watch for any changes.
+- To test locally, install dependencies with `pnpm install` and run `pnpm dev`, which serves the website in `site/` at http://localhost:3000 with hot reloading. Run `pnpm build` to build the player into `dist/` and the website into `site/dist/`, then `pnpm preview` to check the production site.
 
 ### Online one-click setup for contributing
 
 You can use Gitpod (a free online VS Code-like IDE) for contributing. With a single click it will launch a workspace and automatically:
 
-- clone the plyr repo.
-- install the dependencies with `yarn install` in root directory and "demo" directory.
-- run `gulp` in root directory to start the dev server.
+- Clone the Plyr repo.
+- Install the workspace dependencies with `pnpm install`.
+- Run `pnpm dev` in the root directory to start the dev server.
 
 So that you can start straight away.
 
@@ -52,3 +52,30 @@ So that you can start straight away.
 - When finished, push the changes to your GitHub repository and send a pull request. Describe what your PR does.
 
 - If the Travis build fails, or if you get a code review with change requests, you can fix these by pushing new or rebased commits to the branch.
+
+## Tooling
+
+Use Node.js 22.18+ (22.x), 24.11+ or a newer supported release and pnpm 12. Run `pnpm lint` for Oxlint, Stylelint, and Markdown link checks, `pnpm typecheck` for TypeScript, and `pnpm fmt` to format with Oxfmt (`pnpm fmt:check` in CI). The player continues to use Sass; the website uses Tailwind through the Vite plugin.
+
+`pnpm build:player` builds the player into `dist/` with Vite+ (Rolldown and Oxc, no Babel). The JavaScript is lowered to ES2019, which matches the previously published builds: class fields, `??` and `?.` are transpiled for older Safari releases while classes, arrow functions and async/await are kept. The `browserslist` in `package.json` lists the browsers from the README and drives Autoprefixer for the CSS.
+
+## Releases
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please) and GitHub Actions, and every release needs a manual approval:
+
+1. Land changes on `master` using [Conventional Commits](https://www.conventionalcommits.org) (`fix:`, `feat:`, `docs:` and so on). Commits decide the next version and write the changelog. Commits that only touch the website (`site/`, `vercel.json`) or editor config are ignored: the site is deployed separately by Vercel and shares no code with the player, so it never triggers or appears in a release.
+2. The **Release** workflow keeps a `chore(release): vX.Y.Z` pull request up to date with the version bump, `CHANGELOG.md`, and the version strings in `README.md`, `src/js/plyr.js`, `src/js/plyr.polyfilled.js` and `src/js/config/defaults.js` (look for the `x-release-please-version` markers). The workflow does not run at all for site-only pushes.
+3. Review and merge that pull request when you are ready to release. Merging creates the `vX.Y.Z` tag and GitHub release.
+4. The `publish` job then builds the player, publishes `plyr` to npm (via npm trusted publishing, so no npm token is stored) with provenance, uploads the build to `cdn.plyr.io` and attaches a zip to the GitHub release. It runs in the `Production` environment, so you can require a second approval there in the repository settings.
+
+The workflow expects these repository settings: the `RELEASE_APP_ID` variable and `RELEASE_APP_PRIVATE_KEY` secret for a GitHub App with contents and pull request write access (so the release pull request triggers CI), plus the `CF_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` secrets. npm publishing uses a trusted publisher configured on npmjs.com for `sampotts/plyr`, workflow `release.yml`, environment `Production`. `node tasks/deploy.ts --dry-run` lists what would be uploaded to the CDN without credentials.
+
+CI runs lint, formatting and type checks on every change, and builds the player or the site only when their files changed.
+
+## Website
+
+The `site/` workspace is a small React 19 and TypeScript app built with Vite. There is no router and no server: `pnpm build:site` bundles the page, renders it to static HTML with React, and writes the result to `site/dist/`, which React hydrates in the browser. The demo player is [Video.js 10](https://videojs.org) (`@videojs/react`) streaming from Mux.
+
+Run `pnpm dev` for the dev server at http://localhost:3000, or `pnpm preview` to serve the production build.
+
+The site deploys to Vercel from `vercel.json` in the repository root, so importing the repository into Vercel needs no further configuration: it installs the workspace with pnpm, runs `pnpm build:site`, and serves `site/dist` as a static site. Vercel skips the build when a commit changes nothing under `site/` (see `ignoreCommand`). The site has no dependency on the player source, and publishing the player to `cdn.plyr.io` is a separate process (see Releases).

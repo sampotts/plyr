@@ -1,0 +1,42 @@
+packages:
+  - site
+
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+
+# Vite+ uses its own version for the Vite-compatible package.
+minimumReleaseAgeExclude:
+  - '@cspell/cspell-bundled-dicts@10.3.2'
+  - '@cspell/cspell-json-reporter@10.3.2'
+  - '@cspell/cspell-performance-monitor@10.3.2'
+  - '@cspell/cspell-pipe@10.3.2'
+  - '@cspell/cspell-resolver@10.3.2'
+  - '@cspell/cspell-service-bus@10.3.2'
+  - '@cspell/cspell-types@10.3.2'
+  - '@cspell/cspell-worker@10.3.2'
+  - '@cspell/dynamic-import@10.3.2'
+  - '@cspell/filetypes@10.3.2'
+  - '@cspell/rpc@10.3.2'
+  - '@cspell/strong-weak-map@10.3.2'
+  - '@cspell/url@10.3.2'
+  - autoprefixer@10.6.1
+  - cspell-config-lib@10.3.2
+  - cspell-dictionary@10.3.2
+  - cspell-gitignore@10.3.2
+  - cspell-glob@10.3.2
+  - cspell-grammar@10.3.2
+  - cspell-io@10.3.2
+  - cspell-lib@10.3.2
+  - cspell-trie-lib@10.3.2
+  - cspell@10.3.2
+  - '@aws-sdk/client-s3@3.1133.0'
+
+peerDependencyRules:
+  allowedVersions:
+    vite: '0.3.2'
+
+# Newer cssnano plugins rewrite selector lists with `:is()`, which would change dist/plyr.css from the published builds.
+overrides:
+  postcss-merge-rules: 7.0.6
+  postcss-minify-selectors: 7.0.5

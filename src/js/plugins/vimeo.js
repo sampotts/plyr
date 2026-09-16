@@ -78,8 +78,7 @@ const vimeo = {
         .catch((error) => {
           player.debug.warn('Vimeo SDK (player.js) failed to load', error);
         });
-    }
-    else {
+    } else {
       vimeo.ready.call(player);
     }
   },
@@ -97,8 +96,7 @@ const vimeo = {
       source = player.media.getAttribute(player.config.attributes.embed.id);
       // hash can also be set as attribute on the <div>
       hash = player.media.getAttribute(player.config.attributes.embed.hash);
-    }
-    else {
+    } else {
       hash = parseHash(source);
     }
     const hashParam = hash ? { h: hash } : {};
@@ -143,10 +141,9 @@ const vimeo = {
     if (premium || !config.customControls) {
       iframe.setAttribute('data-poster', player.poster);
       player.media = replaceElement(iframe, player.media);
-    }
-    else {
+    } else {
       const wrapper = createElement('div', {
-        'class': player.config.classNames.embedContainer,
+        class: player.config.classNames.embedContainer,
         'data-poster': player.poster,
       });
       wrapper.appendChild(iframe);
@@ -354,7 +351,7 @@ const vimeo = {
     });
 
     player.embed.on('cuechange', ({ cues = [] }) => {
-      const strippedCues = cues.map(cue => stripHTML(cue.text));
+      const strippedCues = cues.map((cue) => stripHTML(cue.text));
       captions.updateCues.call(player, strippedCues);
     });
 

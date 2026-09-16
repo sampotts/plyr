@@ -8,3 +8,6 @@ yarn-error.log
 .idea/
 dist/
 .env
+site/dist/
+site/.server/
+.vercel/

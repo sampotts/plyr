@@ -1,0 +1,119 @@
+name: Release
+
+# release-please keeps a "chore(release): vX.Y.Z" pull request open against master that
+# collects every conventional commit since the last tag. Nothing is published until a
+# maintainer reviews and merges that PR: merging it creates the tag and GitHub release, and
+# the publish job below then runs behind the `Production` environment, which can require a
+# second approval in the repository settings.
+
+on:
+  push:
+    branches:
+      - master
+    # The site deploys through Vercel and shares no code with the player, so site-only pushes never start a
+    # release run. release-please also ignores site commits when calculating versions (see exclude-paths in
+    # .github/release-please/release-please-config.json).
+    paths-ignore:
+      - 'site/**'
+      - 'vercel.json'
+      - '.vscode/**'
+      - '.claude/**'
+      - '.gitpod.yml'
+      - 'plyr.code-workspace'
+      - '**/*.md'
+      - '!README.md'
+      - '!CHANGELOG.md'
+  # Recovery hatch: re-run the release calculation without needing a new commit on master
+  # (for example after restoring a missing tag).
+  workflow_dispatch:
+
+concurrency: release
+
+permissions: {}
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+      sha: ${{ steps.release.outputs.sha }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      # A GitHub App token (rather than GITHUB_TOKEN) lets the release PR trigger the CI
+      # workflow and attributes the PR and tags to the app's bot user.
+      # See https://github.com/googleapis/release-please-action#github-credentials
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          config-file: .github/release-please/release-please-config.json
+          manifest-file: .github/release-please/.release-please-manifest.json
+
+  publish:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.released == 'true' }}
+    runs-on: ubuntu-latest
+    environment: Production
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # The push that triggered this run is the release PR merge; build the tagged commit.
+          ref: ${{ needs.release-please.outputs.sha }}
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Verify release checkout
+        run: |
+          node -e "process.exit(require('./package.json').version === process.env.VERSION ? 0 : 1)"
+        env:
+          VERSION: ${{ needs.release-please.outputs.version }}
+
+      - name: Build player
+        run: pnpm build:player
+
+      # npm trusted publishing: the job's OIDC token (id-token: write) is exchanged for a short-lived npm
+      # credential, so no NPM_TOKEN secret exists. The trusted publisher is configured on npmjs.com for this
+      # repository, this workflow file and the Production environment. Node 22 bundles an npm older than 11.5,
+      # the first version that can do the exchange, so update it first.
+      - name: Update npm for trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+
+      - name: Upload to cdn.plyr.io
+        run: node tasks/deploy.ts
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      - name: Attach build to the GitHub release
+        run: |
+          (cd dist && zip -r "../plyr-${VERSION}.zip" .)
+          gh release upload "$TAG" "plyr-${VERSION}.zip" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release-please.outputs.tag }}
+          VERSION: ${{ needs.release-please.outputs.version }}

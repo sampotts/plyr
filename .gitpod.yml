@@ -1,6 +1,6 @@
 tasks:
-  - before: npm install && npm i gulp -g
-    command: gulp
+  - before: corepack enable && pnpm install
+    command: pnpm dev --host 0.0.0.0
 ports:
   - port: 3000
     onOpen: open-preview

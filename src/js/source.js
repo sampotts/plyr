@@ -19,8 +19,7 @@ const source = {
       insertElement(type, this.media, {
         src: attributes,
       });
-    }
-    else if (is.array(attributes)) {
+    } else if (is.array(attributes)) {
       attributes.forEach((attribute) => {
         insertElement(type, this.media, attribute);
       });
