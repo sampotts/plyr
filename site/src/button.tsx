@@ -5,15 +5,15 @@ const button = cva(
   [
     'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm ring-1 shadow-sm text-center font-medium no-underline motion-safe:transition-all',
     'hocus:shadow-md hocus:shadow-black/5 dark:hocus:shadow-black/40',
-    'motion-safe:active:translate-y-px motion-safe:active:shadow-none',
+    'motion-safe:active:translate-y-px motion-safe:active:shadow-none!',
   ],
   {
     variants: {
       variant: {
         default:
-          'bg-white ring-brand/15 text-brand-600 hocus:ring-brand/30 dark:bg-brand/10 dark:text-brand-100 dark:ring-brand/20 dark:hocus:ring-brand/30',
+          'bg-white ring-brand/15 text-brand-600 hocus:ring-brand/30 dark:bg-brand/10 dark:text-brand-100 dark:ring-brand/20 dark:hocus:bg-brand/20',
         primary:
-          'bg-brand ring-brand-600 dark:ring-brand-400 text-white text-shadow-2xs hocus:ring-brand-700 dark:hocus:ring-brand-300',
+          'bg-brand ring-brand-600 dark:ring-brand-400 text-white text-shadow-2xs hocus:ring-brand-700 dark:hocus:bg-brand-600 dark:hocus:ring-brand-500',
       },
     },
     defaultVariants: { variant: 'default' },
