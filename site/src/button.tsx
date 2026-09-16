@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react';
 
 const button = cva(
   [
-    'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm ring-1 shadow-sm text-center font-medium no-underline motion-safe:transition-all',
+    'inline-flex items-center justify-center gap-1 rounded-lg px-4 py-2.5 text-sm ring-1 shadow-sm text-center font-medium no-underline motion-safe:transition-all',
     'hocus:shadow-md hocus:shadow-black/5 dark:hocus:shadow-black/40',
     'motion-safe:active:translate-y-px motion-safe:active:shadow-none!',
   ],
