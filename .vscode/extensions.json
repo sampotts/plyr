@@ -3,7 +3,7 @@
     "oxc.oxc-vscode",
     "bradlc.vscode-tailwindcss",
     "hyrious.import-cost",
-    "pflannery.vscode-versionlens",
+    "legalfina.npm-version-lens",
     "streetsidesoftware.code-spell-checker",
     "DavidAnson.vscode-markdownlint"
   ]
