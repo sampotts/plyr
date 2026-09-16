@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "@videojs/mux-video": "10.0.0-rc.2",
     "@videojs/react": "10.0.0-rc.2",
