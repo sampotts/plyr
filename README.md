@@ -9,11 +9,11 @@
 
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat) - [Video hosting](https://mux.com?ref=plyr-github)
+Need video hosting? [Check out Mux!](https://mux.com?ref=plyr-github)
 
 [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sampotts/plyr) [![Financial Contributors on Open Collective](https://opencollective.com/plyr/all/badge.svg?label=financial+contributors)](https://opencollective.com/plyr)
 
-[![Screenshot of Plyr](https://cdn.plyr.io/static/screenshot.webp)](https://plyr.io)
+![Screenshot of Plyr](https://cdn.plyr.io/static/screenshot.webp)
 
 ## Features
 
@@ -845,15 +845,8 @@ If you find anything weird with Plyr, please let us know using the GitHub issues
 
 ## Author
 
-Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome
+Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.dev](http://sampotts.dev) with help from the awesome
 [contributors](https://github.com/sampotts/plyr/graphs/contributors)
-
-## Donate
-
-Plyr costs money to run, not only my time. I donate my time for free as I enjoy building Plyr but unfortunately have to pay for domains, hosting, and more. Any help with costs is appreciated...
-
-- [Donate via Patreon](https://www.patreon.com/plyr)
-- [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
 
@@ -898,8 +891,9 @@ If you want to be added to the list, open a pull request. It'd be awesome to see
 
 ## Thanks
 
-- [Cloudflare](https://www.cloudflare.com/) for providing the CDN services.
+- [Cloudflare](https://www.cloudflare.com/) for providing the CDN and DNS services.
 - [Sentry](https://sentry.io/) for error logging service on the demo website.
+- [Fastly](https://fastly.com/) for CDN services in the past.
 
 ### Contributors
 
@@ -909,17 +903,11 @@ This project exists thanks to all the people who contribute. [[Contribute](CONTR
 
 <a href="https://github.com/sampotts/plyr/graphs/contributors"><img src="https://opencollective.com/plyr/contributors.svg?width=890&button=false" /></a>
 
-#### Financial Contributors
-
-Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/plyr/contribute)]
-
 ##### Individuals
 
 <a href="https://opencollective.com/plyr"><img src="https://opencollective.com/plyr/individuals.svg?width=890"></a>
 
 ##### Organizations
-
-Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/plyr/contribute)]
 
 <a href="https://opencollective.com/plyr/organization/0/website"><img src="https://opencollective.com/plyr/organization/0/avatar.svg"></a>
 <a href="https://opencollective.com/plyr/organization/1/website"><img src="https://opencollective.com/plyr/organization/1/avatar.svg"></a><a href="https://opencollective.com/plyr/organization/2/website"><img src="https://opencollective.com/plyr/organization/2/avatar.svg"></a>
