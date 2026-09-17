@@ -21,6 +21,8 @@ await build({
   root,
   configFile: `${root}vite.config.ts`,
   logLevel: 'warn',
+  // Bundle dependencies into the server build too, so the react -> preact/compat alias applies to @videojs/react.
+  ssr: { noExternal: true },
   build: {
     ssr: 'src/entry-server.tsx',
     outDir: fileURLToPath(server),

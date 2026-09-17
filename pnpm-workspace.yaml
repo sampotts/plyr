@@ -40,3 +40,6 @@ peerDependencyRules:
 overrides:
   postcss-merge-rules: 7.0.6
   postcss-minify-selectors: 7.0.5
+
+# Experiment only: pkg.pr.new preview packages depend on each other through URLs.
+blockExoticSubdeps: false
