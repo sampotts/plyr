@@ -12,6 +12,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "plyr-site", "dev"],
       "port": 3000
+    },
+    {
+      "name": "site-preview-3001",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "plyr-site", "preview", "--port", "3001"],
+      "port": 3001
     }
   ]
 }

@@ -1,5 +1,5 @@
 import '@videojs/react/video/minimal-skin.css';
-// The /spf entry streams with Video.js's own engine instead of hls.js, which halves the bundle.
+// The /spf entry uses Video.js's own streaming engine instead of hls.js, which halves the bundle.
 import { MuxVideo } from '@videojs/react/media/mux-video/spf';
 import { MinimalVideoSkin, VideoPlayer } from '@videojs/react/video';
 
@@ -8,7 +8,7 @@ import { MinimalVideoSkin, VideoPlayer } from '@videojs/react/video';
 const playbackId = 'lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML';
 // Poster frame at 2:02 (the player poster is passed explicitly so it is in the pre-rendered HTML).
 const posterTime = 129;
-const poster = `https://image.mux.com/${playbackId}/thumbnail.webp?time=${posterTime}`;
+export const poster = `https://image.mux.com/${playbackId}/thumbnail.webp?time=${posterTime}`;
 
 export function Player() {
   return (
