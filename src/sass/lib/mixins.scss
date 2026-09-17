@@ -11,13 +11,15 @@
 
 // Font smoothing
 // ---------------------------------------
-@mixin plyr-font-smoothing($mode: true) {
-  @if $mode {
-    -moz-osx-font-smoothing: grayscale;
+@mixin plyr-font-smoothing($mode: $plyr-font-smoothing) {
+  @if $mode == true {
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  } @else {
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
   }
 }
-
 // <input type="range"> styling
 // ---------------------------------------
 @mixin plyr-range-track() {
