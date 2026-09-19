@@ -6,8 +6,7 @@ import { MinimalVideoSkin, VideoPlayer } from '@videojs/react/video';
 // "View From A Blue Moon" trailer, hosted on Mux. The stream carries an English subtitle track and
 // the storyboard (timeline thumbnails) is derived from the playback ID automatically.
 const playbackId = 'lyrKpPcGfqyzeI00jZAfW6MvP6GNPrkML';
-// Poster frame at 2:02 (the player poster is passed explicitly so it is in the pre-rendered HTML).
-const posterTime = 129;
+const posterTime = 133;
 export const poster = `https://image.mux.com/${playbackId}/thumbnail.webp?time=${posterTime}`;
 
 export function Player() {
