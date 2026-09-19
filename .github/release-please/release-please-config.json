@@ -56,7 +56,7 @@
     ".": {
       "package-name": "plyr",
       "extra-files": ["README.md", "src/js/plyr.js", "src/js/plyr.polyfilled.js", "src/js/config/defaults.js"],
-      "exclude-paths": ["site", ".vscode", ".claude", ".gitpod.yml", "plyr.code-workspace"]
+      "exclude-paths": ["site", ".vscode", ".claude"]
     }
   }
 }

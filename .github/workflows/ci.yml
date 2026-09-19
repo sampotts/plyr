@@ -51,7 +51,6 @@ jobs:
             site:
               - 'site/**'
               - 'site/vercel.json'
-              - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
               - '.github/workflows/ci.yml'
 
