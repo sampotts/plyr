@@ -12,7 +12,9 @@ on:
       - master
     # The site deploys through Vercel and shares no code with the player, so site-only pushes never start a
     # release run. release-please also ignores site commits when calculating versions (see exclude-paths in
-    # .github/release-please/release-please-config.json).
+    # .github/release-please/release-please-config.json). Those excludes only match whole directories, and a
+    # commit still counts if it touches any file outside them, which is why the site keeps its own lockfile
+    # (sharedWorkspaceLockfile in pnpm-workspace.yaml) instead of sharing the root pnpm-lock.yaml.
     paths-ignore:
       - 'site/**'
       - 'site/vercel.json'

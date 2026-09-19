@@ -1,6 +1,11 @@
 packages:
   - site
 
+# The site keeps its own lockfile in site/pnpm-lock.yaml. release-please can only ignore whole directories
+# (see exclude-paths in .github/release-please/release-please-config.json), so site dependency changes must not
+# touch the root pnpm-lock.yaml or they would count as player changes in the changelog and version bump.
+sharedWorkspaceLockfile: false
+
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
