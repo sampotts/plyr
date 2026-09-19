@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.8.5](https://github.com/sampotts/plyr/compare/v3.8.4...v3.8.5) (2026-09-19)
+
+
+### Bug Fixes
+
+* **captions:** case-insensitive language matching + keep selected track ([73f4795](https://github.com/sampotts/plyr/commit/73f4795ab9d13bcc404a48cddb3097736e0a8b71))
+* restore volume when unmuting from zero ([a4bda96](https://github.com/sampotts/plyr/commit/a4bda960b638287150fcc7914949e1af8989adc1))
+* **types:** support default and CSS imports ([ead9ed2](https://github.com/sampotts/plyr/commit/ead9ed2a4c62301176f8834b9579a8cd5e05ba8b))
+
+
+### Refactoring
+
+* use preact instead of react ([9a0a73f](https://github.com/sampotts/plyr/commit/9a0a73f42ce76608c7ef11e5b1871a4b40277a83))
+
 ### v3.8.4
 
 - Fix import path for ESM import in package.json (fixes #2882)
