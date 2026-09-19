@@ -35,6 +35,9 @@ minimumReleaseAgeExclude:
 peerDependencyRules:
   allowedVersions:
     vite: '0.3.2'
+    # pnpm compares the pkg.pr.new URL spec against the preview's `0.0.0-preview-<sha>` peer range and reports a mismatch
+    # even though they are the same tarball.
+    '@videojs/react>@videojs/mux-video': '*'
 
 # Newer cssnano plugins rewrite selector lists with `:is()`, which would change dist/plyr.css from the published builds.
 overrides:
