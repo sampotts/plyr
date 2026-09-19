@@ -16,8 +16,8 @@
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "@videojs/mux-video": "https://pkg.pr.new/videojs/v10/@videojs/mux-video@2f660def",
-    "@videojs/react": "https://pkg.pr.new/videojs/v10/@videojs/react@2f660def",
+    "@videojs/mux-video": "https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6",
+    "@videojs/react": "https://pkg.pr.new/videojs/v10/@videojs/react@1c629d6",
     "class-variance-authority": "^0.7.1",
     "preact": "11.0.0-rc.2",
     "preact-render-to-string": "^6.7.0"
