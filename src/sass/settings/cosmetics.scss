@@ -2,4 +2,6 @@
 // Cosmetic
 // ==========================================================================
 
-$plyr-focus-visible-color: var(--plyr-focus-visible-color, var(--plyr-color-main, $plyr-color-main)) !default;
+@use './colors';
+
+$plyr-focus-visible-color: var(--plyr-focus-visible-color, var(--plyr-color-main, colors.$plyr-color-main)) !default;

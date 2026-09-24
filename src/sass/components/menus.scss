@@ -2,6 +2,11 @@
 // Menus
 // --------------------------------------------------------------
 
+@use '../settings/colors';
+@use '../settings/controls';
+@use '../settings/menus';
+@use '../settings/type';
+
 .plyr__menu {
   display: flex; // Edge fix
   position: relative;
@@ -25,12 +30,12 @@
   // The actual menu container
   &__container {
     animation: plyr-popup 0.2s ease;
-    background: $plyr-menu-background;
-    border-radius: $plyr-menu-radius;
+    background: menus.$plyr-menu-background;
+    border-radius: menus.$plyr-menu-radius;
     bottom: 100%;
-    box-shadow: $plyr-menu-shadow;
-    color: $plyr-menu-color;
-    font-size: $plyr-font-size-base;
+    box-shadow: menus.$plyr-menu-shadow;
+    color: menus.$plyr-menu-color;
+    font-size: type.$plyr-font-size-base;
     margin-bottom: 10px;
     position: absolute;
     right: -3px;
@@ -47,18 +52,21 @@
 
     // Arrow
     &::after {
-      border: $plyr-menu-arrow-size solid transparent;
-      border-top-color: $plyr-menu-background;
+      border: menus.$plyr-menu-arrow-size solid transparent;
+      border-top-color: menus.$plyr-menu-background;
       content: '';
       height: 0;
       position: absolute;
-      right: calc(((#{$plyr-control-icon-size} / 2) + #{$plyr-control-padding}) - (#{$plyr-menu-arrow-size} / 2));
+      right: calc(
+        ((#{controls.$plyr-control-icon-size} / 2) + #{controls.$plyr-control-padding}) -
+          (#{menus.$plyr-menu-arrow-size} / 2)
+      );
       top: 100%;
       width: 0;
     }
 
     [role='menu'] {
-      padding: $plyr-control-padding;
+      padding: controls.$plyr-control-padding;
     }
 
     [role='menuitem'],
@@ -73,10 +81,10 @@
     // Options
     .plyr__control {
       align-items: center;
-      color: $plyr-menu-color;
+      color: menus.$plyr-menu-color;
       display: flex;
-      font-size: $plyr-font-size-menu;
-      padding: calc(#{$plyr-control-padding} / 1.5) calc(#{$plyr-control-padding} * 1.5);
+      font-size: type.$plyr-font-size-menu;
+      padding: calc(#{controls.$plyr-control-padding} / 1.5) calc(#{controls.$plyr-control-padding} * 1.5);
       user-select: none;
       width: 100%;
 
@@ -87,7 +95,7 @@
       }
 
       &::after {
-        border: $plyr-menu-item-arrow-size solid transparent;
+        border: menus.$plyr-menu-item-arrow-size solid transparent;
         content: '';
         position: absolute;
         top: 50%;
@@ -95,11 +103,11 @@
       }
 
       &--forward {
-        padding-right: calc(#{$plyr-control-padding} * 4);
+        padding-right: calc(#{controls.$plyr-control-padding} * 4);
 
         &::after {
-          border-left-color: $plyr-menu-item-arrow-color;
-          right: calc((#{$plyr-control-padding} * 1.5) - #{$plyr-menu-item-arrow-size});
+          border-left-color: menus.$plyr-menu-item-arrow-color;
+          right: calc((#{controls.$plyr-control-padding} * 1.5) - #{menus.$plyr-menu-item-arrow-size});
         }
 
         &:focus-visible::after,
@@ -109,25 +117,25 @@
       }
 
       &--back {
-        font-weight: $plyr-font-weight-regular;
-        margin: $plyr-control-padding;
-        margin-bottom: calc(#{$plyr-control-padding} / 2);
-        padding-left: calc(#{$plyr-control-padding} * 4);
+        font-weight: type.$plyr-font-weight-regular;
+        margin: controls.$plyr-control-padding;
+        margin-bottom: calc(#{controls.$plyr-control-padding} / 2);
+        padding-left: calc(#{controls.$plyr-control-padding} * 4);
         position: relative;
-        width: calc(100% - (#{$plyr-control-padding} * 2));
+        width: calc(100% - (#{controls.$plyr-control-padding} * 2));
 
         &::after {
-          border-right-color: $plyr-menu-item-arrow-color;
-          left: calc((#{$plyr-control-padding} * 1.5) - #{$plyr-menu-item-arrow-size});
+          border-right-color: menus.$plyr-menu-item-arrow-color;
+          left: calc((#{controls.$plyr-control-padding} * 1.5) - #{menus.$plyr-menu-item-arrow-size});
         }
 
         &::before {
-          background: $plyr-menu-back-border-color;
-          box-shadow: 0 1px 0 $plyr-menu-back-border-shadow-color;
+          background: menus.$plyr-menu-back-border-color;
+          box-shadow: 0 1px 0 menus.$plyr-menu-back-border-shadow-color;
           content: '';
           height: 1px;
           left: 0;
-          margin-top: calc(#{$plyr-control-padding} / 2);
+          margin-top: calc(#{controls.$plyr-control-padding} / 2);
           overflow: hidden;
           position: absolute;
           right: 0;
@@ -142,7 +150,7 @@
     }
 
     .plyr__control[role='menuitemradio'] {
-      padding-left: $plyr-control-padding;
+      padding-left: controls.$plyr-control-padding;
 
       &::before,
       &::after {
@@ -155,7 +163,7 @@
         display: block;
         flex-shrink: 0;
         height: 16px;
-        margin-right: $plyr-control-spacing;
+        margin-right: controls.$plyr-control-spacing;
         transition: all 0.3s ease;
         width: 16px;
       }
@@ -176,7 +184,7 @@
 
       &[aria-checked='true'] {
         &::before {
-          background: $plyr-control-toggle-checked-background;
+          background: controls.$plyr-control-toggle-checked-background;
         }
 
         &::after {
@@ -187,7 +195,7 @@
 
       &:focus-visible::before,
       &:hover::before {
-        background: rgba($plyr-color-gray-900, 0.1);
+        background: rgba(colors.$plyr-color-gray-900, 0.1);
       }
     }
 
@@ -196,9 +204,9 @@
       align-items: center;
       display: flex;
       margin-left: auto;
-      margin-right: calc((#{$plyr-control-padding} - 2px) * -1);
+      margin-right: calc((#{controls.$plyr-control-padding} - 2px) * -1);
       overflow: hidden;
-      padding-left: calc(#{$plyr-control-padding} * 3.5);
+      padding-left: calc(#{controls.$plyr-control-padding} * 3.5);
       pointer-events: none;
     }
   }

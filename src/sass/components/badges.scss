@@ -2,11 +2,14 @@
 // Badges
 // --------------------------------------------------------------
 
+@use '../settings/badges';
+@use '../settings/type';
+
 .plyr__badge {
-  background: $plyr-badge-background;
-  border-radius: $plyr-badge-border-radius;
-  color: $plyr-badge-text-color;
-  font-size: $plyr-font-size-badge;
+  background: badges.$plyr-badge-background;
+  border-radius: badges.$plyr-badge-border-radius;
+  color: badges.$plyr-badge-text-color;
+  font-size: type.$plyr-font-size-badge;
   line-height: 1;
   padding: 3px 4px;
 }

@@ -2,24 +2,27 @@
 // Control buttons
 // --------------------------------------------------------------
 
+@use '../lib/mixins';
+@use '../settings/controls';
+
 .plyr__control {
   background: transparent;
   border: 0;
-  border-radius: $plyr-control-radius;
+  border-radius: controls.$plyr-control-radius;
   color: inherit;
   cursor: pointer;
   flex-shrink: 0;
   overflow: visible; // IE11
-  padding: $plyr-control-padding;
+  padding: controls.$plyr-control-padding;
   position: relative;
   transition: all 0.1s ease-in-out;
 
   svg {
     display: block;
     fill: currentColor;
-    height: $plyr-control-icon-size;
+    height: controls.$plyr-control-icon-size;
     pointer-events: none;
-    width: $plyr-control-icon-size;
+    width: controls.$plyr-control-icon-size;
   }
 
   // Default focus
@@ -29,7 +32,7 @@
 
   // Tab focus
   &:focus-visible {
-    @include plyr-focus-visible;
+    @include mixins.plyr-focus-visible;
   }
 }
 

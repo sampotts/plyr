@@ -2,13 +2,15 @@
 // Hiding content nicely
 // --------------------------------------------------------------
 
+@use '../settings/helpers';
+
 // Screen reader only elements
 .plyr__sr-only {
   clip: rect(1px, 1px, 1px, 1px);
   overflow: hidden;
 
   // !important is not always needed
-  @if $plyr-sr-only-important {
+  @if helpers.$plyr-sr-only-important {
     border: 0 !important;
     height: 1px !important;
     padding: 0 !important;

@@ -3,19 +3,23 @@
 // Tooltips
 // --------------------------------------------------------------
 
+@use '../settings/controls';
+@use '../settings/tooltips';
+@use '../settings/type';
+
 .plyr__tooltip {
-  background: $plyr-tooltip-background;
-  border-radius: $plyr-tooltip-radius;
+  background: tooltips.$plyr-tooltip-background;
+  border-radius: tooltips.$plyr-tooltip-radius;
   bottom: 100%;
-  box-shadow: $plyr-tooltip-shadow;
-  color: $plyr-tooltip-color;
-  font-size: $plyr-font-size-small;
-  font-weight: $plyr-font-weight-regular;
+  box-shadow: tooltips.$plyr-tooltip-shadow;
+  color: tooltips.$plyr-tooltip-color;
+  font-size: type.$plyr-font-size-small;
+  font-weight: type.$plyr-font-weight-regular;
   left: 50%;
   line-height: 1.3;
-  margin-bottom: calc(#{$plyr-tooltip-padding} * 2);
+  margin-bottom: calc(#{tooltips.$plyr-tooltip-padding} * 2);
   opacity: 0;
-  padding: $plyr-tooltip-padding calc(#{$plyr-tooltip-padding} * 1.5);
+  padding: tooltips.$plyr-tooltip-padding calc(#{tooltips.$plyr-tooltip-padding} * 1.5);
   pointer-events: none;
   position: absolute;
   transform: translate(-50%, 10px) scale(0.8);
@@ -28,10 +32,10 @@
 
   // The background triangle
   &::before {
-    border-left: $plyr-tooltip-arrow-size solid transparent;
-    border-right: $plyr-tooltip-arrow-size solid transparent;
-    border-top: $plyr-tooltip-arrow-size solid $plyr-tooltip-background;
-    bottom: calc(#{$plyr-tooltip-arrow-size} * -1);
+    border-left: tooltips.$plyr-tooltip-arrow-size solid transparent;
+    border-right: tooltips.$plyr-tooltip-arrow-size solid transparent;
+    border-top: tooltips.$plyr-tooltip-arrow-size solid tooltips.$plyr-tooltip-background;
+    bottom: calc(#{tooltips.$plyr-tooltip-arrow-size} * -1);
     content: '';
     height: 0;
     left: 50%;
@@ -62,7 +66,7 @@
   transform-origin: 0 100%;
 
   &::before {
-    left: calc((#{$plyr-control-icon-size} / 2) + #{$plyr-control-padding});
+    left: calc((#{controls.$plyr-control-icon-size} / 2) + #{controls.$plyr-control-padding});
   }
 }
 
@@ -75,7 +79,7 @@
 
   &::before {
     left: auto;
-    right: calc((#{$plyr-control-icon-size} / 2) + #{$plyr-control-padding});
+    right: calc((#{controls.$plyr-control-icon-size} / 2) + #{controls.$plyr-control-padding});
     transform: translateX(50%);
   }
 }
