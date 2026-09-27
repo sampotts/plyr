@@ -36,9 +36,19 @@ import { parseUrl } from './utils/urls';
 // TODO: Use a WeakMap for private globals
 // const globals = new WeakMap();
 
+// Logged once per page, however many players are created
+let deprecationNoticeShown = false;
+
 // Plyr instance
 class Plyr {
   constructor(target, options) {
+    if (!deprecationNoticeShown) {
+      deprecationNoticeShown = true;
+      console.info(
+        'Plyr is deprecated in favour of Video.js 10, which combines Plyr, Vidstack and Media Chrome into one player. Migration guide: https://videojs.org/docs/framework/html/guides/migrate-from-plyr',
+      );
+    }
+
     this.timers = {};
 
     // State
