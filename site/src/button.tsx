@@ -1,24 +1,37 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 
-const button = cva(
-  [
-    'inline-flex items-center justify-center gap-1 rounded-lg px-4 py-2.5 text-sm ring-1 shadow-sm text-center font-medium no-underline motion-safe:transition-[box-shadow,background]',
-    'hocus:shadow-md hocus:shadow-black/5 dark:hocus:shadow-black/40',
-    'motion-safe:active:translate-y-px motion-safe:active:shadow-none!',
-  ],
-  {
-    variants: {
-      variant: {
-        default:
-          'bg-white ring-brand/15 text-brand-600 hocus:ring-brand/30 dark:bg-brand/10 dark:text-brand-100 dark:ring-brand/20 dark:hocus:bg-brand/20',
-        primary:
-          'bg-brand ring-brand-600 dark:ring-brand-400 text-white text-shadow-2xs hocus:ring-brand-700 dark:hocus:bg-brand-600 dark:hocus:ring-brand-500',
-      },
+/** Shared chrome for the button-shaped variants. Kept out of the base so the `link` variant stays a plain inline link. */
+const chrome = [
+  'inline-flex items-center justify-center gap-1 rounded-lg px-4 py-2.5 text-sm ring-1 shadow-sm text-center motion-safe:transition-[box-shadow,background]',
+  'hocus:shadow-md hocus:shadow-black/5 dark:hocus:shadow-black/40',
+  'motion-safe:active:translate-y-px motion-safe:active:shadow-none!',
+];
+
+const button = cva('font-medium no-underline', {
+  variants: {
+    variant: {
+      default: [
+        ...chrome,
+        'bg-white ring-brand/15 text-brand-600 hocus:ring-brand/30 dark:bg-brand/10 dark:text-brand-100 dark:ring-brand/20 dark:hocus:bg-brand/20',
+      ],
+      primary: [
+        ...chrome,
+        'bg-brand ring-brand-600 dark:ring-brand-400 text-white text-shadow-2xs hocus:ring-brand-700 dark:hocus:bg-brand-600 dark:hocus:ring-brand-500',
+      ],
+      /* Inline text link. The underline is a pseudo-element that thickens from 1px to 2px on hover and focus.
+         `inline-block` keeps the link on one line so the absolutely positioned underline covers all of it, and
+         forced-colours mode falls back to a real underline because backgrounds are stripped there. */
+      link: [
+        'relative inline-block text-brand-800 dark:text-brand-100 hocus:text-brand-900 dark:hocus:text-white',
+        'after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-current',
+        'motion-safe:transition-colors motion-safe:after:transition-[height] hocus:after:h-0.5',
+        'forced-colors:underline',
+      ],
     },
-    defaultVariants: { variant: 'default' },
   },
-);
+  defaultVariants: { variant: 'default' },
+});
 
 type AnchorProps = ComponentProps<'a'> & { href: string };
 type NativeButtonProps = ComponentProps<'button'> & { href?: undefined };

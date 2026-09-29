@@ -16,15 +16,23 @@ export function App() {
           </h1>
           <p className="lg:text-normal leading-relaxed text-brand-800 dark:text-brand-100">
             The folks behind Plyr, Vidstack and Media Chrome have joined forces to build the latest version of Video.js:
-            one modern, accessible player with the best of all three. Plyr will soon be deprecated, so give Video.js a
-            try.
+            one modern, accessible player with the best of all three. Plyr is now deprecated, so give Video.js a try.
           </p>
           <div className="grid grid-cols-2 gap-4 pt-1">
             <Button href="https://videojs.org/?utm_source=plyr" variant="primary">
               Check out Video.js
             </Button>
-            <Button href="https://github.com/sampotts/plyr">Docs for Plyr</Button>
+            <Button href="https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr">
+              Migrate from Plyr
+            </Button>
           </div>
+          <p className="text-sm text-brand-800 dark:text-brand-100/80">
+            The{' '}
+            <Button href="https://github.com/sampotts/plyr" variant="link">
+              Plyr docs are on GitHub
+            </Button>{' '}
+            if you need them.
+          </p>
         </header>
 
         <main className="w-full min-w-0 text-center lg:m-auto lg:flex-1">
