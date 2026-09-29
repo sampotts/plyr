@@ -1,5 +1,8 @@
 # Contributing
 
+> [!NOTE]
+> Plyr is deprecated and in maintenance mode: only security and critical bug fixes are accepted. New work happens on [Video.js 10](https://videojs.org), and existing Plyr integrations can follow the [migration guide](https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr).
+
 We welcome bug reports, feature requests and pull requests. If you want to help us out, please follow these guidelines, in order to avoid redundant work.
 
 ## Support

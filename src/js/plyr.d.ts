@@ -2,7 +2,16 @@
 // Project: https://plyr.io
 // Definitions by: ondratra <https://github.com/ondratra>
 // TypeScript Version: 3.0
+//
+// Plyr is deprecated. Its creator now works on Video.js 10, which combines
+// Plyr, Vidstack and Media Chrome into one player. New projects should use
+// Video.js (https://videojs.org) and existing Plyr integrations can follow
+// the migration guide: https://videojs.org/docs/framework/html/guides/migrate-from-plyr
 
+/**
+ * @deprecated Plyr is deprecated in favour of Video.js 10 (https://videojs.org).
+ * Migration guide: https://videojs.org/docs/framework/html/guides/migrate-from-plyr
+ */
 declare class Plyr {
   /**
    * Setup a new instance
