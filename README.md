@@ -5,9 +5,9 @@
 >
 > The folks behind Plyr, Vidstack and Media Chrome have joined forces to build the latest version of Video.js: one modern, accessible player with the best of all three. Plyr is now deprecated, so give Video.js a try.
 >
-> **[Try Video.js →](https://videojs.org?utm_source=plyr)**
+> **[Try Video.js →](https://videojs.org?utm_source=plyr)** · **[Migrate from Plyr →](https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr)**
 >
-> Already using Plyr? Follow the **[migration guide from Plyr to Video.js](https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr)** ([React version](https://videojs.org/docs/framework/react/guides/migrate-from-plyr?utm_source=plyr)). AI coding agents can install the [Video.js skill](https://github.com/videojs/skills) or run `npx @videojs/cli agents init` for version-matched Video.js 10 docs.
+> Using React? Follow the [React migration guide](https://videojs.org/docs/framework/react/guides/migrate-from-plyr?utm_source=plyr) instead. AI coding agents can install the [Video.js skill](https://github.com/videojs/skills) or run `npx @videojs/cli agents init` for version-matched Video.js 10 docs.
 
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 

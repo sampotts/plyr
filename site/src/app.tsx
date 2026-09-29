@@ -22,17 +22,16 @@ export function App() {
             <Button href="https://videojs.org/?utm_source=plyr" variant="primary">
               Check out Video.js
             </Button>
-            <Button href="https://github.com/sampotts/plyr">Docs for Plyr</Button>
+            <Button href="https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr">
+              Migrate from Plyr
+            </Button>
           </div>
           <p className="text-sm text-brand-800 dark:text-brand-100/80">
-            Already using Plyr?{' '}
-            <a
-              href="https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr"
-              className="font-medium text-brand-800 underline underline-offset-2 dark:text-brand-100 hocus:text-brand-900 hocus:decoration-2 dark:hocus:text-white"
-            >
-              Read the Plyr to Video.js migration guide
-            </a>
-            .
+            The{' '}
+            <Button href="https://github.com/sampotts/plyr" variant="link">
+              Plyr docs are on GitHub
+            </Button>{' '}
+            if you need them.
           </p>
         </header>
 
