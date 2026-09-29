@@ -9,7 +9,10 @@ export default function fetch(url, responseType = 'text', withCredentials = fals
       const request = new XMLHttpRequest();
 
       // Check for CORS support
-      if (!('withCredentials' in request)) return;
+      if (!('withCredentials' in request)) {
+        reject(new Error('CORS not supported'));
+        return;
+      }
 
       // Set to true if needed for CORS
       if (withCredentials) {
@@ -17,6 +20,11 @@ export default function fetch(url, responseType = 'text', withCredentials = fals
       }
 
       request.addEventListener('load', () => {
+        if (request.status < 200 || request.status >= 300) {
+          reject(new Error(`Request failed with status ${request.status}`));
+          return;
+        }
+
         if (responseType === 'text') {
           try {
             resolve(JSON.parse(request.responseText));
@@ -31,7 +39,7 @@ export default function fetch(url, responseType = 'text', withCredentials = fals
       });
 
       request.addEventListener('error', () => {
-        throw new Error(request.status);
+        reject(new Error(`Network error (status ${request.status})`));
       });
 
       request.open('GET', url, true);
