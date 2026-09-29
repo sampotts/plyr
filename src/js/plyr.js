@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.8.4 x-release-please-version
+// plyr.js v3.8.5 x-release-please-version
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
