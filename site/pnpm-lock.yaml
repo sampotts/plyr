@@ -19,11 +19,11 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(react@19.3.0)
       '@videojs/mux-video':
-        specifier: https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6
-        version: https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6
+        specifier: https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93
+        version: https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93
       '@videojs/react':
-        specifier: https://pkg.pr.new/videojs/v10/@videojs/react@1c629d6
-        version: https://pkg.pr.new/videojs/v10/@videojs/react@1c629d6(@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: https://pkg.pr.new/videojs/v10/@videojs/react@3d6ce93
+        version: https://pkg.pr.new/videojs/v10/@videojs/react@3d6ce93(@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -671,44 +671,44 @@ packages:
       vue-router:
         optional: true
 
-  '@videojs/core@https://pkg.pr.new/videojs/v10/@videojs/core@1c629d6':
-    resolution: {integrity: sha512-TwXG4t3xmboXhDsN8JM4DJNfRHsmkQFMz8d6UPK3zLuxBoQWLa+WR/ixfo4PzbZE8SGwY+1BXsbezjmkLGJEuw==, tarball: https://pkg.pr.new/videojs/v10/@videojs/core@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/core@https://pkg.pr.new/videojs/v10/@videojs/core@3d6ce93':
+    resolution: {integrity: sha512-szwP8n5NVx5mT076uudwJt9LIgCVScpywlzRJBzo1f/zXCA3oGTAI0qNKdp4hgTJMOn5xVbLMMHekwVeedgunw==, tarball: https://pkg.pr.new/videojs/v10/@videojs/core@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
 
-  '@videojs/hlsjs-video@https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@1c629d6':
-    resolution: {integrity: sha512-Zga9AIXkMrgX/45XbNTB58ua7IcNrJxut5GXF3rWY8R4dyWqZhRR5PghnE4hFCjL9Vfl4y/XztPqxRMLXk8NJg==, tarball: https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/hlsjs-video@https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@3d6ce93':
+    resolution: {integrity: sha512-syk5EipZQp9wkA6vRXwLHgSXI91kx33jIMbrHsEFkPfSAdbUYAvu+b4W0jASqzAnmmgGwmFf8AFkzODCP/nMgA==, tarball: https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
 
-  '@videojs/media@https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6':
-    resolution: {integrity: sha512-4Le/x9wRtBY2WvyTwTnWJDmIqLFseCzJTTfoKg76eoq5XOqxWGgm3wNsworiTrPmM2yuUsN/T68BaSratfa0tQ==, tarball: https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/media@https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93':
+    resolution: {integrity: sha512-hkNJPmbqd2DKxLlOpWkZTBmI24LJ1m1y68TTR7/JIcQ+vbnbJ+dzuc6UlllsjJUM/dV9cTIaO0gQ+6K6PL0KIw==, tarball: https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
 
-  '@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6':
-    resolution: {integrity: sha512-b63JtmNKqdmyqU78aVE6SBEuBekwwPjtLD3grt3Nl1onqsGrX4yVV/U55wQJRHi7wdA53hdQvTpOhmPCKe08wg==, tarball: https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93':
+    resolution: {integrity: sha512-tuKAqZghLTmYXgDF5DYdWXe5AgtxQjQFih2VDFiCma2sWI8OelbVspeZfPRX7yELQQitA/L9hU8CYDBZMVSBTg==, tarball: https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
 
-  '@videojs/native-hls-video@https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@1c629d6':
-    resolution: {integrity: sha512-j6UbMUsAiyxrOOaOkpgPcvsMnC2qxicKmQSgO3daVNUycnB3hMCieqHOlmTYgFLlb62Ds+R0JlJd9TYffc82Pg==, tarball: https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/native-hls-video@https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@3d6ce93':
+    resolution: {integrity: sha512-lnCn+cEm1D+dbWuEiTEVwCrvusvOACNlnkb74dltAWAKDwGzjp1xnSY6mubKbWbEuJah/8VaTNTQUUdCY+kz8Q==, tarball: https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
 
-  '@videojs/react@https://pkg.pr.new/videojs/v10/@videojs/react@1c629d6':
-    resolution: {integrity: sha512-9jy9Gv58dNZuaSbqTsqDpYND/esNs78Rj7FoAXqbfaRYd2kS/qC2i5JsPK8Mqdx2mGz4jxR2qsmHQZanr9UhJQ==, tarball: https://pkg.pr.new/videojs/v10/@videojs/react@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/react@https://pkg.pr.new/videojs/v10/@videojs/react@3d6ce93':
+    resolution: {integrity: sha512-8OdkSRm6RutZUBnGpEhQ4X2gVwMf3Bjr2NsB1XvKtMXq9taTFNA8vO+s1HOvXXAMcPUeG/+xN+HV1IYzlzAfmw==, tarball: https://pkg.pr.new/videojs/v10/@videojs/react@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
     peerDependencies:
-      '@videojs/cloudflare-video': 0.0.0-preview-1c629d6
-      '@videojs/dash-video': 0.0.0-preview-1c629d6
-      '@videojs/google-cast': 0.0.0-preview-1c629d6
-      '@videojs/hlsjs-video': 0.0.0-preview-1c629d6
-      '@videojs/mux-audio': 0.0.0-preview-1c629d6
-      '@videojs/mux-data': 0.0.0-preview-1c629d6
-      '@videojs/mux-video': 0.0.0-preview-1c629d6
-      '@videojs/shaka-video': 0.0.0-preview-1c629d6
-      '@videojs/spotify-audio': 0.0.0-preview-1c629d6
-      '@videojs/tiktok-video': 0.0.0-preview-1c629d6
-      '@videojs/twitch-video': 0.0.0-preview-1c629d6
-      '@videojs/vimeo-video': 0.0.0-preview-1c629d6
-      '@videojs/wistia-video': 0.0.0-preview-1c629d6
-      '@videojs/youtube-video': 0.0.0-preview-1c629d6
+      '@videojs/cloudflare-video': 0.0.0-preview-3d6ce93
+      '@videojs/dash-video': 0.0.0-preview-3d6ce93
+      '@videojs/google-cast': 0.0.0-preview-3d6ce93
+      '@videojs/hlsjs-video': 0.0.0-preview-3d6ce93
+      '@videojs/mux-audio': 0.0.0-preview-3d6ce93
+      '@videojs/mux-data': 0.0.0-preview-3d6ce93
+      '@videojs/mux-video': 0.0.0-preview-3d6ce93
+      '@videojs/shaka-video': 0.0.0-preview-3d6ce93
+      '@videojs/spotify-audio': 0.0.0-preview-3d6ce93
+      '@videojs/tiktok-video': 0.0.0-preview-3d6ce93
+      '@videojs/twitch-video': 0.0.0-preview-3d6ce93
+      '@videojs/vimeo-video': 0.0.0-preview-3d6ce93
+      '@videojs/wistia-video': 0.0.0-preview-3d6ce93
+      '@videojs/youtube-video': 0.0.0-preview-3d6ce93
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
@@ -741,15 +741,15 @@ packages:
       '@videojs/youtube-video':
         optional: true
 
-  '@videojs/spf@https://pkg.pr.new/videojs/v10/@videojs/spf@1c629d6':
-    resolution: {integrity: sha512-vMnZWYlwSqad+2Q2AqO6Pz6HlhHO4524WFxEtqTtfTv2YeD+QnLGda6oXdwstLx3At9hALfAo6zP9IzYMmWDzw==, tarball: https://pkg.pr.new/videojs/v10/@videojs/spf@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/spf@https://pkg.pr.new/videojs/v10/@videojs/spf@3d6ce93':
+    resolution: {integrity: sha512-gXunKqhpmOMctpb2Dqhp21bFO5JTCauoIoaNS2WWoc5lc+3pF4iFlz9F7vA6hpRJ3Sgu84nbl2m2qECT3uekDA==, tarball: https://pkg.pr.new/videojs/v10/@videojs/spf@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
 
-  '@videojs/store@https://pkg.pr.new/videojs/v10/@videojs/store@1c629d6':
-    resolution: {integrity: sha512-QVM9zqWKI26PzsENd6/1OWcTNZhSaztUwkK5aIzKsZ7CB2h4cOVgqMh5fbUt8839Qa7wfEwSympUSyE8i/8Txw==, tarball: https://pkg.pr.new/videojs/v10/@videojs/store@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/store@https://pkg.pr.new/videojs/v10/@videojs/store@3d6ce93':
+    resolution: {integrity: sha512-LG2GhX233fNAHXYVpPELsgF0KPv8usBeWe/z14qQFrBs4E01nzQg+R9kogYLKtT9EjgAyLSX4Wb+F+Gjt1P+ng==, tarball: https://pkg.pr.new/videojs/v10/@videojs/store@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
     peerDependencies:
-      '@videojs/element': 0.0.0-preview-1c629d6
+      '@videojs/element': 0.0.0-preview-3d6ce93
       react: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@videojs/element':
@@ -757,9 +757,9 @@ packages:
       react:
         optional: true
 
-  '@videojs/utils@https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6':
-    resolution: {integrity: sha512-kHM5U0GX3hfb8L5PUdtrDMJQ7XGJll2Pa7/CfdICnpdH0sxNQl2UggC9Nl2xjQhXCbElfaEMd8gjfGHJXscONA==, tarball: https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6}
-    version: 0.0.0-preview-1c629d6
+  '@videojs/utils@https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93':
+    resolution: {integrity: sha512-23mafhZ8uADeGXzAOHONP5tf9hOHvwbUKAiG+GMEdqldgFKvraSQ6QqfH3NsxfozNQiD69+W+tD3eSqYc9EsmA==, tarball: https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93}
+    version: 0.0.0-preview-3d6ce93
 
   '@vitest/browser-preview@4.1.11':
     resolution: {integrity: sha512-iPKSE6Ibayey6HFgK1V1/aHgyhx7HSRk1YMi+lnBZGmlIiNV5Uc7xRkD9Su8RDylTxDECK23t7kTHdRKoqSYDQ==}
@@ -1857,68 +1857,68 @@ snapshots:
     optionalDependencies:
       react: 19.3.0
 
-  '@videojs/core@https://pkg.pr.new/videojs/v10/@videojs/core@1c629d6(react@19.3.0)':
+  '@videojs/core@https://pkg.pr.new/videojs/v10/@videojs/core@3d6ce93(react@19.3.0)':
     dependencies:
-      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6
-      '@videojs/store': https://pkg.pr.new/videojs/v10/@videojs/store@1c629d6(react@19.3.0)
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93
+      '@videojs/store': https://pkg.pr.new/videojs/v10/@videojs/store@3d6ce93(react@19.3.0)
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
     transitivePeerDependencies:
       - '@videojs/element'
       - react
 
-  '@videojs/hlsjs-video@https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@1c629d6':
+  '@videojs/hlsjs-video@https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@3d6ce93':
     dependencies:
-      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6
-      '@videojs/native-hls-video': https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@1c629d6
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93
+      '@videojs/native-hls-video': https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@3d6ce93
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
       hls.js: 1.6.7
 
-  '@videojs/media@https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6':
+  '@videojs/media@https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93':
     dependencies:
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
 
-  '@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6':
+  '@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93':
     dependencies:
-      '@videojs/hlsjs-video': https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@1c629d6
-      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6
-      '@videojs/spf': https://pkg.pr.new/videojs/v10/@videojs/spf@1c629d6
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/hlsjs-video': https://pkg.pr.new/videojs/v10/@videojs/hlsjs-video@3d6ce93
+      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93
+      '@videojs/spf': https://pkg.pr.new/videojs/v10/@videojs/spf@3d6ce93
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
 
-  '@videojs/native-hls-video@https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@1c629d6':
+  '@videojs/native-hls-video@https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@3d6ce93':
     dependencies:
-      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
 
-  '@videojs/react@https://pkg.pr.new/videojs/v10/@videojs/react@1c629d6(@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@videojs/react@https://pkg.pr.new/videojs/v10/@videojs/react@3d6ce93(@videojs/mux-video@https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@videojs/core': https://pkg.pr.new/videojs/v10/@videojs/core@1c629d6(react@19.3.0)
-      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6
-      '@videojs/native-hls-video': https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@1c629d6
-      '@videojs/spf': https://pkg.pr.new/videojs/v10/@videojs/spf@1c629d6
-      '@videojs/store': https://pkg.pr.new/videojs/v10/@videojs/store@1c629d6(react@19.3.0)
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/core': https://pkg.pr.new/videojs/v10/@videojs/core@3d6ce93(react@19.3.0)
+      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93
+      '@videojs/native-hls-video': https://pkg.pr.new/videojs/v10/@videojs/native-hls-video@3d6ce93
+      '@videojs/spf': https://pkg.pr.new/videojs/v10/@videojs/spf@3d6ce93
+      '@videojs/store': https://pkg.pr.new/videojs/v10/@videojs/store@3d6ce93(react@19.3.0)
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
       react: 19.3.0
       react-compiler-runtime: 1.0.0(react@19.3.0)
       react-dom: 19.3.0(react@19.3.0)
     optionalDependencies:
-      '@videojs/mux-video': https://pkg.pr.new/videojs/v10/@videojs/mux-video@1c629d6
+      '@videojs/mux-video': https://pkg.pr.new/videojs/v10/@videojs/mux-video@3d6ce93
     transitivePeerDependencies:
       - '@videojs/element'
 
-  '@videojs/spf@https://pkg.pr.new/videojs/v10/@videojs/spf@1c629d6':
+  '@videojs/spf@https://pkg.pr.new/videojs/v10/@videojs/spf@3d6ce93':
     dependencies:
-      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@1c629d6
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/media': https://pkg.pr.new/videojs/v10/@videojs/media@3d6ce93
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
       signal-polyfill: 0.2.2
 
-  '@videojs/store@https://pkg.pr.new/videojs/v10/@videojs/store@1c629d6(react@19.3.0)':
+  '@videojs/store@https://pkg.pr.new/videojs/v10/@videojs/store@3d6ce93(react@19.3.0)':
     dependencies:
-      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6
+      '@videojs/utils': https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93
       react-compiler-runtime: 1.0.0(react@19.3.0)
     optionalDependencies:
       react: 19.3.0
 
-  '@videojs/utils@https://pkg.pr.new/videojs/v10/@videojs/utils@1c629d6': {}
+  '@videojs/utils@https://pkg.pr.new/videojs/v10/@videojs/utils@3d6ce93': {}
 
   '@vitest/browser-preview@4.1.11(@voidzero-dev/vite-plus-core@0.3.2(@types/node@24.13.5)(jiti@2.7.0)(typescript@7.0.2))(vitest@4.1.11)':
     dependencies:
