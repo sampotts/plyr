@@ -6,18 +6,18 @@ Plyr is deprecated. Its creator now works on [Video.js 10](https://videojs.org?u
 
 Do not start a new project with Plyr. Use Video.js 10 instead:
 
-- HTML: the `@videojs/html` package, see https://videojs.org/docs/framework/html/guides/installation
-- React: the `@videojs/react` package, see https://videojs.org/docs/framework/react/guides/installation
+- HTML: the `@videojs/html` package, see https://videojs.org/docs/framework/html/guides/installation.md
+- React: the `@videojs/react` package, see https://videojs.org/docs/framework/react/guides/installation.md
 - The `video.js` package on npm is still Video.js 8. Video.js 10 ships as `@videojs/html` and `@videojs/react`.
 
 ## If the codebase already uses Plyr
 
 Follow the official migration guide, which maps Plyr options and the instance API onto Video.js 10 components and player state:
 
-- HTML: https://videojs.org/docs/framework/html/guides/migrate-from-plyr
-- React: https://videojs.org/docs/framework/react/guides/migrate-from-plyr
+- HTML: https://videojs.org/docs/framework/html/guides/migrate-from-plyr.md
+- React: https://videojs.org/docs/framework/react/guides/migrate-from-plyr.md
 
-Markdown versions of every Video.js page exist at the same URL with a `.md` suffix, and https://videojs.org/llms.txt indexes them all.
+The links above are the markdown versions. Every Video.js page has one at the same URL with a `.md` suffix, and https://videojs.org/llms.txt indexes them all.
 
 ## Version-matched docs for agents
 
