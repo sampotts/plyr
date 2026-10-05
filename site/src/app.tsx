@@ -9,9 +9,9 @@ export function App() {
       <Analytics />
       <SpeedInsights />
 
-      <div className="mx-auto flex min-h-svh w-full max-w-lg flex-col-reverse items-center justify-center gap-12 p-4 lg:max-w-7xl lg:flex-row lg:gap-20 lg:p-12">
+      <div className="mx-auto flex min-h-svh w-full max-w-lg snap-end flex-col-reverse items-center justify-center gap-12 p-4 lg:max-w-7xl lg:flex-row lg:gap-20 lg:p-12">
         <header className="flex flex-col gap-8 pb-4 text-center md:text-left lg:max-w-96 lg:flex-1 lg:pb-0">
-          <h1 className="text-[clamp(2.5rem,5vw,4rem)] leading-[1.15] font-bold tracking-tight text-balance text-brand">
+          <h1 className="text-[clamp(2.5rem,5vw,4rem)] leading-[1.15] font-bold tracking-tight text-balance text-brand text-shadow-[0_1px_0_white]">
             Plyr, meet Video.js 👋
           </h1>
           <p className="lg:text-normal leading-relaxed text-brand-800 dark:text-brand-100">
@@ -38,6 +38,13 @@ export function App() {
         <main className="w-full min-w-0 text-center lg:m-auto lg:flex-1">
           <Player />
         </main>
+      </div>
+      <div aria-hidden="true" className="grid h-52 snap-end grid-rows-[80fr_60fr_45fr_20fr_10fr]">
+        <div className="bg-bright-yellow shadow-[inset_0_1px_0_rgb(0_0_0_/_0.1)] dark:bg-gold" />
+        <div className="bg-gold dark:bg-orange" />
+        <div className="bg-orange dark:bg-red" />
+        <div className="bg-red dark:bg-magenta" />
+        <div className="bg-magenta dark:bg-magenta-dark" />
       </div>
     </>
   );
