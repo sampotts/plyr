@@ -7,7 +7,13 @@
   --font-display: var(--font-sans);
   /* 1px hard drop shadow for icons, the filter counterpart of Tailwind's text-shadow-2xs. Pairs with drop-shadow-{color}. */
   --drop-shadow-2xs: 0 1px 0 rgb(0 0 0 / 0.15);
-  --color-brand: #ed6d2d;
+  --color-brand: #ff6200;
+  --color-bright-yellow: #ffca18;
+  --color-gold: #ffa81b;
+  --color-orange: var(--color-brand);
+  --color-red: #eb3132;
+  --color-magenta: #cc3566;
+  --color-magenta-dark: #922e4f;
   /* Brand scale derived from --color-brand with CSS relative colours, using the lightness and chroma curve of
      Tailwind's own palettes: hue is kept, lightness is fixed per step, and chroma peaks around the middle. The 500
      step is the brand colour itself, so `bg-brand` and `bg-brand-500` are the same. */
@@ -42,6 +48,8 @@
   /* Follow the operating system: Tailwind's `dark:` variant is driven by prefers-color-scheme. */
   :root {
     color-scheme: light dark;
+    overscroll-behavior-y: none;
+    scroll-snap-type: y mandatory;
   }
 
   /* Inter Display: Google Fonts serves Inter as a variable font with an optical size axis, and the 32 end of
@@ -58,6 +66,18 @@
   :where(a, button):not(:where(.video-skin *)):focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 4px;
+  }
+}
+
+@media (any-pointer: coarse) {
+  :root {
+    overscroll-behavior-y: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-snap-type: none;
   }
 }
 
