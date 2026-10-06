@@ -8,4 +8,4 @@ contact_links:
     url: https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr
   - name: 💬 Feature requests and questions
     about: Ask in the Video.js 10 discussions, where the folks behind Plyr now work.
-    url: https://github.com/videojs/v10/discussions
+    url: https://github.com/videojs/video.js/discussions
