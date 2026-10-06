@@ -3,6 +3,9 @@ name: Bug report
 about: Report an issue or unexpected behaviour with Plyr
 ---
 
+> [!IMPORTANT]
+> Plyr is deprecated and receives security updates only, so bug reports that aren't about security are closed. Don't post vulnerability details here; report them privately as described in [SECURITY.md](https://github.com/sampotts/plyr/blob/master/SECURITY.md). For everything else, see [Video.js 10](https://videojs.org?utm_source=plyr).
+
 <!--
 
 Before creating the issue, please make sure that...

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability
+    about: Plyr receives security updates only. Report vulnerabilities privately, not in a public issue.
+    url: https://github.com/sampotts/plyr/security/advisories/new
+  - name: 🚚 Migrate to Video.js 10
+    about: New features and fixes happen in Video.js 10. The migration guide maps Plyr onto it.
+    url: https://videojs.org/docs/framework/html/guides/migrate-from-plyr?utm_source=plyr
+  - name: 💬 Feature requests and questions
+    about: Ask in the Video.js 10 discussions, where the folks behind Plyr now work.
+    url: https://github.com/videojs/v10/discussions
