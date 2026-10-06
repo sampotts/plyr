@@ -1,6 +1,6 @@
 # Plyr
 
-> Plyr is deprecated. Its creator now works on Video.js 10, which combines Plyr, Vidstack and Media Chrome into one modern, accessible player for HTML and React. New projects should use Video.js, and existing Plyr integrations should follow the migration guide.
+> Plyr is deprecated and receives security updates only. Its creator now works on Video.js 10, which combines Plyr, Vidstack and Media Chrome into one modern, accessible player for HTML and React. New projects should use Video.js, and existing Plyr integrations should follow the migration guide.
 
 > The `video.js` package on npm is still Video.js 8. Video.js 10 ships as `@videojs/html` and `@videojs/react`.
 
@@ -19,4 +19,4 @@
 ## Plyr (maintenance mode)
 
 - [Plyr source and documentation](https://github.com/sampotts/plyr): The Plyr 3.x readme, API and options reference, kept for existing users
-- [Plyr on npm](https://www.npmjs.com/package/plyr): Deprecated; security and critical fixes only
+- [Plyr on npm](https://www.npmjs.com/package/plyr): Deprecated; security updates only

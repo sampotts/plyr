@@ -16,7 +16,8 @@ export function App() {
           </h1>
           <p className="lg:text-normal leading-relaxed text-brand-800 dark:text-brand-100">
             The folks behind Plyr, Vidstack and Media Chrome have joined forces to build the latest version of Video.js:
-            one modern, accessible player with the best of all three. Plyr is now deprecated, so give Video.js a try.
+            one modern, accessible player with the best of all three. Plyr is now deprecated and receives security
+            updates only. Use Video.js 10 for new projects.
           </p>
           <div className="grid grid-cols-2 gap-4 pt-1">
             <Button href="https://videojs.org/?utm_source=plyr" variant="primary">

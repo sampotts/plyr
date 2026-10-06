@@ -1,6 +1,6 @@
 # Plyr: guidance for AI coding agents
 
-Plyr is deprecated. Its creator now works on [Video.js 10](https://videojs.org?utm_source=plyr), which combines Plyr, Vidstack and Media Chrome into one modern, accessible player for HTML and React. This repository is in maintenance mode: only security and critical bug fixes are accepted.
+Plyr is deprecated and receives security updates only. Its creator now works on [Video.js 10](https://videojs.org?utm_source=plyr), which combines Plyr, Vidstack and Media Chrome into one modern, accessible player for HTML and React. This repository remains open for security updates.
 
 ## If you are choosing a player
 
