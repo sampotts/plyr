@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.8.6](https://github.com/sampotts/plyr/compare/v3.8.5...v3.8.6) (2026-10-07)
+
+
+### Documentation
+
+* remove Slack chat links ([37eb85c](https://github.com/sampotts/plyr/commit/37eb85cec8233eae47613721f5cc86a15e2e287d))
+
 ## [3.8.5](https://github.com/sampotts/plyr/compare/v3.8.4...v3.8.5) (2026-10-06)
 
 
