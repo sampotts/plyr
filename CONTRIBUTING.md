@@ -12,7 +12,6 @@ Before asking questions, read our [documentation](https://github.com/sampotts/pl
 If these doesn't answer your question
 
 - Use [Stack Overflow](https://stackoverflow.com/) for questions that doesn't directly involve Plyr. This includes for example how to use Javascript, CSS or HTML5 media in general, and how to use other frameworks, libraries and technology.
-- Use [our Slack](https://bit.ly/plyr-chat) if you need help using Plyr or have questions about Plyr.
 
 ## Commenting
 
@@ -28,7 +27,7 @@ Please follow the instructions in our issue templates. Don't use github issues t
 
 ## Contributing features and documentation
 
-- If you want to add a feature or make critical changes, you may want to ensure that this is something we also want (so you don't waste your time). Ask us about this in the corresponding issue if there is one, or on [our Slack](https://bit.ly/plyr-chat) otherwise.
+- If you want to add a feature or make critical changes, you may want to ensure that this is something we also want (so you don't waste your time). Ask us about this in the corresponding issue.
 
 - Fork Plyr, and create a new branch in your fork, based on the **develop** branch
 
