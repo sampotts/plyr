@@ -1,6 +1,6 @@
 {
   "name": "plyr",
-  "version": "3.8.5",
+  "version": "3.8.6",
   "description": "Deprecated; security updates only. Use Video.js 10 for new projects (https://videojs.org). A simple, accessible and customizable HTML5, YouTube and Vimeo media player.",
   "keywords": [
     "DASH",
