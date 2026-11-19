@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(gh pr merge:*)",
+      "Bash(git push origin master:*)",
+      "Bash(git push origin uat:*)",
+      "Bash(git push origin HEAD:master:*)",
+      "Bash(git push origin HEAD:uat:*)",
+      "Bash(git push -u origin master:*)",
+      "Bash(git push -u origin uat:*)",
+      "Bash(git push --force origin master:*)",
+      "Bash(git push --force origin uat:*)",
+      "Bash(git push -f origin master:*)",
+      "Bash(git push -f origin uat:*)"
+    ]
+  }
+}
