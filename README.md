@@ -1,7 +1,9 @@
 # Plyr
 
 > [!IMPORTANT]
-> Upstream Plyr is deprecated and receives security updates only; its authors now build [Video.js 10](https://videojs.org?utm_source=plyr). This fork (`prad-n/plyr`) keeps the 3.8.5 code as a legacy codebase for an AI-delivery proof of concept (see [docs/poc/PLAN.md](docs/poc/PLAN.md)). The full user documentation (every option, method and event) is in the [upstream README](https://github.com/sampotts/plyr#readme) and in [CONTROLS.md](CONTROLS.md).
+> Upstream Plyr is deprecated and receives security updates only; its authors now build [Video.js 10](https://videojs.org?utm_source=plyr). This fork (`prad-n/plyr`) keeps the 3.8.5 code as a legacy codebase for an AI-delivery proof of concept (see [docs/poc/PLAN.md](docs/poc/PLAN.md)).
+
+**Using the player?** The user documentation (setup, options, API, events, shortcuts, fullscreen, preview thumbnails and more) is in [docs/USAGE.md](docs/USAGE.md), and the controls markup is in [CONTROLS.md](CONTROLS.md). This README is the overview for developers and agents.
 
 ## Purpose
 
@@ -9,17 +11,17 @@ Plyr is a browser media player library. You give it a `<video>`, an `<audio>`, o
 
 ## Tech stack
 
-| Area             | What the code uses                                                                                                                                                      |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Language         | Plain JavaScript ES modules in `src/js`, not type-checked. Types are hand-written in `src/js/plyr.d.ts`. TypeScript is used only in `tasks/` and `site/`.               |
-| Styles and icons | Sass (`src/sass`), PostCSS (custom properties resolved, Autoprefixer, cssnano). SVG icons (`src/sprite`) are combined into a sprite with svgstore and svgo.             |
-| Build            | `tasks/build.ts` runs [Vite+](https://viteplus.dev) (`vite-plus` 1.3.0) in library mode, with target `es2019`.                                                          |
-| Output (`dist/`) | `plyr.mjs` (ES module) and `plyr.js` (UMD), each plain or `polyfilled`, each with `.min` and source map; `plyr.css`; `plyr.svg`.                                        |
-| Runtime          | Node `^22.18.0 \|\| >=24.11.0` (`.nvmrc`: 22), pnpm 12.4.2 (enforced with `only-allow pnpm`).                                                                           |
-| Browsers         | `browserslist`: the last 2 versions of Chrome, Edge, Firefox, Safari, iOS and Opera. The polyfilled build adds `CustomEvent` and `URL`.                                 |
-| Runtime deps     | `rangetouch` (touch on range inputs), `custom-event-polyfill`, `url-polyfill`. `loadjs` is in `package.json` but not imported in `src/` (`TODO(TL): verify` it can go). |
-| Quality checks   | `vp lint` (Oxlint), `vp fmt` (Oxfmt), Stylelint, remark (link check), `tsc` for `tasks/` and `site/`. **No test framework and no tests.**                               |
-| External SDKs    | Loaded at runtime from `config.urls`: YouTube IFrame API, Vimeo Player API, Google IMA (ads).                                                                           |
+| Area             | What the code uses                                                                                                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Language         | Plain JavaScript ES modules in `src/js`, not type-checked. Types are hand-written in `src/js/plyr.d.ts`. TypeScript is used only in `tasks/` and `site/`.                                                 |
+| Styles and icons | Sass (`src/sass`), PostCSS (custom properties resolved, Autoprefixer, cssnano). SVG icons (`src/sprite`) are combined into a sprite with svgstore and svgo.                                               |
+| Build            | `tasks/build.ts` runs [Vite+](https://viteplus.dev) (`vite-plus` 1.3.0) in library mode, with target `es2019`.                                                                                            |
+| Output (`dist/`) | `plyr.mjs` (ES module) and `plyr.js` (UMD), each plain or `polyfilled`, each with `.min` and source map; `plyr.css`; `plyr.svg`.                                                                          |
+| Runtime          | Node `^22.18.0 \|\| >=24.11.0` (`.nvmrc`: 22), pnpm 12.4.2 (enforced with `only-allow pnpm`).                                                                                                             |
+| Browsers         | `browserslist`: the last 2 versions of Chrome, Edge, Firefox, Safari, iOS and Opera. The polyfilled build adds `CustomEvent` and `URL`.                                                                   |
+| Runtime deps     | `loadjs` (loads the YouTube, Vimeo and IMA SDKs; `src/js/utils/load-script.js`), `rangetouch` (touch on range inputs; `controls.js`), `custom-event-polyfill` and `url-polyfill` (polyfilled build only). |
+| Quality checks   | `vp lint` (Oxlint), `vp fmt` (Oxfmt), Stylelint, remark (link check), `tsc` for `tasks/` and `site/`. **No test framework and no tests.**                                                                 |
+| External SDKs    | Loaded at runtime from `config.urls`: YouTube IFrame API, Vimeo Player API, Google IMA (ads).                                                                                                             |
 
 ## Architecture
 
