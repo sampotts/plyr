@@ -28,6 +28,12 @@ export default defineConfig({
     trailingComma: 'all',
     sortTailwindcss: { stylesheet: './site/src/site.css' },
   },
+  // Smoke tests for the player source (pnpm test). jsdom provides the DOM; media playback is mocked in the tests.
+  test: {
+    environment: 'jsdom',
+    include: ['tests/**/*.test.js'],
+    setupFiles: ['tests/setup.js'],
+  },
   // Pre-commit (see .vite-hooks/pre-commit): lint and format the staged files.
   staged: {
     '*': 'vp check --fix --no-error-on-unmatched-pattern',
