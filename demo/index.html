@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plyr demo (local build)</title>
+    <!-- The local build from `pnpm build:player`, not the CDN. -->
+    <link rel="stylesheet" href="../dist/plyr.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 32px 16px;
+        background: #f4f5f7;
+        color: #1f2933;
+        font-family: system-ui, sans-serif;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .credit {
+        font-size: 0.875rem;
+        color: #52606d;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Plyr demo (local build)</h1>
+      <p>
+        Loads <code>dist/plyr.css</code>, <code>dist/plyr.js</code> and <code>dist/plyr.svg</code> from this repository.
+      </p>
+
+      <video id="player" playsinline controls>
+        <source src="https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4" type="video/mp4" />
+      </video>
+
+      <p class="credit">
+        Video: <a href="https://durian.blender.org/">Sintel</a> trailer, © copyright Blender Foundation,
+        <a href="https://durian.blender.org/">durian.blender.org</a>, licensed under
+        <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.
+      </p>
+    </main>
+
+    <script src="../dist/plyr.js"></script>
+    <script>
+      // Default controls; icons come from the local sprite instead of cdn.plyr.io.
+      window.player = new Plyr('#player', {
+        iconUrl: '../dist/plyr.svg',
+      });
+    </script>
+  </body>
+</html>

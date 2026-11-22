@@ -20,7 +20,7 @@ Plyr is a browser media player library. You give it a `<video>`, an `<audio>`, o
 | Runtime          | Node `^22.18.0 \|\| >=24.11.0` (`.nvmrc`: 22), pnpm 12.4.2 (enforced with `only-allow pnpm`).                                                                                                             |
 | Browsers         | `browserslist`: the last 2 versions of Chrome, Edge, Firefox, Safari, iOS and Opera. The polyfilled build adds `CustomEvent` and `URL`.                                                                   |
 | Runtime deps     | `loadjs` (loads the YouTube, Vimeo and IMA SDKs; `src/js/utils/load-script.js`), `rangetouch` (touch on range inputs; `controls.js`), `custom-event-polyfill` and `url-polyfill` (polyfilled build only). |
-| Quality checks   | `vp lint` (Oxlint), `vp fmt` (Oxfmt), Stylelint, remark (link check), `tsc` for `tasks/` and `site/`. **No test framework and no tests.**                                                                 |
+| Quality checks   | `vp lint` (Oxlint), `vp fmt` (Oxfmt), Stylelint, remark (link check), `tsc` for `tasks/` and `site/`. Smoke tests: Vitest through Vite+ (`vp test`) with jsdom, in `tests/`.                              |
 | External SDKs    | Loaded at runtime from `config.urls`: YouTube IFrame API, Vimeo Player API, Google IMA (ads).                                                                                                             |
 
 ## Architecture
@@ -62,15 +62,17 @@ pnpm build:player     # builds dist/ (JS bundles, plyr.css, plyr.svg)
 pnpm lint             # Oxlint, Stylelint and remark: what CI runs
 pnpm fmt:check        # formatting check (CI); pnpm fmt fixes it
 pnpm typecheck        # tsc for tasks/ and site/ only
+pnpm test             # Vitest smoke tests in tests/ (jsdom, media playback mocked)
+pnpm demo             # builds the player, serves http://localhost:3001/demo/
 pnpm dev              # plyr.io site at http://localhost:3000 (doesn't load Plyr)
 pnpm build            # build:player, then build:site
 ```
 
-CI (`.github/workflows/ci.yml`) runs `lint`, `fmt:check` and `typecheck` on every PR. It also runs `build:player` plus `node tasks/deploy.ts --dry-run` when `src/` or `tasks/` change, and `build:site` when `site/` changes.
+CI (`.github/workflows/ci.yml`) runs `lint`, `fmt:check`, `typecheck` and `test` on every PR. It also runs `build:player` plus `node tasks/deploy.ts --dry-run` when `src/` or `tasks/` change, and `build:site` when `site/` changes.
 
 ## Known quirks
 
-- **No tests and no demo.** There is no `test` script and there are no test files. Under pnpm 12, `pnpm test` exits 0 without running anything. The site doesn't use Plyr, so to see the player you need your own HTML page that loads `dist/plyr.css` and `dist/plyr.js`. `TODO(TL): verify` which test framework and demo page the stage 3 feature should add.
+- **Only smoke tests, and a separate demo.** `tests/plyr.smoke.test.js` has 5 smoke tests (setup on `<video>`, default controls, `play`, `pause`, event forwarding). They are not full coverage. jsdom can't play media, so the tests mock `play`, `pause`, `load` and `paused`, and `tests/setup.js` stubs `matchMedia`, `TextTrack` and `TextTrackCue`. The plyr.io site doesn't use Plyr; `demo/index.html` is the page that shows the player. It loads the local `dist/` build (including `iconUrl: '../dist/plyr.svg'`) and streams the Sintel trailer (CC BY 3.0) from blender.org, so it needs a network connection.
 - **Build output is frozen.** The output must keep matching the published 3.8.x CDN files (see `AGENTS.md`). Don't change the `es2019` target, the CSS toolchain or the pinned `cssnano`, `sass`, `postcss-merge-rules` and `postcss-minify-selectors` versions.
 - **Icons come from the CDN by default.** `iconUrl` defaults to `https://cdn.plyr.io/3.8.5/plyr.svg`, so a new icon in `src/sprite/` doesn't show until `iconUrl` points at the local `dist/plyr.svg`.
 - **Legacy browser code.** IE and old Edge checks remain (`utils/browser.js`, `browser.isIE` in listeners and controls), even though these browsers aren't targeted.

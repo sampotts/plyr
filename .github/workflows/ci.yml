@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Lint, formatting and types cover the whole repository and are cheap, so they always run.
+  # Lint, formatting, types and the smoke tests cover the whole repository and are cheap, so they always run.
   checks:
     runs-on: ubuntu-latest
     steps:
@@ -25,6 +25,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm fmt:check
       - run: pnpm typecheck
+      - run: pnpm test
 
   # Decide which parts of the repository a change touches. The player and the site share no code: the site is
   # deployed by Vercel and the player is released by release-please, so each is only built when it changed.
